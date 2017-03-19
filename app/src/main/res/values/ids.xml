@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="moiree_image_transformed" type="id"/>
+    <item name="moiree_image_fixed" type="id"/>
+    <item name="moiree_background" type="id"/>
+    <item name="moiree_touch_handler" type="id"/>
+
+    <item name="menu_holder" type="id"/>
+    <item name="snackbar_holder" type="id"/>
+
+    <item name="main_menu_moiree_image_card" type="id"/>
+    <item name="main_menu_moiree_image_background1" type="id"/>
+    <item name="main_menu_image_background2" type="id"/>
+
+    <item name="main_menu_colors_card" type="id"/>
+    <item name="main_menu_colors_background" type="id"/>
+
+    <item name="main_menu_transformation_card" type="id"/>
+    <item name="main_menu_settings" type="id"/>
+    <item name="main_menu_help" type="id"/>
+    <item name="main_menu_about" type="id"/>
+
+    <item name="imagecreator_radio_button" type="id"/>
+    <item name="imagecreator_config_holder" type="id"/>
+
+    <item name="moiree_image_imagecreators_list" type="id"/>
+    <item name="moiree_image_create_button" type="id"/>
+
+    <item name="transformation_setup_set_to_identity_button" type="id"/>
+    <item name="transformation_setup_tablayout" type="id"/>
+    <item name="transformation_setup_viewpager" type="id"/>
+    <item name="transformation_setup_rotation" type="id"/>
+    <item name="transformation_setup_scaling" type="id"/>
+    <item name="transformation_setup_translation" type="id"/>
+
+    <item name="input_settings_rotation_card" type="id"/>
+    <item name="input_settings_rotation_switch" type="id"/>
+    <item name="input_settings_translation_card" type="id"/>
+    <item name="input_settings_translation_switch" type="id"/>
+    <item name="input_settings_scaling_card" type="id"/>
+    <item name="input_settings_scaling_switch" type="id"/>
+
+    <item name="rotation_setup_card" type="id"/>
+
+    <item name="translation_setup_card" type="id"/>
+
+    <item name="scaling_setup_card" type="id"/>
+    <item name="scaling_setup_root_common" type="id"/>
+    <item name="scaling_setup_root_xy" type="id"/>
+    <item name="scaling_setup_common_scaling_switch" type="id"/>
+
+    <item name="value_setup_name" type="id"/>
+    <item name="value_setup_value" type="id"/>
+    <item name="value_setup_slider" type="id"/>
+    <item name="value_setup_increase_button" type="id"/>
+    <item name="value_setup_decrease_button" type="id"/>
+    <item name="value_setup_reset_button" type="id"/>
+
+    <item name="twodimen_transformation_value_setup_root_x" type="id"/>
+    <item name="twodimen_transformation_value_setup_root_y" type="id"/>
+    <item name="reset_button_x" type="id"/>
+    <item name="reset_button_y" type="id"/>
+    <item name="reset_button_both" type="id"/>
+
+    <item name="color_setup_swap" type="id"/>
+    <item name="color_setup_reset" type="id"/>
+
+    <item name="key_porter_duff_color" type="id"/>
+    <item name="key_porter_duff_mode" type="id"/>
+
+    <item name="fragment_moiree_view" type="id"/>
+    <item name="fragment_touch_handler" type="id"/>
+
+    <item name="input_method_switch" type="id"/>
+    <item name="input_method_description" type="id"/>
+    <item name="input_method_sensitivity_setup" type="id"/>
+
+    <item name="rotation_input_setup_fragment" type="id"/>
+    <item name="scaling_input_setup_fragment" type="id"/>
+    <item name="translation_input_setup_fragment" type="id"/>
+    <item name="menu_transparency_setup_fragment" type="id"/>
+
+    <item name="divider" type="id"/>
+
+    <item name="menu_transparency_setup_switch" type="id"/>
+    <item name="menu_transparency_setup_slider" type="id"/>
+    <item name="menu_transparency_setup_value_display" type="id"/>
+
+    <item name="horizontal_translation_setup" type="id"/>
+    <item name="vertical_translation_setup" type="id"/>
+
+    <item name="transformation_setup_scrollview" type="id"/>
+
+    <item name="rotation_setup" type="id"/>
+    <item name="scaling_setup" type="id"/>
+    <item name="translation_setup" type="id"/>
+
+    <item name="menu_opacity_card" type="id"/>
+
+    <item name="horizontal_scaling_setup" type="id"/>
+    <item name="vertical_scaling_setup" type="id"/>
+    <item name="common_scaling_setup" type="id"/>
+
+    <item name="reset_button_bar" type="id"/>
+
+    <item name="menu_title" type="id"/>
+
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/BaseMenuCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <de.lennartmeinhardt.android.moiree.util.ExpandableView
+        android:id="@+id/expandable_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:saveEnabled="false"
+        app:contentLayout="@layout/content_color_setup_card"
+        app:headerLayout="@layout/header_with_preview"/>
+
+</android.support.v7.widget.CardView>

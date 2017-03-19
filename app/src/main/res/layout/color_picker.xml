@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:layout_height="300dp"
+    tools:layout_width="match_parent"
+    tools:orientation="vertical"
+    tools:parentTag="LinearLayout">
+
+    <de.lennartmeinhardt.android.moiree.util.SeekPane
+        android:id="@+id/sat_val_selection"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true"
+        android:minHeight="50dp"
+        app:maxX="300"
+        app:maxY="300"
+        app:stepX="10"
+        app:stepY="10"
+        tools:background="@drawable/sat_val_mask"/>
+
+    <de.lennartmeinhardt.android.moiree.util.SeekPane
+        android:id="@+id/hue_selection2"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginTop="20dp"
+        app:maxX="360"
+        app:maxY="0"
+        app:stepX="10"
+        app:thumbDrawable="@drawable/thumb_rect"
+        tools:background="#f00"/>
+
+</merge>

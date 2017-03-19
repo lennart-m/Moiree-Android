@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <bool name="menu_transparency_default_enabled">false</bool>
+
+</resources>

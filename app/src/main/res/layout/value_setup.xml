@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:layout_height="wrap_content"
+    tools:layout_width="match_parent"
+    tools:parentTag="RelativeLayout">
+
+    <TextView
+        android:id="@id/value_setup_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/value_setup_decrease_button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@id/value_setup_decrease_button"
+        android:layout_toLeftOf="@id/value_setup_decrease_button"
+        android:layout_toStartOf="@id/value_setup_decrease_button"
+        android:gravity="center_vertical"
+        tools:text="Name"/>
+
+    <ImageButton
+        android:id="@id/value_setup_decrease_button"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/value_setup_value"
+        android:layout_alignTop="@id/value_setup_value"
+        android:layout_toLeftOf="@id/value_setup_value"
+        android:layout_toStartOf="@id/value_setup_value"
+        android:contentDescription="@string/decrease"
+        android:src="@drawable/ic_decrease"/>
+
+    <TextView
+        android:id="@id/value_setup_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/value_setup_increase_button"
+        android:layout_alignTop="@id/value_setup_increase_button"
+        android:layout_toLeftOf="@id/value_setup_increase_button"
+        android:layout_toStartOf="@id/value_setup_increase_button"
+        android:ems="5"
+        android:gravity="center"
+        tools:text="value"/>
+    <!-- TODO random ems value -->
+
+    <ImageButton
+        android:id="@id/value_setup_increase_button"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/increase"
+        android:src="@drawable/ic_increase"/>
+
+    <SeekBar
+        android:id="@id/value_setup_slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/value_setup_increase_button"
+        android:saveEnabled="false"/>
+
+</merge>

@@ -1,0 +1,17 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="root_menu_card_padding">10dp</dimen>
+
+    <dimen name="moiree_image_button_tile_size">5dp</dimen>
+
+    <dimen name="main_menu_max_width">300dp</dimen>
+    <dimen name="main_menu_max_height">500dp</dimen>
+    <dimen name="expanded_indicator_size">30dp</dimen>
+
+    <dimen name="checkerboard_image_default_square_size">6dp</dimen>
+    <dimen name="random_pixels_image_default_square_size">4dp</dimen>
+
+</resources>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ColorPicker">
+        <attr name="selectedColor" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="SeekPane">
+        <attr name="maxX" format="integer"/>
+        <attr name="posX" format="integer"/>
+        <attr name="stepX" format="integer"/>
+        <attr name="maxY" format="integer"/>
+        <attr name="posY" format="integer"/>
+        <attr name="stepY" format="integer"/>
+        <attr name="thumbDrawable" format="reference"/>
+    </declare-styleable>
+
+    <attr name="state_input_active" format="boolean"/>
+
+    <declare-styleable name="IntValueSetup">
+        <attr name="minValue" format="integer"/>
+        <attr name="maxValue" format="integer"/>
+        <attr name="value" format="integer"/>
+        <attr name="stepSize" format="integer"/>
+        <attr name="name" format="string"/>
+        <attr name="allowStepOutOfBounds" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="ExpandableView">
+        <attr name="expanded" format="boolean"/>
+        <attr name="headerLayout" format="reference"/>
+        <attr name="contentLayout" format="reference"/>
+    </declare-styleable>
+
+</resources>

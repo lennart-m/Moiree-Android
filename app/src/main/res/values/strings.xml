@@ -1,0 +1,80 @@
+<resources>
+    <string name="app_name">Moir\u00e9</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="first_start_message">Welcome to the Moir\u00e9 App!</string>
+    <string name="need_help_button_text">Need help?</string>
+    <string name="image">Image</string>
+    <string name="colors">Colors</string>
+    <string name="transformation">Transformation</string>
+    <string name="about">About</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="help">Help</string>
+    <string name="swap_colors">Swap</string>
+    <string name="title_colors">Colors</string>
+    <string name="create_image">Create image</string>
+    <string name="image_creator_checkerboard">Checkerboard</string>
+    <string name="image_creator_random_pixels">Random pixels</string>
+    <string name="background">Background</string>
+    <string name="foreground">Foreground</string>
+    <string name="reset_to_default">Reset to default</string>
+    <string name="reset_transformation">Reset all</string>
+    <string name="reset">Reset</string>
+    <string name="input">Input</string>
+    <string name="settings">Settings</string>
+
+    <string name="rotation">Rotation</string>
+    <string name="degrees">Degrees</string>
+    <string name="translations">Translations</string>
+    <string name="translation_x">Horizontal</string>
+    <string name="translation_y">Vertical</string>
+    <string name="scalings">Scalings</string>
+    <string name="use_common_scaling">Scale x and y equally</string>
+    <string name="common_scaling">Common scaling</string>
+    <string name="horizontal">Horizontal</string>
+    <string name="vertical">Vertical</string>
+
+    <string name="input_sensitivity_name">Sensitivity</string>
+    <string name="rotation_input_name">Rotation input</string>
+    <string name="rotation_input_description">Drag two fingers across the screen in order to rotate the image.</string>
+
+    <string name="reset_translation_x">hor</string>
+    <string name="reset_translation_y">ver</string>
+    <string name="reset_translation_both">both</string>
+    <string name="click_to_open_menu">Click anywhere to open the menu</string>
+
+    <string name="menu_transparency_title">Transparent menus</string>
+    <string name="menu_transparency_value_name">Opacity</string>
+
+    <string name="rotation_value_formatter">%1$.2f\u2009°</string>
+    <string name="translation_value_formatter">%1$.1f\u2009px</string>
+    <string name="scaling_value_formatter">%1$.2f\u2009%%</string>
+
+    <string name="percentage_formatter">%1$d\u2009%%</string>
+
+    <string name="rotation_sensitivity_formatter">%1$.0f\u2009%%</string>
+    <string name="scaling_sensitivity_formatter">%1$.0f\u2009%%</string>
+    <string name="translation_sensitivity_formatter">%1$.0f\u2009%%</string>
+
+    <string name="increase">Increase</string>
+    <string name="decrease">Decrease</string>
+    <string name="reset_both">Reset both</string>
+    <string name="reset_vertical">Reset vertical</string>
+    <string name="reset_horizontal">Reset horizontal</string>
+    <string name="translation_input_name">Translation input</string>
+    <string name="translation_input_description">Move one finger across the screen to change the image\'s translation.</string>
+    <string name="scaling_input_description">Drag two fingers across the screen in order to scale the image.</string>
+    <string name="scaling_input_name">Scaling input</string>
+    <string name="settings_animations_description">Animate changes in transformation and colors</string>
+    <string name="settings_animations_title">Animations</string>
+    <string name="pixel_size">Pixel size</string>
+    <string name="density">Density</string>
+    <string name="checkerboard_title">Checkerboard</string>
+
+    <string name="integer_pixel_formatter">%1$d\u2009px</string>
+    <string name="square_size">Square size</string>
+
+    <string name="input_methods">Touch input</string>
+</resources>

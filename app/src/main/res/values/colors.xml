@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<color name="colorPrimary">@android:color/transparent</color>-->
+    <color name="colorPrimary">#618ca5</color>
+    <color name="menuBackground">#cfff</color>
+    <color name="menuButtonBackgroundTint">#d1d8dc</color>
+    <color name="menuButtonText">#062f48</color>
+    <color name="menuText">@color/menuButtonBackgroundTint</color>
+    <!--<color name="colorPrimaryDark">@android:color/transparent</color>-->
+    <color name="colorPrimaryDark">#2d556d</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="lightred">#fbb</color>
+    <color name="lightorange">#fca</color>
+    <color name="lightyellow">#ffb</color>
+    <color name="lightgreen">#bfb</color>
+    <color name="lightblue">#abf</color>
+
+    <color name="lightgrey">#bbb</color>
+    <color name="grey">#777</color>
+    <color name="darkgrey">#333</color>
+
+    <color name="textPrimary">#444</color>
+    <color name="textSecondary">#444</color>
+    <color name="textTertiary">#444</color>
+
+    <color name="root_menu_card_background">#eee</color>
+
+    <color name="color_picker_default">#000</color>
+
+</resources>

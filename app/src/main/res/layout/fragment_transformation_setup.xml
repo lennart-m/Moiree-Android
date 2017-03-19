@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/RootMenuCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/MenuHeader"
+            android:text="@string/transformation"/>
+
+        <ScrollView
+            android:id="@id/transformation_setup_scrollview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <fragment
+                    android:name="de.lennartmeinhardt.android.moiree.menu.transformation.RotationSetupFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:tag="rotationSetup"
+                    tools:layout="@layout/fragment_rotation_setup"/>
+
+                <fragment
+                    android:name="de.lennartmeinhardt.android.moiree.menu.transformation.ScalingSetupFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:tag="scalingSetup"
+                    tools:layout="@layout/fragment_scaling_setup"/>
+
+                <fragment
+                    android:name="de.lennartmeinhardt.android.moiree.menu.transformation.TranslationSetupFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:tag="translationSetup"
+                    tools:layout="@layout/fragment_translation_setup"/>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <Button
+            android:id="@id/transformation_setup_set_to_identity_button"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/reset_transformation"/>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
