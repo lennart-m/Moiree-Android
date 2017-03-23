@@ -106,4 +106,10 @@
 
     <item name="menu_title" type="id"/>
 
+    <item name="expandable_view_header" type="id"/>
+    <item name="expandable_view_content" type="id"/>
+
+    <item name="checkerboard_image_setup" type="id"/>
+    <item name="random_pixels_image_setup" type="id"/>
+
 </resources>

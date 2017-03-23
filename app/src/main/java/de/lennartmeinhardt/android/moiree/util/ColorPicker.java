@@ -5,20 +5,19 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import de.lennartmeinhardt.android.moiree.R;
 
 // TODO mirror sat-val-selection in RTL mode
 // TODO interface colorPicker hat getselected und setselected, außerdem add und remove listener
 // TODO dies wird HsbColorPicker
-public class ColorPicker extends LinearLayout {
+public class ColorPicker extends RelativeLayout {
 
     private final float[] tmpHsv = new float[3];
 
@@ -71,7 +70,6 @@ public class ColorPicker extends LinearLayout {
 
     private void inflateColorPicker(Context context) {
         inflate(context, R.layout.color_picker, this);
-        setOrientation(VERTICAL);
 
         initializeHueSelection();
         initializeSatValSelection();
@@ -114,13 +112,7 @@ public class ColorPicker extends LinearLayout {
     }
 
     private void initializeHueSelection() {
-        hueSelection = (SeekPane) findViewById(R.id.hue_selection2);
-
-        // initialize rainbow background for the hue selection
-        int[] colorSteps = {Color.RED, Color.YELLOW, Color.GREEN, Color.CYAN, Color.BLUE, Color.MAGENTA, Color.RED};
-        GradientDrawable rainbow = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colorSteps);
-        ViewCompat.setBackground(hueSelection, rainbow);
-
+        hueSelection = (SeekPane) findViewById(R.id.hue_selection);
         hueSelection.setOnPosition2DChangeListener(new SeekPane.OnPosition2DChangeListener.Adapter() {
             @Override
             public void onPositionXChanged(SeekPane seekPane, int positionX, boolean fromUser) {

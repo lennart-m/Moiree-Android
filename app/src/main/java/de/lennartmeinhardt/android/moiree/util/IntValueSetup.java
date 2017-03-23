@@ -17,21 +17,23 @@ public class IntValueSetup extends BaseValueSetup {
 
     private int minValue = 0;
     private int maxValue = 100;
-    private int stepSize = 5;
+    private int stepSize = 1;
     private int value = 0;
     private boolean allowStepOutOfBounds = false;
 
-    private IntStringConverter intStringConverter;
+    private TextFormatter textFormatter;
 
-    private OnIntValueUpdatedListener listener;
+    private OnValueChangedListener onValueChangedListener;
 
     private boolean isSeekBarInputActive;
+    private boolean decreaseButtonInputActive;
+    private boolean increaseButtonInputActive;
 
     public IntValueSetup(Context context) {
         super(context);
 
         setMaxValue(100);
-        setStepSize(5);
+        setStepSize(1);
         setAllowStepOutOfBounds(true);
         setValueInternal(0, true);
 
@@ -63,6 +65,16 @@ public class IntValueSetup extends BaseValueSetup {
 
             String name = a.getString(R.styleable.IntValueSetup_name);
             valueNameTextView.setText(name);
+
+            final int formatterId = a.getResourceId(R.styleable.IntValueSetup_textFormatter, 0);
+            if(formatterId != 0) {
+                setTextFormatter(new TextFormatter() {
+                    @Override
+                    public String formatInt(int value) {
+                        return getResources().getString(formatterId, value);
+                    };
+                });
+            }
         } finally {
             a.recycle();
         }
@@ -85,21 +97,17 @@ public class IntValueSetup extends BaseValueSetup {
         valueSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser) {
-                    setValueInternal(progress + minValue, false);
-                }
+                setValueInternal(progress + minValue, false);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 isSeekBarInputActive = true;
-                startUserInput();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 isSeekBarInputActive = false;
-                stopUserInput();
             }
         });
     }
@@ -108,9 +116,7 @@ public class IntValueSetup extends BaseValueSetup {
         return stepSize;
     }
     public void setStepSize(int stepSize) {
-        stepSize = Math.abs(stepSize);
         this.stepSize = stepSize;
-        valueSeekbar.setKeyProgressIncrement(stepSize);
     }
 
     public int getValue() {
@@ -148,8 +154,8 @@ public class IntValueSetup extends BaseValueSetup {
         if(forceUpdate || this.value != value) {
             this.value = value;
             updateUI();
-            if(listener != null)
-                listener.onIntValueSelected(this, value);
+            if(onValueChangedListener != null)
+                onValueChangedListener.onValueChanged(this, value, isUserInputActive());
         }
     }
 
@@ -173,36 +179,25 @@ public class IntValueSetup extends BaseValueSetup {
             valueSeekbar.setProgress(value - minValue);
     }
 
-    private void startUserInput() {
-        if(listener != null)
-            listener.onStartTrackingInput(this);
-    }
-    private void stopUserInput() {
-        if(listener != null)
-            listener.onStopTrackingInput(this);
-    }
-
-    private void stepValueByUser(int stepSize) {
-        if(! isSeekBarInputActive)
-            startUserInput();
-
-        setValueInternal(value + stepSize, false);
-
-        if(! isSeekBarInputActive)
-            stopUserInput();
-    }
-
     protected void onIncreaseButtonClicked() {
-        stepValueByUser(stepSize);
+        increaseButtonInputActive = true;
+        stepValue(stepSize, false);
+        increaseButtonInputActive = false;
     }
 
     protected void onDecreaseButtonClicked() {
-        stepValueByUser(- stepSize);
+        decreaseButtonInputActive = true;
+        stepValue(-stepSize, false);
+        decreaseButtonInputActive = false;
+    }
+
+    private void stepValue(int stepSize, boolean forceUpdate) {
+        setValueInternal(value + stepSize, forceUpdate);
     }
 
     private String valueToText(int value) {
-        if(intStringConverter != null)
-            return intStringConverter.intToText(value);
+        if(textFormatter != null)
+            return textFormatter.formatInt(value);
         else
             return Integer.toString(value);
     }
@@ -216,46 +211,19 @@ public class IntValueSetup extends BaseValueSetup {
     }
 
     public boolean isUserInputActive() {
-        return isSeekBarInputActive;
+        return isSeekBarInputActive || increaseButtonInputActive || decreaseButtonInputActive;
     }
 
-    public void setOnIntValueSelectedListener(OnIntValueUpdatedListener listener) {
-        this.listener = listener;
+    public void setOnValueChangedListener(OnValueChangedListener onValueChangedListener) {
+        this.onValueChangedListener = onValueChangedListener;
     }
 
-    public void setIntStringConverter(IntStringConverter intStringConverter) {
-        this.intStringConverter = intStringConverter;
+    public TextFormatter getTextFormatter() {
+        return textFormatter;
+    }
+    public void setTextFormatter(TextFormatter textFormatter) {
+        this.textFormatter = textFormatter;
         updateValueText();
-    }
-
-    public interface OnIntValueUpdatedListener {
-        void onIntValueSelected(IntValueSetup intValueSetup, int value);
-
-        void onStartTrackingInput(IntValueSetup intValueSetup);
-        void onStopTrackingInput(IntValueSetup intValueSetup);
-
-        class Adapter implements OnIntValueUpdatedListener {
-            @Override
-            public void onIntValueSelected(IntValueSetup intValueSetup, int value) {
-            }
-
-            @Override
-            public void onStartTrackingInput(IntValueSetup intValueSetup) {
-            }
-
-            @Override
-            public void onStopTrackingInput(IntValueSetup intValueSetup) {
-            }
-        }
-    }
-
-    // TODO das hier alternativ zum obigen. fromUser ist einfach isUserInputActive, und das wird auch in den buttons gesetzt.
-    public interface OnIntValueChangedListener {
-        void onIntValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser);
-    }
-
-    public interface IntStringConverter {
-        String intToText(int value);
     }
 
     @Override
@@ -275,5 +243,12 @@ public class IntValueSetup extends BaseValueSetup {
         super.onRestoreInstanceState(superState);
         int value = instanceState.getInt(KEY_VALUE);
         setValueInternal(value, true);
+    }
+    public interface OnValueChangedListener {
+        void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser);
+    }
+
+    public interface TextFormatter {
+        String formatInt(int value);
     }
 }

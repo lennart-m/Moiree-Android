@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/expandable_view_header"
+    style="@style/ExpandableHeader"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/header_preview"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/color_preview_mask"
+        android:contentDescription="@null"
+        android:scaleType="center"/>
+
+    <ProgressBar
+        android:id="@+id/header_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/header_preview"
+        android:layout_alignEnd="@id/header_preview"
+        android:layout_alignLeft="@id/header_preview"
+        android:layout_alignRight="@id/header_preview"
+        android:layout_alignStart="@id/header_preview"
+        android:layout_alignTop="@id/header_preview"
+        android:indeterminate="true"/>
+
+
+    <TextView
+        android:id="@+id/header_title"
+        style="@style/ExpandableHeaderTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/header_preview"
+        android:layout_alignTop="@id/header_preview"
+        android:layout_toLeftOf="@id/header_preview"
+        android:layout_toStartOf="@id/header_preview"
+        android:gravity="center_vertical"
+        tools:text="Title"/>
+
+</RelativeLayout>

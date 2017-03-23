@@ -1,17 +1,69 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!--<?xml version="1.0" encoding="utf-8"?>-->
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/BaseMenuCard"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:clipChildren="false">
+    android:layout_height="wrap_content">
 
     <de.lennartmeinhardt.android.moiree.util.ExpandableView
-        android:id="@+id/expandable_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:contentLayout="@layout/content_checkerboard_image_setup"
-        app:headerLayout="@layout/header_with_preview"/>
+        android:id="@+id/expandable_view"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+
+            <include
+                layout="@layout/header_with_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/expandable_view_header"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:id="@id/expandable_view_content"
+                android:layout_height="wrap_content">
+
+                <de.lennartmeinhardt.android.moiree.util.IntValueSetup
+                    android:id="@+id/pixel_size_value_setup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:allowStepOutOfBounds="false"
+                    app:textFormatter="@string/integer_pixel_formatter"
+                    app:maxValue="100"
+                    app:minValue="1"
+                    app:name="@string/square_size"/>
+
+                <Button
+                    android:id="@+id/reset_button"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@id/pixel_size_value_setup"
+                    android:text="@string/reset"/>
+
+                <ImageButton
+                    android:id="@+id/create_button"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/reset_button"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignTop="@id/reset_button"
+                    android:layout_below="@id/pixel_size_value_setup"
+                    android:contentDescription="@string/create_image"
+                    android:src="@drawable/ic_checkmark"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </de.lennartmeinhardt.android.moiree.util.ExpandableView>
 
 </android.support.v7.widget.CardView>

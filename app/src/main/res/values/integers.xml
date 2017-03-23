@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <integer name="translation_range">400</integer>
-
-    <integer name="rotation_steps_per_degree">4</integer>
-    <integer name="rotation_value_range">1440</integer>
+    <integer name="rotation_min_degrees">-180</integer>
+    <integer name="rotation_max_degrees">180</integer>
+    <integer name="rotation_default_degrees">0</integer>
 
     <integer name="scaling_min_percent">50</integer>
     <integer name="scaling_max_percent">200</integer>
-    <integer name="scaling_steps_per_percent">4</integer>
+    <integer name="scaling_default_percent">100</integer>
 
     <integer name="translation_min_pixels">-200</integer>
     <integer name="translation_max_pixels">200</integer>
-    <integer name="translation_steps_per_pixel">2</integer>
-
-    <integer name="random_pixels_image_default_density_percents">20</integer>
+    <integer name="translation_default_pixels">0</integer>
 
     <integer name="sensitivity_min_percents">0</integer>
     <integer name="sensitivity_max_percents">200</integer>
-    <integer name="sensitivity_default_value_percents">20</integer>
-    <integer name="sensitivity_step_size_percents">1</integer>
+    <integer name="sensitivity_default_percents">20</integer>
 
-    <integer name="menu_opacity_step_size_percents">1</integer>
     <integer name="menu_opacity_default_percents">90</integer>
     <integer name="menu_opacity_min_percents">40</integer>
     <integer name="menu_opacity_max_percents">100</integer>
     
     <integer name="immersive_mode_delay_millis">2000</integer>
+
+    <integer name="indicator_arrow_collapsed_rotation">-90</integer>
+
+    <integer name="random_pixels_density_default_percents">20</integer>
 
 </resources>

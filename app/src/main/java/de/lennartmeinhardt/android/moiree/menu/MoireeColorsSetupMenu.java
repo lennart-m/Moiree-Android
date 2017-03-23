@@ -66,9 +66,12 @@ public class MoireeColorsSetupMenu extends MenuFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_moiree_colors_setup, container, false);
+        return inflater.inflate(R.layout.fragment_moiree_colors_setup, container, false);
+    }
 
-        Button swapColorsButton = (Button) rootView.findViewById(R.id.color_setup_swap);
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Button swapColorsButton = (Button) view.findViewById(R.id.color_setup_swap);
         swapColorsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,7 +79,7 @@ public class MoireeColorsSetupMenu extends MenuFragment {
             }
         });
 
-        Button resetToDefaultButton = (Button) rootView.findViewById(R.id.color_setup_reset);
+        Button resetToDefaultButton = (Button) view.findViewById(R.id.color_setup_reset);
         resetToDefaultButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,16 +87,14 @@ public class MoireeColorsSetupMenu extends MenuFragment {
             }
         });
 
-        initializeForegroundColorSetup(rootView);
-        initializeBackgroundColorSetup(rootView);
+        initializeForegroundColorSetup(view);
+        initializeBackgroundColorSetup(view);
 
         boolean foregroundSetupExpanded = preferences.getBoolean(KEY_FOREGROUND_SETUP_EXPANDED, false);
         boolean backgroundSetupExpanded = preferences.getBoolean(KEY_BACKGROUND_SETUP_EXPANDED, false);
 
         foregroundSetupExpandable.setExpanded(foregroundSetupExpanded);
         backgroundSetupExpandable.setExpanded(backgroundSetupExpanded);
-
-        return rootView;
     }
 
     @Override
@@ -113,7 +114,7 @@ public class MoireeColorsSetupMenu extends MenuFragment {
     private void initializeForegroundColorSetup(View rootView) {
         View foregroundCard = rootView.findViewById(R.id.foreground_color_setup_card);
         foregroundSetupExpandable = (ExpandableView) foregroundCard.findViewById(R.id.expandable_view);
-        View header = foregroundSetupExpandable.findViewById(R.id.expandable_view_header);
+        View header = foregroundSetupExpandable.getHeaderView();
         header.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,11 +122,11 @@ public class MoireeColorsSetupMenu extends MenuFragment {
                 foregroundSetupExpandable.toggleExpanded();
             }
         });
-        TextView title = (TextView) header.findViewById(R.id.expandable_view_header_title);
+        TextView title = (TextView) header.findViewById(R.id.header_title);
         title.setText(R.string.foreground);
-        foregroundPreview = (ImageView) header.findViewById(R.id.expandable_view_header_preview);
+        foregroundPreview = (ImageView) header.findViewById(R.id.header_preview);
         foregroundPreview.setImageResource(R.drawable.color_preview_mask);
-        foregroundColorPicker = (ColorPicker) foregroundSetupExpandable.findViewById(R.id.color_picker);
+        foregroundColorPicker = (ColorPicker) foregroundSetupExpandable.getContentView().findViewById(R.id.color_picker);
         foregroundColorPicker.setOnColorSelectionChangeListener(new ColorPicker.OnColorSelectionChangeListener() {
             @Override
             public void onColorSelectionChanged(ColorPicker colorPicker, int color, boolean fromUser) {
@@ -138,7 +139,7 @@ public class MoireeColorsSetupMenu extends MenuFragment {
     private void initializeBackgroundColorSetup(View rootView) {
         View backgroundCard = rootView.findViewById(R.id.background_color_setup_card);
         backgroundSetupExpandable = (ExpandableView) backgroundCard.findViewById(R.id.expandable_view);
-        View header = backgroundSetupExpandable.findViewById(R.id.expandable_view_header);
+        View header = backgroundSetupExpandable.getHeaderView();
         header.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,11 +147,11 @@ public class MoireeColorsSetupMenu extends MenuFragment {
                 backgroundSetupExpandable.toggleExpanded();
             }
         });
-        TextView title = (TextView) header.findViewById(R.id.expandable_view_header_title);
+        TextView title = (TextView) header.findViewById(R.id.header_title);
         title.setText(R.string.background);
-        backgroundPreview = (ImageView) header.findViewById(R.id.expandable_view_header_preview);
+        backgroundPreview = (ImageView) header.findViewById(R.id.header_preview);
         backgroundPreview.setImageResource(R.drawable.color_preview_mask);
-        backgroundColorPicker = (ColorPicker) backgroundSetupExpandable.findViewById(R.id.color_picker);
+        backgroundColorPicker = (ColorPicker) backgroundSetupExpandable.getContentView().findViewById(R.id.color_picker);
         backgroundColorPicker.setOnColorSelectionChangeListener(new ColorPicker.OnColorSelectionChangeListener() {
             @Override
             public void onColorSelectionChanged(ColorPicker colorPicker, int color, boolean fromUser) {

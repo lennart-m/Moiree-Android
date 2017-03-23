@@ -15,14 +15,11 @@ import android.widget.TextView;
 import de.lennartmeinhardt.android.moiree.Expandable;
 import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.imaging.CheckerboardImageCreator;
-import de.lennartmeinhardt.android.moiree.imaging.MoireeImageCreator;
 import de.lennartmeinhardt.android.moiree.imaging.RescaledDrawable;
 import de.lennartmeinhardt.android.moiree.util.ExpandableView;
 import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
 
-public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragment implements Expandable {
-
-    private CheckerboardImageCreator imageCreator;
+public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragment<CheckerboardImageCreator> implements Expandable {
 
     private ExpandableView expandableView;
 
@@ -32,27 +29,27 @@ public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragmen
 
     private RescaledDrawable previewDrawable;
 
-    private IntValueSetup pixelSizeSetup;
+    private IntValueSetup squareSizeSetup;
+    private Button resetButton;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        defSquareSize = getResources().getDimensionPixelSize(R.dimen.checkerboard_image_default_square_size);
-        imageCreator = new CheckerboardImageCreator(defSquareSize);
-
-        super.onCreate(savedInstanceState);
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_checkerboard_image_setup, container, false);
+        return inflater.inflate(R.layout.fragment_checkerboard_image_setup, container, false);
+    }
 
-        expandableView = (ExpandableView) rootView.findViewById(R.id.expandable_view);
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        expandableView = (ExpandableView) view.findViewById(R.id.expandable_view);
 
-        pixelSizeSetup = (IntValueSetup) rootView.findViewById(R.id.pixel_size_value_setup);
+        initializeHeaderView();
+        initializeContentView();
+    }
 
-        View header = expandableView.findViewById(R.id.expandable_view_header);
-        header.setOnClickListener(new View.OnClickListener() {
+    private void initializeHeaderView() {
+        View headerView = expandableView.getHeaderView();
+        headerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 beginMenuBoundsTransition();
@@ -60,7 +57,48 @@ public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragmen
             }
         });
 
-        ImageButton applyButton = (ImageButton) rootView.findViewById(R.id.create_button);
+        TextView titleView = (TextView) headerView.findViewById(R.id.header_title);
+        titleView.setText(R.string.checkerboard_title);
+
+        preview = (ImageView) headerView.findViewById(R.id.header_preview);
+        preview.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if(Build.VERSION.SDK_INT < 16)
+                    preview.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                else
+                    preview.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                initializePreviewDrawable();
+            }
+        });
+    }
+
+    private void initializeContentView() {
+        View contentView = expandableView.getContentView();
+
+        resetButton = (Button) contentView.findViewById(R.id.reset_button);
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                squareSizeSetup.setValue(defSquareSize);
+            }
+        });
+
+        squareSizeSetup = (IntValueSetup) contentView.findViewById(R.id.pixel_size_value_setup);
+        squareSizeSetup.setOnValueChangedListener(new IntValueSetup.OnValueChangedListener() {
+            @Override
+            public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
+                imageCreator.setSquareSizeInPixels(value);
+                if (previewDrawable != null) {
+                    previewDrawable.setScaleX(value);
+                    previewDrawable.setScaleY(value);
+                }
+                updateUI(true);
+            }
+        });
+
+        ImageButton applyButton = (ImageButton) contentView.findViewById(R.id.create_button);
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,50 +106,7 @@ public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragmen
             }
         });
 
-        TextView titleView = (TextView) header.findViewById(R.id.expandable_view_header_title);
-        titleView.setText(R.string.checkerboard_title);
-
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if(Build.VERSION.SDK_INT < 16)
-                    rootView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                else
-                    rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-                initializePreviewDrawable();
-            }
-        });
-
-        Button resetButton = (Button) rootView.findViewById(R.id.reset_button);
-        resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pixelSizeSetup.setValue(defSquareSize);
-            }
-        });
-
-        preview = (ImageView) rootView.findViewById(R.id.expandable_view_header_preview);
-
-        pixelSizeSetup.setIntStringConverter(new IntValueSetup.IntStringConverter() {
-            @Override
-            public String intToText(int value) {
-                return getResources().getString(R.string.integer_pixel_formatter, value);
-            }
-        });
-        pixelSizeSetup.setOnIntValueSelectedListener(new IntValueSetup.OnIntValueUpdatedListener.Adapter() {
-            @Override
-            public void onIntValueSelected(IntValueSetup intValueSetup, int value) {
-                imageCreator.setSquareSizeInPixels(value);
-                if(previewDrawable != null) {
-                    previewDrawable.setScaleX(value);
-                    previewDrawable.setScaleY(value);
-                }
-            }
-        });
-        pixelSizeSetup.setValue(imageCreator.getSquareSizeInPixels());
-
-        return rootView;
+        updateUI(false);
     }
 
     private void initializePreviewDrawable() {
@@ -122,9 +117,19 @@ public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragmen
         preview.setImageDrawable(previewDrawable);
     }
 
+    private void updateUI(boolean fromValueSetup) {
+        int squareSize = imageCreator.getSquareSizeInPixels();
+
+        resetButton.setEnabled(squareSize != defSquareSize);
+
+        if(! fromValueSetup)
+            squareSizeSetup.setValue(squareSize);
+    }
+
     @Override
-    MoireeImageCreator getMoireeImageCreator() {
-        return imageCreator;
+    CheckerboardImageCreator initializeImageCreator() {
+        defSquareSize = getResources().getDimensionPixelSize(R.dimen.checkerboard_image_default_square_size);
+        return new CheckerboardImageCreator(defSquareSize);
     }
 
     @Override

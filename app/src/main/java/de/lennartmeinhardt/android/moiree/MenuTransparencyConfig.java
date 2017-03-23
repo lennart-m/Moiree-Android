@@ -1,7 +1,6 @@
 package de.lennartmeinhardt.android.moiree;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,18 +13,11 @@ public class MenuTransparencyConfig {
     private final List<OnMenuTransparencyChangedListener> onMenuTransparencyChangedListeners = new ArrayList<>();
 
     private boolean transparencyEnabled;
-    private final float defaultMenuAlpha;
     private float menuAlpha;
 
 
-    public MenuTransparencyConfig(Resources resources) {
-        this(resources.getBoolean(R.bool.menu_transparency_default_enabled),
-                resources.getInteger(R.integer.menu_opacity_default_percents) / 100f);
-    }
-
     public MenuTransparencyConfig(boolean transparencyEnabled, float defaultMenuAlpha) {
         this.transparencyEnabled = transparencyEnabled;
-        this.defaultMenuAlpha = defaultMenuAlpha;
         this.menuAlpha = defaultMenuAlpha;
     }
 
@@ -60,10 +52,6 @@ public class MenuTransparencyConfig {
             for(OnMenuTransparencyChangedListener onMenuTransparencyChangedListener : onMenuTransparencyChangedListeners)
                 onMenuTransparencyChangedListener.onMenuTransparencyChanged(transparencyEnabled, menuAlpha);
         }
-    }
-
-    public void setMenuAlphaToDefault() {
-        setMenuAlpha(defaultMenuAlpha);
     }
 
     public void addMenuTransparencyListener(OnMenuTransparencyChangedListener onMenuTransparencyChangedListener) {

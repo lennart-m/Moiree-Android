@@ -11,6 +11,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import de.lennartmeinhardt.android.moiree.Expandable;
 import de.lennartmeinhardt.android.moiree.MoireeInputMethods;
 import de.lennartmeinhardt.android.moiree.MoireeInputMethodsHolder;
 import de.lennartmeinhardt.android.moiree.R;
@@ -19,188 +20,216 @@ import de.lennartmeinhardt.android.moiree.menu.transformation.TransformationSetu
 import de.lennartmeinhardt.android.moiree.util.ExpandableView;
 import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
 
-public class InputMethodsSetupFragment extends MenuFragment {
+public class InputMethodsSetupFragment extends MenuFragment implements Expandable {
 
     private MoireeInputMethods moireeInputMethods;
+
+    private ExpandableView expandableView;
 
     private IntValueSetup rotationSensitivitySetup;
     private IntValueSetup scalingSensitivitySetup;
     private IntValueSetup translationSensitivitySetup;
 
-    private ExpandableView rotationSetupRoot;
-    private ExpandableView scalingSetupRoot;
-    private ExpandableView translationSetupRoot;
-
-    private Button rotationSensitivityResetButton;
-    private Button scalingSensitivityResetButton;
-    private Button translationSensitivityResetButton;
+    private ExpandableView rotationSetupExpandable;
+    private ExpandableView scalingSetupExpandable;
+    private ExpandableView translationSetupExpandable;
 
     private Switch rotationInputSwitch;
     private Switch scalingInputSwitch;
     private Switch translationInputSwitch;
 
+    private Button rotationSensitivityResetButton;
+    private Button scalingSensitivityResetButton;
+    private Button translationSensitivityResetButton;
 
-    private final IntValueSetup.OnIntValueUpdatedListener sensitivitySetter = new IntValueSetup.OnIntValueUpdatedListener.Adapter() {
-        @Override
-        public void onIntValueSelected(IntValueSetup intValueSetup, int value) {
-            float sensitivity = valueToSensitivity(value);
-            if(intValueSetup == rotationSensitivitySetup)
-                moireeInputMethods.setRotationSensitivity(sensitivity);
-            else if(intValueSetup == scalingSensitivitySetup)
-                moireeInputMethods.setScalingSensitivity(sensitivity);
-            else if(intValueSetup == translationSensitivitySetup)
-                moireeInputMethods.setTranslationSensitivity(sensitivity);
-        }
-    };
+    private int defaultSensitivityPercents;
 
-    private final MoireeInputMethods.MoireeInputMethodListener uiUpdater = new MoireeInputMethods.MoireeInputMethodListener.Adapter() {
-        @Override
-        public void onRotationInputMethodChanged(boolean enabled, float sensitivity) {
-            int value = sensitivityToValue(sensitivity);
-            if(! rotationSensitivitySetup.isUserInputActive())
-                rotationSensitivitySetup.setValue(value);
 
-            rotationInputSwitch.setChecked(enabled);
-            rotationSetupRoot.setExpanded(enabled);
-        }
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        @Override
-        public void onScalingInputMethodChanged(boolean enabled, float sensitivity) {
-            int value = sensitivityToValue(sensitivity);
-            if(! scalingSensitivitySetup.isUserInputActive())
-                scalingSensitivitySetup.setValue(value);
-
-            scalingInputSwitch.setChecked(enabled);
-            scalingSetupRoot.setExpanded(enabled);
-        }
-
-        @Override
-        public void onTranslationInputMethodChanged(boolean enabled, float sensitivity) {
-            int value = sensitivityToValue(sensitivity);
-            if(! translationSensitivitySetup.isUserInputActive())
-                translationSensitivitySetup.setValue(value);
-
-            translationInputSwitch.setChecked(enabled);
-            translationSetupRoot.setExpanded(enabled);
-        }
-    };
-
-    private final View.OnClickListener sensitivityResetter = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            beginMenuBoundsTransition();
-            if(v == rotationSensitivityResetButton)
-                moireeInputMethods.setRotationSensitivityToDefault();
-            else if(v == scalingSensitivityResetButton)
-                moireeInputMethods.setScalingSensitivityToDefault();
-            else if(v == translationSensitivityResetButton)
-                moireeInputMethods.setTranslationSensitivityToDefault();
-        }
-    };
-
-    private final CompoundButton.OnCheckedChangeListener inputMethodEnabler = new CompoundButton.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            beginMenuBoundsTransition();
-            if(buttonView == rotationInputSwitch)
-                moireeInputMethods.setRotationInputEnabled(isChecked);
-            else if(buttonView == scalingInputSwitch)
-                moireeInputMethods.setScalingInputEnabled(isChecked);
-            else if(buttonView == translationInputSwitch)
-                moireeInputMethods.setTranslationInputEnabled(isChecked);
-        }
-    };
-
-    private final IntValueSetup.IntStringConverter textConverter = new IntValueSetup.IntStringConverter() {
-        @Override
-        public String intToText(int value) {
-            return getResources().getString(R.string.percentage_formatter, value);
-        }
-    };
-
+        defaultSensitivityPercents = getResources().getInteger(R.integer.sensitivity_default_percents);
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_input_methods_setup, container, false);
-        final ExpandableView expandableView = (ExpandableView) rootView.findViewById(R.id.expandable_view);
-        final View indicatorView = rootView.findViewById(R.id.expandable_view_expanded_indicator);
-        expandableView.findViewById(R.id.expandable_view_header).setOnClickListener(new View.OnClickListener() {
+        return inflater.inflate(R.layout.fragment_input_methods_setup, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        expandableView = (ExpandableView) view.findViewById(R.id.expandable_view);
+        final View indicatorView = view.findViewById(R.id.header_expanded_indicator);
+        expandableView.getHeaderView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Transition transition = TransformationSetupMenu.createExpandTransition();
-                beginMenuBoundsTransition(transition);
+                beginMenuTransition(transition);
                 expandableView.toggleExpanded();
             }
         });
+
+        final int arrowCollapsedDegrees = getResources().getInteger(R.integer.indicator_arrow_collapsed_rotation);
         expandableView.setOnExpandedStateChangedListener(new ExpandableView.OnExpandedStateChangedListener() {
             @Override
             public void onExpandedStateChanged(ExpandableView expandableView, boolean expanded) {
-                indicatorView.setRotation(expandableView.isExpanded() ? 0 : -90);
+                indicatorView.setRotation(expandableView.isExpanded() ? 0 : arrowCollapsedDegrees);
             }
         });
-        TextView title = (TextView) expandableView.findViewById(R.id.expandable_view_header_title);
+        TextView title = (TextView) expandableView.findViewById(R.id.header_title);
         title.setText(R.string.input_methods);
 
-        initializeRotationInputSetupViews(rootView);
-        initializeScalingInputSetupViews(rootView);
-        initializeTranslationInputSetupViews(rootView);
-
-        return rootView;
+        initializeRotationInputSetupViews(view);
+        initializeScalingInputSetupViews(view);
+        initializeTranslationInputSetupViews(view);
     }
 
     private void initializeRotationInputSetupViews(View rootView) {
-        rotationSetupRoot = (ExpandableView) rootView.findViewById(R.id.rotation_input_setup_root);
-        rotationInputSwitch = (Switch) rotationSetupRoot.findViewById(R.id.input_method_switch);
-        rotationSensitivitySetup = (IntValueSetup) rotationSetupRoot.findViewById(R.id.sensitivity_value_setup);
-        rotationSensitivityResetButton = (Button) rotationSetupRoot.findViewById(R.id.reset_button);
+        rotationSetupExpandable = (ExpandableView) rootView.findViewById(R.id.rotation_input_setup_root);
+        rotationInputSwitch = (Switch) rotationSetupExpandable.getHeaderView().findViewById(R.id.input_method_switch);
+        rotationSensitivitySetup = (IntValueSetup) rotationSetupExpandable.findViewById(R.id.sensitivity_value_setup);
+        rotationSensitivityResetButton = (Button) rotationSetupExpandable.findViewById(R.id.reset_button);
 
-        rotationSensitivitySetup.setIntStringConverter(textConverter);
-        rotationSensitivitySetup.setOnIntValueSelectedListener(sensitivitySetter);
+        rotationSensitivitySetup.setOnValueChangedListener(new IntValueSetup.OnValueChangedListener() {
+            @Override
+            public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
+                float sensitivity = valueToSensitivity(value);
+                moireeInputMethods.setRotationSensitivity(sensitivity);
+                updateRotationUI(true);
+            }
+        });
+        rotationInputSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                beginMenuBoundsTransition();
+                moireeInputMethods.setRotationInputEnabled(isChecked);
+                updateRotationUI(false);
+            }
+        });
 
-        rotationInputSwitch.setOnCheckedChangeListener(inputMethodEnabler);
-
-        TextView description = (TextView) rotationSetupRoot.findViewById(R.id.description_text);
+        TextView description = (TextView) rotationSetupExpandable.findViewById(R.id.description_text);
         description.setText(R.string.rotation_input_description);
 
-        rotationSensitivityResetButton.setOnClickListener(sensitivityResetter);
+        rotationSensitivityResetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rotationSensitivitySetup.setValue(defaultSensitivityPercents);
+            }
+        });
         rotationInputSwitch.setText(R.string.rotation_input_name);
     }
 
+    private void updateRotationUI(boolean fromValueSetup) {
+        boolean inputEnabled = moireeInputMethods.isRotationInputEnabled();
+        float sensitivity = moireeInputMethods.getRotationSensitivity();
+        int sensitivityPercents = sensitivityToValue(sensitivity);
+
+        rotationInputSwitch.setChecked(inputEnabled);
+        rotationSetupExpandable.setExpanded(inputEnabled);
+        rotationSensitivityResetButton.setEnabled(sensitivityPercents != defaultSensitivityPercents);
+
+        if(! fromValueSetup)
+            rotationSensitivitySetup.setValue(sensitivityPercents);
+    }
+
     private void initializeScalingInputSetupViews(View rootView) {
-        scalingSetupRoot = (ExpandableView) rootView.findViewById(R.id.scaling_input_setup_root);
-        scalingInputSwitch = (Switch) scalingSetupRoot.findViewById(R.id.input_method_switch);
-        scalingSensitivitySetup = (IntValueSetup) scalingSetupRoot.findViewById(R.id.sensitivity_value_setup);
-        scalingSensitivityResetButton = (Button) scalingSetupRoot.findViewById(R.id.reset_button);
+        scalingSetupExpandable = (ExpandableView) rootView.findViewById(R.id.scaling_input_setup_root);
+        scalingInputSwitch = (Switch) scalingSetupExpandable.getHeaderView().findViewById(R.id.input_method_switch);
+        scalingSensitivitySetup = (IntValueSetup) scalingSetupExpandable.findViewById(R.id.sensitivity_value_setup);
+        scalingSensitivityResetButton = (Button) scalingSetupExpandable.findViewById(R.id.reset_button);
 
-        scalingSensitivitySetup.setIntStringConverter(textConverter);
-        scalingSensitivitySetup.setOnIntValueSelectedListener(sensitivitySetter);
+        scalingSensitivitySetup.setOnValueChangedListener(new IntValueSetup.OnValueChangedListener() {
+            @Override
+            public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
+                float sensitivity = valueToSensitivity(value);
+                moireeInputMethods.setScalingSensitivity(sensitivity);
+                updateScalingUI(true);
+            }
+        });
 
-        TextView description = (TextView) scalingSetupRoot.findViewById(R.id.description_text);
+        TextView description = (TextView) scalingSetupExpandable.findViewById(R.id.description_text);
         description.setText(R.string.scaling_input_description);
 
-        scalingInputSwitch.setOnCheckedChangeListener(inputMethodEnabler);
+        scalingInputSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                beginMenuBoundsTransition();
+                moireeInputMethods.setScalingInputEnabled(isChecked);
+                updateScalingUI(false);
+            }
+        });
 
-        scalingSensitivityResetButton.setOnClickListener(sensitivityResetter);
+        scalingSensitivityResetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scalingSensitivitySetup.setValue(defaultSensitivityPercents);
+            }
+        });
         scalingInputSwitch.setText(R.string.scaling_input_name);
     }
 
+    private void updateScalingUI(boolean fromValueSetup) {
+        boolean inputEnabled = moireeInputMethods.isScalingInputEnabled();
+        float sensitivity = moireeInputMethods.getScalingSensitivity();
+        int sensitivityPercents = sensitivityToValue(sensitivity);
+
+        scalingInputSwitch.setChecked(inputEnabled);
+        scalingSetupExpandable.setExpanded(inputEnabled);
+        scalingSensitivityResetButton.setEnabled(sensitivityPercents != defaultSensitivityPercents);
+
+        if(! fromValueSetup)
+            scalingSensitivitySetup.setValue(sensitivityPercents);
+    }
+
     private void initializeTranslationInputSetupViews(View rootView) {
-        translationSetupRoot = (ExpandableView) rootView.findViewById(R.id.translation_input_setup_root);
-        translationInputSwitch = (Switch) translationSetupRoot.findViewById(R.id.input_method_switch);
-        translationSensitivitySetup = (IntValueSetup) translationSetupRoot.findViewById(R.id.sensitivity_value_setup);
-        translationSensitivityResetButton = (Button) translationSetupRoot.findViewById(R.id.reset_button);
+        translationSetupExpandable = (ExpandableView) rootView.findViewById(R.id.translation_input_setup_root);
+        translationInputSwitch = (Switch) translationSetupExpandable.getHeaderView().findViewById(R.id.input_method_switch);
+        translationSensitivitySetup = (IntValueSetup) translationSetupExpandable.findViewById(R.id.sensitivity_value_setup);
+        translationSensitivityResetButton = (Button) translationSetupExpandable.findViewById(R.id.reset_button);
 
-        translationSensitivitySetup.setIntStringConverter(textConverter);
-        translationSensitivitySetup.setOnIntValueSelectedListener(sensitivitySetter);
+        translationSensitivitySetup.setOnValueChangedListener(new IntValueSetup.OnValueChangedListener() {
+            @Override
+            public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
+                float sensitivity = valueToSensitivity(value);
+                moireeInputMethods.setTranslationSensitivity(sensitivity);
+                updateTranslationUI(true);
+            }
+        });
 
-        TextView description = (TextView) translationSetupRoot.findViewById(R.id.description_text);
+        TextView description = (TextView) translationSetupExpandable.findViewById(R.id.description_text);
         description.setText(R.string.translation_input_description);
 
-        translationInputSwitch.setOnCheckedChangeListener(inputMethodEnabler);
+        translationInputSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                beginMenuBoundsTransition();
+                moireeInputMethods.setTranslationInputEnabled(isChecked);
+                updateTranslationUI(false);
+            }
+        });
 
-        translationSensitivityResetButton.setOnClickListener(sensitivityResetter);
+        translationSensitivityResetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                translationSensitivitySetup.setValue(defaultSensitivityPercents);
+            }
+        });
         translationInputSwitch.setText(R.string.translation_input_name);
+    }
+
+    private void updateTranslationUI(boolean fromValueSetup) {
+        boolean inputEnabled = moireeInputMethods.isTranslationInputEnabled();
+        float sensitivity = moireeInputMethods.getTranslationSensitivity();
+        int sensitivityPercents = sensitivityToValue(sensitivity);
+
+        translationInputSwitch.setChecked(inputEnabled);
+        translationSetupExpandable.setExpanded(inputEnabled);
+        translationSensitivityResetButton.setEnabled(sensitivityPercents != defaultSensitivityPercents);
+
+        if(! fromValueSetup)
+            translationSensitivitySetup.setValue(sensitivityPercents);
     }
 
     @Override
@@ -208,14 +237,10 @@ public class InputMethodsSetupFragment extends MenuFragment {
         super.onActivityCreated(savedInstanceState);
 
         this.moireeInputMethods = ((MoireeInputMethodsHolder) getActivity()).getMoireeInputMethods();
-        moireeInputMethods.addAndFireMoireeInputMethodListener(uiUpdater);
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        moireeInputMethods.removeMoireeInputMethodListener(uiUpdater);
+        updateRotationUI(false);
+        updateScalingUI(false);
+        updateTranslationUI(false);
     }
 
     private int sensitivityToValue(float sensitivity) {
@@ -224,5 +249,20 @@ public class InputMethodsSetupFragment extends MenuFragment {
 
     private float valueToSensitivity(int value) {
         return value / 100f;
+    }
+
+    @Override
+    public boolean isExpanded() {
+        return expandableView.isExpanded();
+    }
+
+    @Override
+    public void setExpanded(boolean expanded) {
+        expandableView.setExpanded(expanded);
+    }
+
+    @Override
+    public void toggleExpanded() {
+        expandableView.toggleExpanded();
     }
 }

@@ -22,7 +22,8 @@
     <ImageButton
         android:id="@id/value_setup_decrease_button"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="40dp"
+        android:layout_width="wrap_content"
+        android:adjustViewBounds="true"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/value_setup_value"
         android:layout_alignTop="@id/value_setup_value"
@@ -47,7 +48,8 @@
     <ImageButton
         android:id="@id/value_setup_increase_button"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="40dp"
+        android:layout_width="wrap_content"
+        android:adjustViewBounds="true"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"

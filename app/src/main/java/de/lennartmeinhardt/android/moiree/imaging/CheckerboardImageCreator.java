@@ -7,13 +7,15 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
 import de.lennartmeinhardt.android.moiree.R;
+import de.lennartmeinhardt.android.moiree.util.BundleIO;
+import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 
-public class CheckerboardImageCreator extends BaseBitmapMoireeImageCreator<RescaledDrawable> {
+public class CheckerboardImageCreator extends BaseBitmapMoireeImageCreator<RescaledDrawable> implements BundleIO, PreferenceIO {
 
-    private static final String KEY_SQUARE_SIZE = "checkerboardImageImageCreator:squareSizeInPixels";
+    private static final String KEY_SQUARE_SIZE = "checkerboardImageCreator:squareSizeInPixels";
 
     private int squareSizeInPixels;
 
@@ -42,13 +44,13 @@ public class CheckerboardImageCreator extends BaseBitmapMoireeImageCreator<Resca
     }
 
     @Override
-    public void loadFromBundle(Bundle bundle, String prefix) {
-        squareSizeInPixels = bundle.getInt(prefix + KEY_SQUARE_SIZE, squareSizeInPixels);
+    public void loadFromBundle(Bundle bundle) {
+        squareSizeInPixels = bundle.getInt(KEY_SQUARE_SIZE, squareSizeInPixels);
     }
 
     @Override
-    public void storeToBundle(Bundle bundle, String prefix) {
-        bundle.putInt(prefix + KEY_SQUARE_SIZE, squareSizeInPixels);
+    public void storeToBundle(Bundle bundle) {
+        bundle.putInt(KEY_SQUARE_SIZE, squareSizeInPixels);
     }
 
     public int getSquareSizeInPixels() {
@@ -79,6 +81,21 @@ public class CheckerboardImageCreator extends BaseBitmapMoireeImageCreator<Resca
     @Override
     public Bitmap getBitmapFromDrawable(RescaledDrawable drawable) {
         return ((BitmapDrawable) drawable.getWrappedDrawable()).getBitmap();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CheckerboardImageCreator that = (CheckerboardImageCreator) o;
+
+        return squareSizeInPixels == that.squareSizeInPixels;
+    }
+
+    @Override
+    public int hashCode() {
+        return squareSizeInPixels;
     }
 
     private static void drawCheckerboardToImage(Bitmap image) {

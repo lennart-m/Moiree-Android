@@ -18,9 +18,8 @@ public class MoireeTransformation {
 	private float scalingX, scalingY, commonScaling;
 	private boolean useCommonScaling;
 
-	private final List<TransformationListener> listeners = new ArrayList<>();
 	private final List<OnTransformationChangedListener> onTransformationChangedListeners = new ArrayList<>();
-	
+
 	
 	public float getRotation() {
 		return rotation;
@@ -28,7 +27,6 @@ public class MoireeTransformation {
 	public void setRotation(float rotation) {
 		if(this.rotation != rotation) {
 			this.rotation = rotation;
-			notifyListener();
 			for (OnTransformationChangedListener listener : onTransformationChangedListeners)
 				listener.onRotationChanged(rotation);
 		}
@@ -40,7 +38,6 @@ public class MoireeTransformation {
 	public void setTranslationX(float translationX) {
 		if(this.translationX != translationX) {
 			this.translationX = translationX;
-			notifyListener();
 			for (OnTransformationChangedListener listener : onTransformationChangedListeners)
 				listener.onTranslationXChanged(translationX);
 		}
@@ -52,7 +49,6 @@ public class MoireeTransformation {
 	public void setTranslationY(float translationY) {
 		if(this.translationY != translationY) {
 			this.translationY = translationY;
-			notifyListener();
 			for (OnTransformationChangedListener listener : onTransformationChangedListeners)
 				listener.onTranslationYChanged(translationY);
 		}
@@ -64,7 +60,6 @@ public class MoireeTransformation {
 	public void setScalingX(float scalingX) {
 		if(this.scalingX != scalingX) {
 			this.scalingX = scalingX;
-			notifyListener();
 			for (OnTransformationChangedListener listener : onTransformationChangedListeners)
 				listener.onScalingXChanged(scalingX);
 		}
@@ -76,7 +71,6 @@ public class MoireeTransformation {
 	public void setScalingY(float scalingY) {
 		if(this.scalingY != scalingY) {
 			this.scalingY = scalingY;
-			notifyListener();
 			for (OnTransformationChangedListener listener : onTransformationChangedListeners)
 				listener.onScalingYChanged(scalingY);
 		}
@@ -88,7 +82,6 @@ public class MoireeTransformation {
 	public void setCommonScaling(float commonScaling) {
 		if(this.commonScaling != commonScaling) {
 			this.commonScaling = commonScaling;
-			notifyListener();
 			for (OnTransformationChangedListener listener : onTransformationChangedListeners)
 				listener.onCommonScalingChanged(commonScaling);
 		}
@@ -100,7 +93,6 @@ public class MoireeTransformation {
 	public void setUseCommonScaling(boolean useCommonScaling) {
 		if(this.useCommonScaling != useCommonScaling) {
 			this.useCommonScaling = useCommonScaling;
-			notifyListener();
 			for (OnTransformationChangedListener listener : onTransformationChangedListeners)
 				listener.onUseCommonScalingChanged(useCommonScaling);
 		}
@@ -114,14 +106,6 @@ public class MoireeTransformation {
 		return isUseCommonScaling() ? commonScaling : scalingY;
 	}
 
-	
-	public void addTransformationListener(TransformationListener listener) {
-		listeners.add(listener);
-	}
-
-	public void removeTransformationListener(TransformationListener listener) {
-		listeners.remove(listener);
-	}
 
 	public void addOnTransformationChangedListener(OnTransformationChangedListener listener) {
 		onTransformationChangedListeners.add(listener);
@@ -140,11 +124,6 @@ public class MoireeTransformation {
 		onTransformationChangedListeners.remove(listener);
 	}
 	
-	private void notifyListener() {
-		for(TransformationListener listener : listeners)
-			listener.onTransformationChanged();
-	}
-
 	public void setToIdentity() {
 		setCommonScalingToIdentity();
 		setScalingXToIdentity();
@@ -187,10 +166,6 @@ public class MoireeTransformation {
 		setTranslationY(ID_TRANSLATION_Y);
 	}
 
-
-	public static interface TransformationListener {
-		public void onTransformationChanged();
-	}
 
 	public interface OnTransformationChangedListener {
 		void onRotationChanged(float newRotation);

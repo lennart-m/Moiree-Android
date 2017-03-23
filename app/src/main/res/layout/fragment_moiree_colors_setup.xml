@@ -2,7 +2,7 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/RootMenuCard"
-    android:layout_width="match_parent"
+    android:layout_width="300dp"
     android:layout_height="wrap_content">
 
     <LinearLayout
@@ -28,14 +28,12 @@
                 <include
                     android:id="@+id/foreground_color_setup_card"
                     layout="@layout/color_setup_card"
-                    android:layout_margin="5dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/background_color_setup_card"
                     layout="@layout/color_setup_card"
-                    android:layout_margin="5dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

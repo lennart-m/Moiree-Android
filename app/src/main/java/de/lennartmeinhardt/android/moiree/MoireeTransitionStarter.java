@@ -48,11 +48,16 @@ public class MoireeTransitionStarter {
     }
 
     public void beginTransformationTransitionIfWanted() {
-        if(transformationTransitionEnabled) {
-            Transition transition = new SimpleChangeTransform().addTarget(R.id.moiree_image_transformed).setDuration(transformationTransitionDuration);
+        beginTransformationTransitionIfWanted(createTransformationTransition());
+    }
 
+    public void beginTransformationTransitionIfWanted(Transition transition) {
+        if(transformationTransitionEnabled)
             TransitionManager.beginDelayedTransition(moireeViewGroup, transition);
-        }
+    }
+
+    public Transition createTransformationTransition() {
+        return new SimpleChangeTransform().addTarget(R.id.moiree_image_transformed).setDuration(transformationTransitionDuration);
     }
 
     public boolean isColorTransitionEnabled() {

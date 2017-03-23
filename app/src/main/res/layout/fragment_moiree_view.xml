@@ -13,14 +13,14 @@
         android:id="@id/moiree_image_fixed"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="center"
-        android:contentDescription="@null"/>
+        android:contentDescription="@null"
+        android:scaleType="center"/>
 
     <ImageView
         android:id="@id/moiree_image_transformed"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="center"
-        android:contentDescription="@null"/>
+        android:contentDescription="@null"
+        android:scaleType="center"/>
 
 </de.lennartmeinhardt.android.moiree.util.ForceChildrenSquareViewGroup>

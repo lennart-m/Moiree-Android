@@ -35,7 +35,6 @@
                     android:name="de.lennartmeinhardt.android.moiree.menu.settings.MenuTransparencySetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
                     android:tag="menuTransparencySetup"
                     tools:layout="@layout/fragment_menu_transparency_setup"/>
 
@@ -43,7 +42,6 @@
                     android:name="de.lennartmeinhardt.android.moiree.menu.settings.InputMethodsSetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
                     android:tag="inputMethodsSetup"
                     tools:layout="@layout/fragment_input_methods_setup"/>
 

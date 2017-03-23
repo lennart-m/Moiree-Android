@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.transition.Fade;
+import android.support.transition.TransitionManager;
 import android.support.transition.TransitionSet;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,9 +23,6 @@ import de.lennartmeinhardt.android.moiree.menu.MainMenuFragment;
 import de.lennartmeinhardt.android.moiree.util.ImageCreatorHolder;
 import de.lennartmeinhardt.android.moiree.util.StateReportingActivity;
 
-// TODO: progress für "creating image". wenn das bild erzeugt wird reagiere nicht mehr auf eingaben
-// TODO: menü verschieben: snap
-
 // TODO: first steps activity: holt sich aus dieser activity die view bounds und zeigt ein overlay
 
 // TODO transition: alle casts zu mainactivity weg, sowie alle findViewById(android.R.id.content) und viewgroup-casts
@@ -37,7 +35,6 @@ import de.lennartmeinhardt.android.moiree.util.StateReportingActivity;
 
 // TODO pattern: add and fire listener
 
-// TODO rtl: header_with_arrow nicht -90 sondern 90
 // TODO alle vectordrawables knallgrün machen (oder so). dann alle mit tint versehen -> textPrimary
 
 public class MainActivity extends StateReportingActivity
@@ -54,7 +51,6 @@ public class MainActivity extends StateReportingActivity
 	private static final String KEY_SYSTEM_UI_VISIBLE = "mainActivity:systemUiVisible";
 	private static final String KEY_FIRST_START = "mainActivity:firstStart";
 
-	private static final String TAG_MOIREE_IMAGE_FRAGMENT = "moireeImageFragment";
 	private static final String TAG_MAIN_MENU = "mainMenu";
 
 	private MoireeViewFragment moireeViewFragment;
@@ -76,6 +72,8 @@ public class MainActivity extends StateReportingActivity
 	private MoireeImageFragment moireeImageFragment;
 
 	private SharedPreferences preferences;
+
+	private boolean shouldAnimateImageChange;
 
 	private final Handler enterImmersiveModeHandler = new Handler() {
 		@Override
@@ -109,7 +107,6 @@ public class MainActivity extends StateReportingActivity
 		preferencesEditor.putBoolean(KEY_FIRST_START, false);
 
 		moireeColors.storeToPreferences(preferencesEditor);
-//		imageCreator.storeToPreferences(preferencesEditor); TODO
 		MoireeTransformationPreferencesHelper.storeMoireeTransformationToPreferences(preferencesEditor, moireeTransformation);
 
 		menuTransparencyConfig.storeToPreferences(preferencesEditor);
@@ -154,15 +151,13 @@ public class MainActivity extends StateReportingActivity
 		moireeTransitionStarter.setTransformationTransitionEnabled(true);
 		moireeTransitionStarter.setTransformationTransitionDuration(2000);
 
-		menuTransparencyConfig = new MenuTransparencyConfig(getResources());
+		boolean defaultMenuTransparencyEnabled = getResources().getBoolean(R.bool.menu_transparency_default_enabled);
+		float defaultMenuAlpha = getResources().getInteger(R.integer.menu_opacity_default_percents) / 100f;
+		menuTransparencyConfig = new MenuTransparencyConfig(defaultMenuTransparencyEnabled, defaultMenuAlpha);
 		menuTransparencyConfig.addMenuTransparencyListener(menuTransparencySetter);
 		menuTransparencyConfig.loadFromPreferences(preferences);
 
-		moireeImageFragment = (MoireeImageFragment) getSupportFragmentManager().findFragmentByTag(TAG_MOIREE_IMAGE_FRAGMENT);
-		if(moireeImageFragment == null) {
-			moireeImageFragment = new MoireeImageFragment();
-			getSupportFragmentManager().beginTransaction().add(moireeImageFragment, TAG_MOIREE_IMAGE_FRAGMENT).commit();
-		}
+		moireeImageFragment = (MoireeImageFragment) getSupportFragmentManager().findFragmentById(R.id.moiree_image_fragment);
 
 		decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
 			@Override
@@ -191,6 +186,8 @@ public class MainActivity extends StateReportingActivity
 
 		if(DEBUG || ! preferences.contains(KEY_FIRST_START))
 			showFirstStartMessage();
+
+		shouldAnimateImageChange = savedInstanceState == null;
 	}
 
 	private void delayedHide() {
@@ -218,7 +215,8 @@ public class MainActivity extends StateReportingActivity
 	public void toggleMenuShowing() {
 		if(isMenuShowing())
 			hideMenuIfShown();
-		else
+		// TODO die bedingung ist unsinn
+		else// if(! moireeImageFragment.isCalculating())
 			showMenuIfHidden();
 	}
 
@@ -293,6 +291,7 @@ public class MainActivity extends StateReportingActivity
 		if(! isMenuShowing())
 			return;
 
+		// TODO problem: hier werden alle fragments nochmal erzeugt und wieder entfernt.
 		getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 	}
 
@@ -333,10 +332,6 @@ public class MainActivity extends StateReportingActivity
 		return touchHandlerFragment.getMoireeInputMethods();
 	}
 
-	public ViewGroup getRootView() {
-		return rootView;
-	}
-
 	@Override
 	public MenuTransparencyConfig getMenuTransparencyConfig() {
 		return menuTransparencyConfig;
@@ -348,22 +343,36 @@ public class MainActivity extends StateReportingActivity
 	}
 
 	public void onMoireeImageCreated(Drawable moireeImage) {
+		System.out.println("on image created");
+
 		moireeViewFragment.setMoireeImage(moireeImage, true);
+
 		// TODO weiter. evtl enabled state des menüs ändern oder ähnliches. auf jeden fall einblenden der moiree-image-views, zurücksetzen der trafo, und dann animieren der trafo
-		TransitionSet enterNewImageTransition = new TransitionSet().addTransition(new Fade(Fade.IN)).setOrdering(TransitionSet.ORDERING_SEQUENTIAL);
-		if(moireeTransitionStarter.isTransformationTransitionEnabled()) {
+		if(shouldAnimateImageChange && moireeTransitionStarter.isTransformationTransitionEnabled()) {
+			moireeViewFragment.setMoireeViewsVisible(false);
 			MoireeTransformation backupTransformation = new MoireeTransformation();
 			MoireeTransformations.copyTransformationValues(moireeTransformation, backupTransformation);
 			moireeTransformation.setToIdentity();
-			moireeTransitionStarter.beginTransformationTransitionIfWanted();
+
+			TransitionSet enterNewImageTransition = new TransitionSet()
+					.addTransition(new Fade(Fade.IN))
+					.addTransition(moireeTransitionStarter.createTransformationTransition())
+					.setOrdering(TransitionSet.ORDERING_SEQUENTIAL);
+
+			moireeTransitionStarter.beginTransformationTransitionIfWanted(enterNewImageTransition);
+			moireeViewFragment.setMoireeViewsVisible(true);
 			MoireeTransformations.copyTransformationValues(backupTransformation, moireeTransformation);
 		}
+
+		// animate all following changes
+		shouldAnimateImageChange = true;
 	}
 
 	public void onPreCreateMoireeImage() {
-//		TransitionManager.beginDelayedTransition(((ViewGroup) moireeViewFragment.getView()), new Fade(Fade.OUT));
-//		moireeViewFragment.setMoireeViewsVisible(false);
-		// TODO weiter. zb. zurücksetzen ausblenden der moiree-image-views.
+		if(shouldAnimateImageChange) {
+			TransitionManager.beginDelayedTransition(((ViewGroup) moireeViewFragment.getView()), new Fade(Fade.OUT));
+			moireeViewFragment.setMoireeViewsVisible(false);
+		}
 	}
 
 	public int getMoireeImageWidth() {

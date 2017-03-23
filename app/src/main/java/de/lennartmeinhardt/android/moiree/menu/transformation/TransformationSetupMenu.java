@@ -43,9 +43,12 @@ public class TransformationSetupMenu extends BaseTransformationSetupFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_transformation_setup, container, false);
+        return inflater.inflate(R.layout.fragment_transformation_setup, container, false);
+    }
 
-        Button resetButton = (Button) rootView.findViewById(R.id.transformation_setup_set_to_identity_button);
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Button resetButton = (Button) view.findViewById(R.id.transformation_setup_set_to_identity_button);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,8 +69,6 @@ public class TransformationSetupMenu extends BaseTransformationSetupFragment {
         rotationSetupFragment.setExpanded(rotationExpanded);
         scalingSetupFragment.setExpanded(scalingExpanded);
         translationSetupFragment.setExpanded(translationExpanded);
-
-        return rootView;
     }
 
     @Override
@@ -92,7 +93,7 @@ public class TransformationSetupMenu extends BaseTransformationSetupFragment {
     public static Transition createExpandTransition() {
         return new TransitionSet()
                 .addTransition(createMenuBoundsTransition())
-                .addTransition(new SimpleChangeTransform().addTarget(R.id.expandable_view_expanded_indicator))
+                .addTransition(new SimpleChangeTransform().addTarget(R.id.header_expanded_indicator))
                 .setOrdering(TransitionSet.ORDERING_TOGETHER);
     }
 }

@@ -22,23 +22,23 @@
             android:layout_height="50dp"
             android:layout_marginTop="10dp">
 
-            <!-- TODO das bild ist zu klein. sieht im querformat komisch aus (oder?) alternative: kind ist ein forceSquareImageView und das bild wird via tiling erzeugt -->
-
             <ImageView
                 android:id="@id/main_menu_moiree_image_background1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
-                android:rotation="-3"
-                android:scaleType="fitXY"/>
+                android:tint="@color/image_setup_card_preview_color"
+                android:scaleType="center"
+                android:rotation="-3"/>
 
             <ImageView
                 android:id="@id/main_menu_image_background2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:scaleType="center"
+                android:tint="@color/image_setup_card_preview_color"
                 android:contentDescription="@null"
-                android:rotation="3"
-                android:scaleType="fitXY"/>
+                android:rotation="3"/>
 
             <TextView
                 style="@style/MainMenuButtonCardText"
@@ -59,8 +59,10 @@
                 android:id="@id/main_menu_colors_background"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:alpha=".3"
                 android:contentDescription="@null"
-                android:scaleType="centerCrop"/>
+                android:scaleType="centerCrop"
+                android:src="@drawable/rainbow"/>
 
             <TextView
                 style="@style/MainMenuButtonCardText"

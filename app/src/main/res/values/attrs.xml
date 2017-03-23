@@ -24,12 +24,13 @@
         <attr name="stepSize" format="integer"/>
         <attr name="name" format="string"/>
         <attr name="allowStepOutOfBounds" format="boolean"/>
+        <attr name="textFormatter" format="reference"/>
     </declare-styleable>
 
     <declare-styleable name="ExpandableView">
         <attr name="expanded" format="boolean"/>
-        <attr name="headerLayout" format="reference"/>
-        <attr name="contentLayout" format="reference"/>
+        <attr name="keepHeaderReference" format="boolean"/>
+        <attr name="keepContentReference" format="boolean"/>
     </declare-styleable>
 
 </resources>

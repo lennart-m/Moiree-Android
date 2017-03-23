@@ -11,8 +11,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.graphics.BitmapCompat;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
 import java.io.File;
@@ -22,87 +23,140 @@ import java.io.IOException;
 import de.lennartmeinhardt.android.moiree.imaging.BaseBitmapMoireeImageCreator;
 import de.lennartmeinhardt.android.moiree.imaging.CheckerboardImageCreator;
 import de.lennartmeinhardt.android.moiree.imaging.MoireeImageCreator;
-import de.lennartmeinhardt.android.moiree.imaging.MoireeImageMode;
+import de.lennartmeinhardt.android.moiree.util.BundleIO;
 import de.lennartmeinhardt.android.moiree.util.ImageCreatorHolder;
+import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
 public class MoireeImageFragment extends Fragment implements ImageCreatorHolder {
 
-    private static final String KEY_IMAGE_MODE_NAME = "moireeImageMode";
+    private static final String KEY_IMAGE_CREATOR_CLASS = "moireeImageCreator:class";
     private static final String FILE_NAME = "moireeImageBackup.png";
 
     private MoireeImageCreator moireeImageCreator;
 
     private SharedPreferences preferences;
+    private SharedPreferences preferencesForBackup;
 
     private Drawable moireeImage;
 
-    private boolean shouldSaveImage;
+    private View rootView;
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    private boolean reusedSavedImage;
 
-        this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
-    }
+    private ImageCreatorTask calculatingTask;
+    private ImageCreatorTask nextTaskToCalculate;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO initialize moiree image creator from preferences
-        MoireeImageMode imageMode = MoireeImageMode.valueOfOrDefault(preferences.getString(KEY_IMAGE_MODE_NAME, null));
-        moireeImageCreator = imageMode.getImageCreatorInstance(getActivity());
-        moireeImageCreator = new CheckerboardImageCreator(getResources());
+        preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         if(savedInstanceState != null)
-            moireeImageCreator.loadFromBundle(savedInstanceState, "");
+            moireeImageCreator = loadImageCreatorFromBundle(savedInstanceState, null);
         else
-            moireeImageCreator.loadFromPreferences(preferences);
+            moireeImageCreator = loadImageCreatorFromPreferences(preferences, null);
 
-//		moireeImageCreator = new RandomPixelsImageCreator(
-//				getResources().getDimensionPixelSize(R.dimen.random_pixels_image_default_square_size),
-//				getResources().getInteger(R.integer.random_pixels_image_default_density_percents) / 100f);
-
+        if(moireeImageCreator == null) {
+            int defSquareSize = getResources().getDimensionPixelSize(R.dimen.checkerboard_image_default_square_size);
+            moireeImageCreator = new CheckerboardImageCreator(defSquareSize);
+        }
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final View root = ((MainActivity) getActivity()).getRootView();
-        root.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        preferencesForBackup = getContext().getSharedPreferences("imageCreatorBackup", Context.MODE_PRIVATE);
+        MoireeImageCreator imageCreatorForBackup = loadImageCreatorFromPreferences(preferencesForBackup, null);
+
+        reusedSavedImage = false;
+        if(imageCreatorForBackup != null
+                && imageCreatorForBackup.equals(moireeImageCreator)
+                && imageCreatorForBackup instanceof BaseBitmapMoireeImageCreator) {
+            Bitmap bitmap = loadImageFromInternalStorage();
+            if(bitmap != null) {
+                moireeImage = ((BaseBitmapMoireeImageCreator) moireeImageCreator).createDrawableFromBitmap(getResources(), bitmap);
+                reusedSavedImage = true;
+            }
+        }
+
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if(Build.VERSION.SDK_INT < 16)
-                    root.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                if (Build.VERSION.SDK_INT < 16)
+                    rootView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 else
-                    root.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                initializeMoireeImage();
+                if(reusedSavedImage)
+                    notifyActivity();
+                else
+                    recreateImageInBackground();
             }
         });
     }
 
-    private void initializeMoireeImage() {
-        // TODO aufteilen. bild kann in oncreate geladen werden. wenn es danach (onActivityCreated) immernoch nicht existiert führe das inBackground aus
-
-        // try to retrieve image from internal storage
-        if(moireeImageCreator instanceof BaseBitmapMoireeImageCreator) {
-            Bitmap bitmap = loadImageFromInternalStorage((BaseBitmapMoireeImageCreator) moireeImageCreator);
-            if(bitmap != null) {
-                Drawable image = ((BaseBitmapMoireeImageCreator) moireeImageCreator).createDrawableFromBitmap(getResources(), bitmap);
-                setMoireeImage(image);
-                shouldSaveImage = false;
-                return;
-            }
-        }
-
-        // image has not been retrieved from internal storage. create a new one
-        shouldSaveImage = true;
-        recreateImageInBackground();
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_image_creator, container, false);
     }
 
-    private Bitmap loadImageFromInternalStorage(BaseBitmapMoireeImageCreator bitmapMoireeImageCreator) {
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        rootView = view;
+        rootView.setAlpha(0);
+    }
+
+    private static void storeImageCreatorToPreferences(SharedPreferences.Editor preferencesEditor, MoireeImageCreator imageCreator) {
+        preferencesEditor.putString(KEY_IMAGE_CREATOR_CLASS, imageCreator.getClass().getName());
+
+        if(imageCreator instanceof PreferenceIO)
+            ((PreferenceIO) imageCreator).storeToPreferences(preferencesEditor);
+    }
+
+    private static void storeImageCreatorToBundle(Bundle bundle, MoireeImageCreator imageCreator) {
+        bundle.putString(KEY_IMAGE_CREATOR_CLASS, imageCreator.getClass().getName());
+
+        if(imageCreator instanceof BundleIO)
+            ((BundleIO) imageCreator).storeToBundle(bundle);
+    }
+
+    private static MoireeImageCreator loadImageCreatorFromPreferences(SharedPreferences preferences, MoireeImageCreator defValue) {
+        String className = preferences.getString(KEY_IMAGE_CREATOR_CLASS, null);
+        MoireeImageCreator imageCreator;
+        try {
+            Class<?> clazz = Class.forName(className);
+            imageCreator = (MoireeImageCreator) clazz.newInstance();
+        } catch(Exception e) {
+            imageCreator = defValue;
+        }
+
+        if(imageCreator instanceof PreferenceIO)
+            ((PreferenceIO) imageCreator).loadFromPreferences(preferences);
+
+        return imageCreator;
+    }
+
+    private static MoireeImageCreator loadImageCreatorFromBundle(Bundle bundle, MoireeImageCreator defValue) {
+        String className = bundle.getString(KEY_IMAGE_CREATOR_CLASS, null);
+        MoireeImageCreator imageCreator;
+        try {
+            Class<?> clazz = Class.forName(className);
+            imageCreator = (MoireeImageCreator) clazz.newInstance();
+        } catch(Exception e) {
+            imageCreator = defValue;
+        }
+
+        if(imageCreator instanceof PreferenceIO)
+            ((BundleIO) imageCreator).loadFromBundle(bundle);
+
+        return imageCreator;
+    }
+
+    private Bitmap loadImageFromInternalStorage() {
         File imageFile = getInternalImageFile();
         return BitmapFactory.decodeFile(imageFile.getPath());
     }
@@ -111,36 +165,32 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
     public void onDestroy() {
         super.onDestroy();
 
-        if(shouldSaveImage && moireeImageCreator instanceof BaseBitmapMoireeImageCreator) {
+        if((!reusedSavedImage) && moireeImageCreator instanceof BaseBitmapMoireeImageCreator) {
             Bitmap bitmap = ((BaseBitmapMoireeImageCreator) moireeImageCreator).getBitmapFromDrawable(moireeImage);
             saveImageInInternalStorage(bitmap);
+            SharedPreferences.Editor backupPrefsEditor = preferencesForBackup.edit();
+            storeImageCreatorToPreferences(backupPrefsEditor, moireeImageCreator);
+            backupPrefsEditor.apply();
         }
 
         SharedPreferences.Editor preferencesEditor = preferences.edit();
-        moireeImageCreator.storeToPreferences(preferencesEditor);
+        storeImageCreatorToPreferences(preferencesEditor, moireeImageCreator);
         preferencesEditor.apply();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        moireeImageCreator.storeToBundle(outState, "");
+        storeImageCreatorToBundle(outState, moireeImageCreator);
     }
 
     private static Bitmap getAsArgb8888(Bitmap bitmap, boolean recycleOld) {
         if(bitmap.getConfig() == Bitmap.Config.ARGB_8888)
             return bitmap;
         else {
-            // for older versions than android 4.4 a copy has to be created
-//            if (Build.VERSION.SDK_INT < 19) {
-                Bitmap configCopy = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-                if(recycleOld)
-                    bitmap.recycle();
-                return configCopy;
-//            } else {
-//                // for newer versions the config can be changed here
-//                bitmap.setConfig(Bitmap.Config.ARGB_8888);
-//                return bitmap;
-//            }
+            Bitmap configCopy = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            if(recycleOld)
+                bitmap.recycle();
+            return configCopy;
         }
     }
 
@@ -161,7 +211,6 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
             } catch (Exception e) {
             }
         }
-
     }
 
     private File getInternalImageFile() {
@@ -173,32 +222,38 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
         recreateImageInBackground();
     }
 
-    private void setMoireeImage(Drawable image) {
-        if(this.moireeImage != image) {
-            this.moireeImage = image;
-            // something about the image has changed. it should be saved when this fragment is destroyed
-            shouldSaveImage = true;
-        }
-
-        // TODO firstStart muss angegeben werden damit die activity nicht jedes mal wieder neu animiert
+    private void notifyActivity() {
+        // check if the activity is null as it may have been closed before some calculation was finished
         if(getActivity() != null)
-            ((MainActivity) getActivity()).onMoireeImageCreated(image);
+            ((MainActivity) getActivity()).onMoireeImageCreated(moireeImage);
     }
 
     private void recreateImageInBackground() {
-        new ImageCreatorTask().execute();
+        // if something is calculating right now, cancel it and queue a new task to start
+        if(calculatingTask != null) {
+            nextTaskToCalculate = new ImageCreatorTask();
+            calculatingTask.cancel(true);
+        } else {
+            new ImageCreatorTask().execute();
+        }
     }
 
 
     private class ImageCreatorTask extends AsyncTask<Void, Void, Drawable> {
+
+        private MoireeImageCreator imageCreatorToUse;
 
         private int width, height;
         private long t;
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
+            rootView.animate().alpha(1).start();
 
+            calculatingTask = this;
+            nextTaskToCalculate = null;
+
+            imageCreatorToUse = moireeImageCreator;
             MainActivity mainActivity = (MainActivity) getActivity();
             width = mainActivity.getMoireeImageWidth();
             height = mainActivity.getMoireeImageHeight();
@@ -209,7 +264,7 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
 
         @Override
         protected Drawable doInBackground(Void... params) {
-            return moireeImageCreator.createMoireeImageForDimensions(getResources(), width, height);
+            return imageCreatorToUse.createMoireeImageForDimensions(getResources(), width, height);
         }
 
         private long t() {
@@ -221,14 +276,29 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
         }
 
         @Override
+        protected void onCancelled(Drawable drawable) {
+            calculatingTask = null;
+            if(nextTaskToCalculate != null)
+                nextTaskToCalculate.execute();
+        }
+
+        @Override
         protected void onPostExecute(Drawable drawable) {
+            calculatingTask = null;
             System.out.println("created image in " + d(t) + " ms");
-            setMoireeImage(drawable);
+            moireeImage = drawable;
+            rootView.animate().alpha(0).start();
+            notifyActivity();
+            reusedSavedImage = false;
         }
     }
 
     @Override
     public MoireeImageCreator getImageCreator() {
         return moireeImageCreator;
+    }
+
+    public boolean isCalculating() {
+        return calculatingTask != null;
     }
 }

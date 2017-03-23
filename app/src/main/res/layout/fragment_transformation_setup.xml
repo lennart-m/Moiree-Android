@@ -31,7 +31,6 @@
                     android:name="de.lennartmeinhardt.android.moiree.menu.transformation.RotationSetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="5dp"
                     android:tag="rotationSetup"
                     tools:layout="@layout/fragment_rotation_setup"/>
 
@@ -39,7 +38,6 @@
                     android:name="de.lennartmeinhardt.android.moiree.menu.transformation.ScalingSetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="5dp"
                     android:tag="scalingSetup"
                     tools:layout="@layout/fragment_scaling_setup"/>
 
@@ -47,7 +45,6 @@
                     android:name="de.lennartmeinhardt.android.moiree.menu.transformation.TranslationSetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="5dp"
                     android:tag="translationSetup"
                     tools:layout="@layout/fragment_translation_setup"/>
 

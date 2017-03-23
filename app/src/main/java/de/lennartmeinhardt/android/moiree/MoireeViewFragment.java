@@ -34,15 +34,43 @@ public class MoireeViewFragment extends Fragment {
         }
     };
 
-    MoireeTransformation.TransformationListener transformedViewUpdater = new MoireeTransformation.TransformationListener() {
+    private MoireeTransformation.OnTransformationChangedListener transformedViewUpdater = new MoireeTransformation.OnTransformationChangedListener() {
         @Override
-        public void onTransformationChanged() {
+        public void onRotationChanged(float newRotation) {
+            transformedImageView.setRotation(newRotation);
+        }
+
+        @Override
+        public void onCommonScalingChanged(float newCommonScaling) {
             transformedImageView.setScaleX(moireeTransformation.getEffectiveScalingX());
             transformedImageView.setScaleY(moireeTransformation.getEffectiveScalingY());
-            transformedImageView.setRotation(moireeTransformation.getRotation());
-            transformedImageView.setTranslationX(moireeTransformation.getTranslationX());
+        }
+
+        @Override
+        public void onScalingXChanged(float newScalingX) {
+            transformedImageView.setScaleX(moireeTransformation.getEffectiveScalingX());
+        }
+
+        @Override
+        public void onScalingYChanged(float newScalingY) {
+            transformedImageView.setScaleY(moireeTransformation.getEffectiveScalingY());
+        }
+
+        @Override
+        public void onUseCommonScalingChanged(boolean newUseCommonScaling) {
+            transformedImageView.setScaleX(moireeTransformation.getEffectiveScalingX());
+            transformedImageView.setScaleY(moireeTransformation.getEffectiveScalingY());
+        }
+
+        @Override
+        public void onTranslationXChanged(float newTranslationX) {
+            transformedImageView.setTranslationX(newTranslationX);
+        }
+
+        @Override
+        public void onTranslationYChanged(float newTranslationY) {
             // reverse y translation because bottom > top in android's coordinate system
-            transformedImageView.setTranslationY(- moireeTransformation.getTranslationY());
+            transformedImageView.setTranslationY(- newTranslationY);
         }
     };
 
@@ -50,11 +78,14 @@ public class MoireeViewFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_moiree_view, container, false);
-        backgroundView = root.findViewById(R.id.moiree_background);
-        fixedImageView = (ImageView) root.findViewById(R.id.moiree_image_fixed);
-        transformedImageView = (ImageView) root.findViewById(R.id.moiree_image_transformed);
-        return root;
+        return inflater.inflate(R.layout.fragment_moiree_view, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        backgroundView = view.findViewById(R.id.moiree_background);
+        fixedImageView = (ImageView) view.findViewById(R.id.moiree_image_fixed);
+        transformedImageView = (ImageView) view.findViewById(R.id.moiree_image_transformed);
     }
 
     @Override
@@ -65,7 +96,7 @@ public class MoireeViewFragment extends Fragment {
         this.moireeTransformation = ((MoireeTransformationHolder) getActivity()).getMoireeTransformation();
 
         moireeColors.addAndFireMoireeColorsListener(moireeColorsUpdater);
-        moireeTransformation.addTransformationListener(transformedViewUpdater);
+        moireeTransformation.addAndFireOnTransformationChangedListener(transformedViewUpdater);
     }
 
     @Override
@@ -73,7 +104,7 @@ public class MoireeViewFragment extends Fragment {
         super.onDestroy();
 
         moireeColors.removeMoireeColorsListener(moireeColorsUpdater);
-        moireeTransformation.removeTransformationListener(transformedViewUpdater);
+        moireeTransformation.removeOnTransformationChangedListener(transformedViewUpdater);
     }
 
 
@@ -110,7 +141,8 @@ public class MoireeViewFragment extends Fragment {
     }
 
     public void setMoireeViewsVisible(boolean visible) {
-        fixedImageView.setVisibility(View.GONE);
-        transformedImageView.setVisibility(View.GONE);
+        int visibility = visible ? View.VISIBLE : View.INVISIBLE;
+        fixedImageView.setVisibility(visibility);
+        transformedImageView.setVisibility(visibility);
     }
 }

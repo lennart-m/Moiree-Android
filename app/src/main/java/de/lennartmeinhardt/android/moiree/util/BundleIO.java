@@ -5,7 +5,7 @@ import android.os.Bundle;
 // TODO weg
 public interface BundleIO {
 
-    void storeToBundle(Bundle bundle, String prefix);
+    void storeToBundle(Bundle bundle);
 
-    void loadFromBundle(Bundle bundle, String prefix);
+    void loadFromBundle(Bundle bundle);
 }

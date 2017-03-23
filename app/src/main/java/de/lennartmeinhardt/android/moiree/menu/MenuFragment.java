@@ -21,10 +21,10 @@ public abstract class MenuFragment extends Fragment {
 
     protected void beginMenuBoundsTransition() {
         Transition transition = createMenuBoundsTransition();
-        beginMenuBoundsTransition(transition);
+        beginMenuTransition(transition);
     }
 
-    protected void beginMenuBoundsTransition(Transition transition) {
+    protected void beginMenuTransition(Transition transition) {
         ViewGroup root = (ViewGroup) getActivity().findViewById(R.id.menu_holder);
         TransitionManager.beginDelayedTransition(root, transition);
         // TODO das kann sonst auch in ein MenuTransitionStarter-Objekt

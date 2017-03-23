@@ -22,12 +22,14 @@
         <item name="android:focusable">true</item>
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
         <item name="android:stateListAnimator">@animator/lift_on_touch</item>
-        <item name="cardPreventCornerOverlap">false</item>
         <item name="cardUseCompatPadding">true</item>
+        <item name="cardPreventCornerOverlap">false</item>
     </style>
 
     <style name="BaseMenuCard">
         <item name="contentPadding">10dp</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardPreventCornerOverlap">false</item>
         <item name="android:clipChildren">false</item>
         <item name="android:clipToPadding">false</item>
     </style>
@@ -86,6 +88,48 @@
         <!--<item name="android:textAppearance">?android:textAppearanceMedium</item>-->
         <!--<item name="android:textStyle">bold</item>-->
         <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="TransformationValueSetup">
+        <item name="allowStepOutOfBounds">true</item>
+    </style>
+
+    <style name="TransformationValueSetup.Rotation">
+        <item name="minValue">@integer/rotation_min_degrees</item>
+        <item name="maxValue">@integer/rotation_max_degrees</item>
+        <item name="textFormatter">@string/degrees_formatter</item>
+        <item name="value">@integer/rotation_default_degrees</item>
+    </style>
+
+    <style name="TransformationValueSetup.Scaling">
+        <item name="minValue">@integer/scaling_min_percent</item>
+        <item name="maxValue">@integer/scaling_max_percent</item>
+        <item name="textFormatter">@string/percentage_formatter</item>
+        <item name="value">@integer/scaling_default_percent</item>
+    </style>
+
+    <style name="TransformationValueSetup.Translation">
+        <item name="minValue">@integer/translation_min_pixels</item>
+        <item name="maxValue">@integer/translation_max_pixels</item>
+        <item name="value">@integer/translation_default_pixels</item>
+        <item name="textFormatter">@string/integer_pixel_formatter</item>
+    </style>
+
+    <style name="PercentageValueSetup">
+        <item name="textFormatter">@string/percentage_formatter</item>
+        <item name="allowStepOutOfBounds">false</item>
+    </style>
+
+    <style name="SensitivityValueSetup" parent="PercentageValueSetup">
+        <item name="minValue">@integer/sensitivity_min_percents</item>
+        <item name="maxValue">@integer/sensitivity_max_percents</item>
+        <item name="value">@integer/sensitivity_default_percents</item>
+    </style>
+
+    <style name="MenuTransparencyValueSetup" parent="PercentageValueSetup">
+        <item name="minValue">@integer/menu_opacity_min_percents</item>
+        <item name="maxValue">@integer/menu_opacity_max_percents</item>
+        <item name="value">@integer/menu_opacity_default_percents</item>
     </style>
 
 </resources>

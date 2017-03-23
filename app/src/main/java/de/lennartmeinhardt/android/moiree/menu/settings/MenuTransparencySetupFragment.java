@@ -23,67 +23,75 @@ public class MenuTransparencySetupFragment extends MenuFragment {
 
     private MenuTransparencyConfig menuTransparencyConfig;
 
-    private ExpandableView expandableView;
     private Switch menuTransparencySwitch;
     private IntValueSetup opacityValueSetup;
+    private ExpandableView expandableView;
+    private Button resetButton;
 
-    private MenuTransparencyConfig.OnMenuTransparencyChangedListener uiUpdater = new MenuTransparencyConfig.OnMenuTransparencyChangedListener() {
-        @Override
-        public void onMenuTransparencyChanged(boolean transparencyEnabled, float menuAlpha) {
-            menuTransparencySwitch.setChecked(transparencyEnabled);
-            expandableView.setExpanded(transparencyEnabled);
-            if(! opacityValueSetup.isUserInputActive()) {
-                int value = alphaToValue(menuAlpha);
-                opacityValueSetup.setValue(value);
-            }
-        }
-    };
+    private int defaultMenuTransparencyPercents;
 
-    private final IntValueSetup.IntStringConverter textConverter = new IntValueSetup.IntStringConverter() {
-        @Override
-        public String intToText(int value) {
-            return getString(R.string.percentage_formatter, value);
-        }
-    };
 
-    private final IntValueSetup.OnIntValueUpdatedListener transparencySetter = new IntValueSetup.OnIntValueUpdatedListener.Adapter() {
-        @Override
-        public void onIntValueSelected(IntValueSetup intValueSetup, int value) {
-            float alpha = valueToAlpha(value);
-            menuTransparencyConfig.setMenuAlpha(alpha);
-        }
-    };
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        defaultMenuTransparencyPercents = getResources().getInteger(R.integer.menu_opacity_default_percents);
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_menu_transparency_setup, container, false);
+        return inflater.inflate(R.layout.fragment_menu_transparency_setup, container, false);
+    }
 
-        expandableView = (ExpandableView) rootView.findViewById(R.id.expandable_view);
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        expandableView = (ExpandableView) view.findViewById(R.id.expandable_view);
 
-        menuTransparencySwitch = (Switch) rootView.findViewById(R.id.menu_transparency_setup_switch);
+        View header = expandableView.getHeaderView();
+        menuTransparencySwitch = (Switch) header;
         menuTransparencySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                beginMenuBoundsTransition(createTransition());
+                beginMenuTransition(createBoundsAndAlphaTransition());
                 menuTransparencyConfig.setTransparencyEnabled(isChecked);
+                updateUI(false);
             }
         });
 
-        opacityValueSetup = (IntValueSetup) rootView.findViewById(R.id.opacity_value_setup);
-        opacityValueSetup.setOnIntValueSelectedListener(transparencySetter);
-        opacityValueSetup.setIntStringConverter(textConverter);
+        View content = expandableView.getContentView();
 
-        Button resetButton = (Button) rootView.findViewById(R.id.reset_button);
+        resetButton = (Button) content.findViewById(R.id.reset_button);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                beginMenuBoundsTransition(createTransition());
-                menuTransparencyConfig.setMenuAlphaToDefault();
+                beginMenuTransition(createMenuTransparencyTransition());
+                opacityValueSetup.setValue(defaultMenuTransparencyPercents);
             }
         });
 
-        return rootView;
+        opacityValueSetup = (IntValueSetup) content.findViewById(R.id.opacity_value_setup);
+        opacityValueSetup.setOnValueChangedListener(new IntValueSetup.OnValueChangedListener() {
+            @Override
+            public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
+                float alpha = valueToAlpha(value);
+                menuTransparencyConfig.setMenuAlpha(alpha);
+                updateUI(true);
+            }
+        });
+    }
+
+    private void updateUI(boolean fromValueSetup) {
+        boolean transparencyEnabled = menuTransparencyConfig.isTransparencyEnabled();
+        float menuAlpha = menuTransparencyConfig.getMenuAlpha();
+        int opacityPercents = alphaToValue(menuAlpha);
+
+        menuTransparencySwitch.setChecked(transparencyEnabled);
+        expandableView.setExpanded(transparencyEnabled);
+        resetButton.setEnabled(opacityPercents != defaultMenuTransparencyPercents);
+
+        if(! fromValueSetup)
+            opacityValueSetup.setValue(opacityPercents);
     }
 
     @Override
@@ -91,14 +99,10 @@ public class MenuTransparencySetupFragment extends MenuFragment {
         super.onActivityCreated(savedInstanceState);
 
         menuTransparencyConfig = ((MenuTransparencyConfigHolder) getActivity()).getMenuTransparencyConfig();
-        menuTransparencyConfig.addAndFireMenuTransparencyListener(uiUpdater);
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        menuTransparencyConfig.removeMenuTransparencyListener(uiUpdater);
+        updateUI(false);
+        int value = alphaToValue(menuTransparencyConfig.getMenuAlpha());
+        opacityValueSetup.setValue(value);
     }
 
     private int alphaToValue(float alpha) {
@@ -109,7 +113,7 @@ public class MenuTransparencySetupFragment extends MenuFragment {
         return value / 100f;
     }
 
-    private static Transition createTransition() {
+    private static Transition createBoundsAndAlphaTransition() {
         return new TransitionSet()
                 .addTransition(createMenuBoundsTransition())
                 .addTransition(createMenuTransparencyTransition())

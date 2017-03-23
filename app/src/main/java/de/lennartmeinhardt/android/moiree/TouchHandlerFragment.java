@@ -162,23 +162,22 @@ public class TouchHandlerFragment extends Fragment {
         if(resourceId != 0)
             statusBarHeight = getResources().getDimensionPixelSize(resourceId);
 
-        moireeInputMethods = new MoireeInputMethods(getResources());
+        int defaultSensitivityPercents = getResources().getInteger(R.integer.sensitivity_default_percents);
+        moireeInputMethods = new MoireeInputMethods(true, defaultSensitivityPercents / 100f);
         moireeInputMethods.loadFromPreferences(preferences);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View touchHandlerView = inflater.inflate(R.layout.fragment_touch_handler, container, false);
-        initializeTouchListener(touchHandlerView);
-
-        // TODO alternative: menuFragment übernimmt die ganze klick geschichte. der menuHolder wird dann klickbar (gucken ob er alles abfängt). das view hier ist nicht fokussierbar und die im moireeViewFragment sind es auch nicht
-
-        return touchHandlerView;
+        return inflater.inflate(R.layout.fragment_touch_handler, container, false);
     }
 
-    private void initializeTouchListener(View touchHandlerView) {
-        final GestureDetector tapDetector = new GestureDetector(touchHandlerView.getContext(), new GestureDetector.SimpleOnGestureListener() {
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        // TODO alternative: menuFragment übernimmt die ganze klick geschichte. der menuHolder wird dann klickbar (gucken ob er alles abfängt). das view hier ist nicht fokussierbar und die im moireeViewFragment sind es auch nicht
+
+        final GestureDetector tapDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
                 ((MainActivity) getActivity()).toggleMenuShowing();
@@ -187,7 +186,7 @@ public class TouchHandlerFragment extends Fragment {
             }
         });
 
-        touchHandlerView.setOnTouchListener(new View.OnTouchListener() {
+        view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if(tapDetector.onTouchEvent(event))
@@ -196,20 +195,18 @@ public class TouchHandlerFragment extends Fragment {
                 if(event.getY() <= statusBarHeight)
                     return false;
 
-                boolean shouldReturnTrue = false;
-
                 // handle rotation
-                shouldReturnTrue |= rotationDetector.onTouchEvent(event);
+                rotationDetector.onTouchEvent(event);
                 // handle scaling
                 if(moireeTransformation.isUseCommonScaling())
-                    shouldReturnTrue |= commonScalingDetector.onTouchEvent(event);
+                    commonScalingDetector.onTouchEvent(event);
                 else
-                    shouldReturnTrue |= xyScalingDetector.onTouchEvent(event);
+                    xyScalingDetector.onTouchEvent(event);
 
                 // handle translation
-                shouldReturnTrue |= translationDetector.onTouchEvent(event);
+                translationDetector.onTouchEvent(event);
 
-                return shouldReturnTrue;
+                return true;
             }
         });
     }

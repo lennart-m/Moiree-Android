@@ -48,6 +48,8 @@
     <string name="menu_transparency_title">Transparent menus</string>
     <string name="menu_transparency_value_name">Opacity</string>
 
+    <string name="degrees_formatter">%1$d\u2009°</string>
+
     <string name="rotation_value_formatter">%1$.2f\u2009°</string>
     <string name="translation_value_formatter">%1$.1f\u2009px</string>
     <string name="scaling_value_formatter">%1$.2f\u2009%%</string>
@@ -72,9 +74,28 @@
     <string name="pixel_size">Pixel size</string>
     <string name="density">Density</string>
     <string name="checkerboard_title">Checkerboard</string>
+    <string name="random_pixels_title">Random pixels</string>
 
     <string name="integer_pixel_formatter">%1$d\u2009px</string>
     <string name="square_size">Square size</string>
 
     <string name="input_methods">Touch input</string>
+    <string name="about_copyright">This app was written by Lennart Meinhardt in 2017.</string>
+    <string name="about_feedback">I would be happy to read your feedback on this app!</string>
+    <string name="about_source_code">If you are curious about how this app works you might want to check out the source code.</string>
+    <string name="send_email">Send email</string>
+    <string name="view_source_code">View source code</string>
+    <string name="email_subject">Moir\u00e9 \u2013 App on Android</string>
+    <string name="email_address">lennart.meinhardt+moireeandroid@googlemail.com</string>
+
+    <string name="youtube_link_freaky_dot_patterns">https://www.youtube.com/watch?v=QAja2jp1VjE</string>
+
+    <string name="reset_translation_vertical">Reset vertical translation</string>
+    <string name="reset_translations_both">Reset both translations</string>
+    <string name="reset_translation_horizontal">Reset horizontal translation</string>
+
+    <string name="reset_scaling_vertical">Reset vertical scaling</string>
+    <string name="reset_scaling_both">Reset both scalings</string>
+    <string name="reset_scaling_horizontal">Reset horizontal scaling</string>
+
 </resources>

@@ -32,7 +32,12 @@
         android:clipToPadding="false"
         android:fitsSystemWindows="true"/>
 
-    <!--android:layout_width="@dimen/main_menu_max_width"-->
-    <!--android:layout_height="@dimen/main_menu_max_height"-->
+    <fragment
+        android:id="@+id/moiree_image_fragment"
+        android:name="de.lennartmeinhardt.android.moiree.MoireeImageFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        tools:layout="@layout/fragment_image_creator"/>
 
 </android.support.design.widget.CoordinatorLayout>
