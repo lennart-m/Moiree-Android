@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.transition.Transition;
 import android.support.transition.TransitionValues;
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -50,11 +49,11 @@ public class ChangeScroll extends Transition {
         if(startScrollX != endScrollX) {
             endValues.view.setScrollX(startScrollX);
             animators.add(ObjectAnimator.ofInt(endValues.view, "scrollX", startScrollX, endScrollX));
-        };
+        }
         if(startScrollY != endScrollY) {
             endValues.view.setScrollY(startScrollY);
             animators.add(ObjectAnimator.ofInt(endValues.view, "scrollY", startScrollY, endScrollY));
-        };
+        }
 
         if(! animators.isEmpty()) {
             AnimatorSet bothScrollAnimators = new AnimatorSet();

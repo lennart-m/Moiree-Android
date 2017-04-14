@@ -23,18 +23,6 @@ public class RandomPixelsImageCreator extends BaseBitmapMoireeImageCreator <Resc
 	private float density;
 
 
-	public RandomPixelsImageCreator() {
-		this(1, .5f);
-	}
-
-	public RandomPixelsImageCreator(int squareSizeInPixels) {
-		this(squareSizeInPixels, .5f);
-	}
-
-	public RandomPixelsImageCreator(float density) {
-		this(1, density);
-	}
-
 	public RandomPixelsImageCreator(int squareSizeInPixels, float density) {
 		this.squareSizeInPixels = squareSizeInPixels;
 		this.density = density;

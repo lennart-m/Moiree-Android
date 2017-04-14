@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MenuTransparencyConfig {
+import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
+
+public class MenuTransparencyConfig implements PreferenceIO {
 
     private static final String KEY_TRANSPARENCY_ENABLED = "menuTransparency:transparencyEnabled";
     private static final String KEY_MENU_ALPHA = "menuTransparency:menuAlpha";
@@ -22,11 +24,13 @@ public class MenuTransparencyConfig {
     }
 
 
+    @Override
     public void loadFromPreferences(SharedPreferences preferences) {
         setTransparencyEnabled(preferences.getBoolean(KEY_TRANSPARENCY_ENABLED, transparencyEnabled));
         setMenuAlpha(preferences.getFloat(KEY_MENU_ALPHA, menuAlpha));
     }
 
+    @Override
     public void storeToPreferences(SharedPreferences.Editor preferencesEditor) {
         preferencesEditor.putBoolean(KEY_TRANSPARENCY_ENABLED, transparencyEnabled);
         preferencesEditor.putFloat(KEY_MENU_ALPHA, menuAlpha);

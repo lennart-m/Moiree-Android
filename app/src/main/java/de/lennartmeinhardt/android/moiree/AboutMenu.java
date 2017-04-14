@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
-import android.support.v4.content.IntentCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,10 +37,23 @@ public class AboutMenu extends MenuFragment {
                 viewSourceCode();
             }
         });
+
+        Button viewDesktopVersionButton = (Button) view.findViewById(R.id.view_desktop_version);
+        viewDesktopVersionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewDesktopVersion();
+            }
+        });
     }
 
     private void viewSourceCode() {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/lennart-m/Moiree-Android"));
+        startActivity(intent);
+    }
+
+    private void viewDesktopVersion() {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/lennart-m/Moiree"));
         startActivity(intent);
     }
 

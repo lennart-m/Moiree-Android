@@ -3,15 +3,12 @@
 
     <integer name="rotation_min_degrees">-180</integer>
     <integer name="rotation_max_degrees">180</integer>
-    <integer name="rotation_default_degrees">0</integer>
 
     <integer name="scaling_min_percent">50</integer>
     <integer name="scaling_max_percent">200</integer>
-    <integer name="scaling_default_percent">100</integer>
 
     <integer name="translation_min_pixels">-200</integer>
     <integer name="translation_max_pixels">200</integer>
-    <integer name="translation_default_pixels">0</integer>
 
     <integer name="sensitivity_min_percents">0</integer>
     <integer name="sensitivity_max_percents">200</integer>
@@ -26,5 +23,22 @@
     <integer name="indicator_arrow_collapsed_rotation">-90</integer>
 
     <integer name="random_pixels_density_default_percents">20</integer>
+    <integer name="value_setup_value_ems">5</integer>
+
+
+    <integer name="identity_transformation_rotation_degrees">0</integer>
+    <integer name="identity_transformation_scalings_percents">100</integer>
+    <integer name="identity_transformation_translations">0</integer>
+
+
+    <integer name="default_transformation_rotation_degrees">3</integer>
+    <integer name="default_transformation_translation_x_pixels">0</integer>
+    <integer name="default_transformation_translation_y_pixels">0</integer>
+    <integer name="default_transformation_common_scaling_percents">105</integer>
+    <integer name="default_transformation_scaling_x_percents">105</integer>
+    <integer name="default_transformation_scaling_y_percents">105</integer>
+
+    <integer name="transformation_animation_duration_millis">2000</integer>
+    <integer name="color_animation_duration_millis">300</integer>
 
 </resources>

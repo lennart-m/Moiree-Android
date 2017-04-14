@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -15,7 +14,7 @@ import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.util.ExpandableView;
 import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
 
-public class RotationSetupFragment extends BaseTransformationSetupFragment implements Expandable {
+public class RotationSetupFragment extends BaseTransformationSetupFragment {
 
     private ExpandableView expandableView;
 
@@ -68,22 +67,22 @@ public class RotationSetupFragment extends BaseTransformationSetupFragment imple
     }
 
     private void initializeHeaderView() {
-        View header = expandableView.getHeaderView();
+        View header = expandableView.findHeaderView();
         final View expandedIndicator = header.findViewById(R.id.header_expanded_indicator);
         TextView rotationSetupTitle = (TextView) header.findViewById(R.id.header_title);
 
         header.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                beginMenuTransition(TransformationSetupMenu.createExpandTransition());
+                beginMenuTransition(createMenuBoundsAndHeaderIndicatorTransition());
                 expandableView.toggleExpanded();
             }
         });
 
         final int arrowCollapsedDegrees = getResources().getInteger(R.integer.indicator_arrow_collapsed_rotation);
-        expandableView.setOnExpandedStateChangedListener(new ExpandableView.OnExpandedStateChangedListener() {
+        expandableView.addOnExpandedStateChangedListener(new Expandable.OnExpandedStateChangedListener() {
             @Override
-            public void onExpandedStateChanged(ExpandableView expandableView, boolean expanded) {
+            public void onExpandedStateChanged(Expandable expandable, boolean expanded) {
                 expandedIndicator.setRotation(expanded ? 0 : arrowCollapsedDegrees);
             }
         });
@@ -92,7 +91,7 @@ public class RotationSetupFragment extends BaseTransformationSetupFragment imple
     }
 
     private void initializeContentView() {
-        View content = expandableView.getContentView();
+        View content = expandableView.findContentView();
 
         rotationValueSetup = (IntValueSetup) content.findViewById(R.id.rotation_value_setup);
         resetButton = (ImageButton) content.findViewById(R.id.reset_button);
@@ -131,18 +130,7 @@ public class RotationSetupFragment extends BaseTransformationSetupFragment imple
         return Math.round(rotation);
     }
 
-    @Override
-    public boolean isExpanded() {
-        return expandableView.isExpanded();
-    }
-
-    @Override
-    public void setExpanded(boolean expanded) {
-        expandableView.setExpanded(expanded);
-    }
-
-    @Override
-    public void toggleExpanded() {
-        expandableView.toggleExpanded();
+    public ExpandableView getExpandableView() {
+        return expandableView;
     }
 }

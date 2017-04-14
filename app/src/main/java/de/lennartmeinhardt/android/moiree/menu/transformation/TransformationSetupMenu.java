@@ -5,17 +5,18 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.transition.Transition;
-import android.support.transition.TransitionSet;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import de.lennartmeinhardt.android.moiree.MoireeTransformation;
 import de.lennartmeinhardt.android.moiree.MoireeTransformationHolder;
 import de.lennartmeinhardt.android.moiree.R;
-import de.lennartmeinhardt.android.moiree.transition.SimpleChangeTransform;
 
 public class TransformationSetupMenu extends BaseTransformationSetupFragment {
 
@@ -40,6 +41,13 @@ public class TransformationSetupMenu extends BaseTransformationSetupFragment {
         this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,28 +55,36 @@ public class TransformationSetupMenu extends BaseTransformationSetupFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Button resetButton = (Button) view.findViewById(R.id.transformation_setup_set_to_identity_button);
-        resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                beginMenuBoundsTransition();
-                beginMoireeTransformationTransitionIfWanted();
-                moireeTransformation.setToIdentity();
-            }
-        });
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_transformation_setup, menu);
+    }
 
-        rotationSetupFragment = (RotationSetupFragment) getChildFragmentManager().findFragmentByTag("rotationSetup");
-        scalingSetupFragment = (ScalingSetupFragment) getChildFragmentManager().findFragmentByTag("scalingSetup");
-        translationSetupFragment = (TranslationSetupFragment) getChildFragmentManager().findFragmentByTag("translationSetup");
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.reset_to_identity:
+                resetTransformationToIdentity();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        rotationSetupFragment = (RotationSetupFragment) getChildFragmentManager().findFragmentById(R.id.fragment_rotation_setup);
+        scalingSetupFragment = (ScalingSetupFragment) getChildFragmentManager().findFragmentById(R.id.fragment_scaling_setup);
+        translationSetupFragment = (TranslationSetupFragment) getChildFragmentManager().findFragmentById(R.id.fragment_translation_setup);
 
         boolean rotationExpanded = preferences.getBoolean(KEY_ROTATION_EXPANDED, DEF_EXPANDED);
         boolean scalingExpanded = preferences.getBoolean(KEY_SCALING_EXPANDED, DEF_EXPANDED);
         boolean translationExpanded = preferences.getBoolean(KEY_TRANSLATION_EXPANDED, DEF_EXPANDED);
 
-        rotationSetupFragment.setExpanded(rotationExpanded);
-        scalingSetupFragment.setExpanded(scalingExpanded);
-        translationSetupFragment.setExpanded(translationExpanded);
+        rotationSetupFragment.getExpandableView().setExpanded(rotationExpanded);
+        scalingSetupFragment.getExpandableView().setExpanded(scalingExpanded);
+        translationSetupFragment.getExpandableView().setExpanded(translationExpanded);
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 
     @Override
@@ -82,18 +98,15 @@ public class TransformationSetupMenu extends BaseTransformationSetupFragment {
     public void onDestroy() {
         super.onDestroy();
         SharedPreferences.Editor preferencesEditor = preferences.edit();
-        preferencesEditor.putBoolean(KEY_ROTATION_EXPANDED, rotationSetupFragment.isExpanded());
-        preferencesEditor.putBoolean(KEY_SCALING_EXPANDED, scalingSetupFragment.isExpanded());
-        preferencesEditor.putBoolean(KEY_TRANSLATION_EXPANDED, translationSetupFragment.isExpanded());
+        preferencesEditor.putBoolean(KEY_ROTATION_EXPANDED, rotationSetupFragment.getExpandableView().isExpanded());
+        preferencesEditor.putBoolean(KEY_SCALING_EXPANDED, scalingSetupFragment.getExpandableView().isExpanded());
+        preferencesEditor.putBoolean(KEY_TRANSLATION_EXPANDED, translationSetupFragment.getExpandableView().isExpanded());
         preferencesEditor.apply();
     }
 
-
-    // TODO woanders hin schieben
-    public static Transition createExpandTransition() {
-        return new TransitionSet()
-                .addTransition(createMenuBoundsTransition())
-                .addTransition(new SimpleChangeTransform().addTarget(R.id.header_expanded_indicator))
-                .setOrdering(TransitionSet.ORDERING_TOGETHER);
+    private void resetTransformationToIdentity() {
+        beginMenuBoundsTransition();
+        beginMoireeTransformationTransitionIfWanted();
+        moireeTransformation.setToIdentity();
     }
 }

@@ -1,8 +1,8 @@
 package de.lennartmeinhardt.android.moiree.menu.imagesetup;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +12,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import de.lennartmeinhardt.android.moiree.Expandable;
 import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.imaging.CheckerboardImageCreator;
 import de.lennartmeinhardt.android.moiree.imaging.RescaledDrawable;
 import de.lennartmeinhardt.android.moiree.util.ExpandableView;
 import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
 
-public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragment<CheckerboardImageCreator> implements Expandable {
+public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragment<CheckerboardImageCreator> {
 
     private ExpandableView expandableView;
 
@@ -48,7 +47,7 @@ public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragmen
     }
 
     private void initializeHeaderView() {
-        View headerView = expandableView.getHeaderView();
+        View headerView = expandableView.findHeaderView();
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,10 +63,7 @@ public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragmen
         preview.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if(Build.VERSION.SDK_INT < 16)
-                    preview.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                else
-                    preview.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                preview.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                 initializePreviewDrawable();
             }
@@ -75,7 +71,7 @@ public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragmen
     }
 
     private void initializeContentView() {
-        View contentView = expandableView.getContentView();
+        View contentView = expandableView.findContentView();
 
         resetButton = (Button) contentView.findViewById(R.id.reset_button);
         resetButton.setOnClickListener(new View.OnClickListener() {
@@ -114,7 +110,7 @@ public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragmen
         previewDrawable = previewImageCreator.createMoireeImageForDimensions(getResources(), preview.getWidth(), preview.getHeight());
         previewDrawable.setScaleX(imageCreator.getSquareSizeInPixels());
         previewDrawable.setScaleY(imageCreator.getSquareSizeInPixels());
-        preview.setImageDrawable(previewDrawable);
+        ViewCompat.setBackground(preview, previewDrawable);
     }
 
     private void updateUI(boolean fromValueSetup) {
@@ -132,18 +128,7 @@ public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragmen
         return new CheckerboardImageCreator(defSquareSize);
     }
 
-    @Override
-    public boolean isExpanded() {
-        return expandableView.isExpanded();
-    }
-
-    @Override
-    public void setExpanded(boolean expanded) {
-        expandableView.setExpanded(expanded);
-    }
-
-    @Override
-    public void toggleExpanded() {
-        expandableView.toggleExpanded();
+    public ExpandableView getExpandableView() {
+        return expandableView;
     }
 }

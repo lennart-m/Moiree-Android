@@ -10,8 +10,9 @@ import android.view.ViewGroup;
 import de.lennartmeinhardt.android.moiree.transition.BackgroundRecolor;
 import de.lennartmeinhardt.android.moiree.transition.SimpleChangeTransform;
 import de.lennartmeinhardt.android.moiree.transition.TagColorFilterRecolor;
+import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
-public class MoireeTransitionStarter {
+public class MoireeTransitionStarter implements PreferenceIO {
 
     private static final String KEY_COLOR_ENABLED = "moireeTransitionStarter:colorTransitionEnabled";
     private static final String KEY_COLOR_DURATION = "moireeTransitionStarter:colorTransitionDuration";
@@ -89,6 +90,7 @@ public class MoireeTransitionStarter {
     }
 
 
+    @Override
     public void loadFromPreferences(SharedPreferences preferences) {
         colorTransitionEnabled = preferences.getBoolean(KEY_COLOR_ENABLED, colorTransitionEnabled);
         colorTransitionDuration = preferences.getLong(KEY_COLOR_DURATION, colorTransitionDuration);
@@ -97,6 +99,7 @@ public class MoireeTransitionStarter {
         transformationTransitionDuration = preferences.getLong(KEY_TRANSFORMATION_DURATION, transformationTransitionDuration);
     }
 
+    @Override
     public void storeToPreferences(SharedPreferences.Editor preferencesEditor) {
         preferencesEditor.putBoolean(KEY_COLOR_ENABLED, colorTransitionEnabled);
         preferencesEditor.putLong(KEY_COLOR_DURATION, colorTransitionDuration);

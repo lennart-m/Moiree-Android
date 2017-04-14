@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
-import de.lennartmeinhardt.android.moiree.MainActivity;
+import de.lennartmeinhardt.android.moiree.MoireeImaging;
 import de.lennartmeinhardt.android.moiree.imaging.MoireeImageCreator;
 import de.lennartmeinhardt.android.moiree.menu.MenuFragment;
 import de.lennartmeinhardt.android.moiree.util.BundleIO;
@@ -49,9 +49,8 @@ abstract class BaseImageCreatorSetupFragment <C extends MoireeImageCreator> exte
     }
 
     void onCreateNewImageClicked() {
-        ((MainActivity) getActivity()).setImageCreatorAndRecreateImage(imageCreator);
-        ((MainActivity) getActivity()).hideMenuIfShown();
         storeImageCreatorToPreferences();
+        ((MoireeImaging) getActivity()).setImageCreatorAndRecreateImage(imageCreator);
     }
 
     private void storeImageCreatorToPreferences() {

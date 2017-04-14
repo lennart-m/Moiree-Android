@@ -3,4 +3,8 @@
 
     <bool name="menu_transparency_default_enabled">false</bool>
 
+    <bool name="default_transformation_use_common_scaling">true</bool>
+
+    <bool name="color_setup_user_expandable">true</bool>
+
 </resources>

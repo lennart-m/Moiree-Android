@@ -15,9 +15,7 @@ import android.widget.RelativeLayout;
 import de.lennartmeinhardt.android.moiree.R;
 
 // TODO mirror sat-val-selection in RTL mode
-// TODO interface colorPicker hat getselected und setselected, außerdem add und remove listener
-// TODO dies wird HsbColorPicker
-public class ColorPicker extends RelativeLayout {
+public class HsbColorPicker extends RelativeLayout {
 
     private final float[] tmpHsv = new float[3];
 
@@ -31,24 +29,24 @@ public class ColorPicker extends RelativeLayout {
 
     private boolean hueUserInputActive, satValUserInputActive;
 
-    private OnColorSelectionChangeListener onColorSelectionChangeListener;
+    private OnColorSelectionChangedListener onColorSelectionChangedListener;
 
 
-    public ColorPicker(Context context) {
+    public HsbColorPicker(Context context) {
         super(context);
 
         selectedColor = getInitialColor(context);
         inflateColorPicker(context);
     }
 
-    public ColorPicker(Context context, AttributeSet attrs) {
+    public HsbColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         loadColorFromAttributes(context, attrs);
         inflateColorPicker(context);
     }
 
-    public ColorPicker(Context context, AttributeSet attrs, int defStyleAttr) {
+    public HsbColorPicker(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         loadColorFromAttributes(context, attrs);
@@ -60,9 +58,9 @@ public class ColorPicker extends RelativeLayout {
     }
 
     private void loadColorFromAttributes(Context context, AttributeSet attrs) {
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ColorPicker, 0, 0);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.HsbColorPicker, 0, 0);
         try {
-            selectedColor = a.getColor(R.styleable.ColorPicker_selectedColor, Color.BLACK);
+            selectedColor = a.getColor(R.styleable.HsbColorPicker_selectedColor, Color.BLACK);
         } finally {
             a.recycle();
         }
@@ -182,8 +180,8 @@ public class ColorPicker extends RelativeLayout {
     private void setColorInternal(int color, boolean fromUser) {
         if (selectedColor != color) {
             this.selectedColor = color;
-            if (onColorSelectionChangeListener != null)
-                onColorSelectionChangeListener.onColorSelectionChanged(this, color, fromUser);
+            if (onColorSelectionChangedListener != null)
+                onColorSelectionChangedListener.onColorSelectionChanged(this, color, fromUser);
         }
     }
 
@@ -196,16 +194,16 @@ public class ColorPicker extends RelativeLayout {
         return selectedColor;
     }
 
-    public void setOnColorSelectionChangeListener(OnColorSelectionChangeListener onColorSelectionChangeListener) {
-        this.onColorSelectionChangeListener = onColorSelectionChangeListener;
+    public void setOnColorSelectionChangedListener(OnColorSelectionChangedListener onColorSelectionChangedListener) {
+        this.onColorSelectionChangedListener = onColorSelectionChangedListener;
     }
 
     public boolean isUserInputActive() {
-        return hueUserInputActive || satValUserInputActive;
+        return hueSelection.isInputActive() || satValSelection.isInputActive();
     }
 
 
-    public interface OnColorSelectionChangeListener {
-        void onColorSelectionChanged(ColorPicker colorPicker, int color, boolean fromUser);
+    public interface OnColorSelectionChangedListener {
+        void onColorSelectionChanged(HsbColorPicker colorPicker, int color, boolean fromUser);
     }
 }

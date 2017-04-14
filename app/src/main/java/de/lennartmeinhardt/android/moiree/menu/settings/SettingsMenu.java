@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,16 +36,16 @@ public class SettingsMenu extends MenuFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        inputMethodsSetupFragment = (InputMethodsSetupFragment) getChildFragmentManager().findFragmentByTag("inputMethodsSetup");
+        inputMethodsSetupFragment = (InputMethodsSetupFragment) getChildFragmentManager().findFragmentById(R.id.fragment_input_methods_setup);
 
         if(savedInstanceState == null)
-            inputMethodsSetupFragment.setExpanded(preferences.getBoolean(KEY_INPUT_METHODS_EXPANDED, false));
+            inputMethodsSetupFragment.getExpandableView().setExpanded(preferences.getBoolean(KEY_INPUT_METHODS_EXPANDED, false));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        preferences.edit().putBoolean(KEY_INPUT_METHODS_EXPANDED, inputMethodsSetupFragment.isExpanded()).apply();
+        preferences.edit().putBoolean(KEY_INPUT_METHODS_EXPANDED, inputMethodsSetupFragment.getExpandableView().isExpanded()).apply();
     }
 }

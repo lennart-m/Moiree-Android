@@ -5,10 +5,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,8 +22,8 @@ import de.lennartmeinhardt.android.moiree.MoireeColorsHolder;
 import de.lennartmeinhardt.android.moiree.MoireeTransitionStarter;
 import de.lennartmeinhardt.android.moiree.MoireeTransitionStarterHolder;
 import de.lennartmeinhardt.android.moiree.R;
-import de.lennartmeinhardt.android.moiree.util.ColorPicker;
 import de.lennartmeinhardt.android.moiree.util.ExpandableView;
+import de.lennartmeinhardt.android.moiree.util.HsbColorPicker;
 
 public class MoireeColorsSetupMenu extends MenuFragment {
 
@@ -34,10 +39,15 @@ public class MoireeColorsSetupMenu extends MenuFragment {
     private ExpandableView backgroundSetupExpandable;
 
     private ImageView foregroundPreview;
-    private ColorPicker foregroundColorPicker;
+    private HsbColorPicker foregroundColorPicker;
 
     private ImageView backgroundPreview;
-    private ColorPicker backgroundColorPicker;
+    private HsbColorPicker backgroundColorPicker;
+
+    private int defaultForegroundColor;
+    private int defaultBackgroundColor;
+
+    private boolean userExpandable;
 
     private final MoireeColors.MoireeColorsListener previewColorsUpdater = new MoireeColors.MoireeColorsListener() {
         @Override
@@ -63,6 +73,17 @@ public class MoireeColorsSetupMenu extends MenuFragment {
         this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+        defaultBackgroundColor = ResourcesCompat.getColor(getResources(), R.color.moiree_background_default, getActivity().getTheme());
+        defaultForegroundColor = ResourcesCompat.getColor(getResources(), R.color.moiree_foreground_default, getActivity().getTheme());
+
+        userExpandable = getResources().getBoolean(R.bool.color_setup_user_expandable);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -71,30 +92,29 @@ public class MoireeColorsSetupMenu extends MenuFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Button swapColorsButton = (Button) view.findViewById(R.id.color_setup_swap);
-        swapColorsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                swapColors();
-            }
-        });
-
-        Button resetToDefaultButton = (Button) view.findViewById(R.id.color_setup_reset);
-        resetToDefaultButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setColorsWithTransition(MoireeColors.DEF_FOREGROUND_COLOR, MoireeColors.DEF_BACKGROUND_COLOR);
-            }
-        });
-
         initializeForegroundColorSetup(view);
         initializeBackgroundColorSetup(view);
 
-        boolean foregroundSetupExpanded = preferences.getBoolean(KEY_FOREGROUND_SETUP_EXPANDED, false);
-        boolean backgroundSetupExpanded = preferences.getBoolean(KEY_BACKGROUND_SETUP_EXPANDED, false);
+        boolean foregroundSetupExpanded;
+        boolean backgroundSetupExpanded;
+        if(userExpandable) {
+            foregroundSetupExpanded = preferences.getBoolean(KEY_FOREGROUND_SETUP_EXPANDED, false);
+            backgroundSetupExpanded = preferences.getBoolean(KEY_BACKGROUND_SETUP_EXPANDED, false);
+        } else {
+            foregroundSetupExpanded = true;
+            backgroundSetupExpanded = true;
+        }
 
         foregroundSetupExpandable.setExpanded(foregroundSetupExpanded);
         backgroundSetupExpandable.setExpanded(backgroundSetupExpanded);
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_colors_setup, menu);
     }
 
     @Override
@@ -111,26 +131,43 @@ public class MoireeColorsSetupMenu extends MenuFragment {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.swap_colors:
+                swapColors();
+                return true;
+            case R.id.reset_colors:
+                resetColorsToDefault();
+                return true;
+            default: return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void initializeForegroundColorSetup(View rootView) {
         View foregroundCard = rootView.findViewById(R.id.foreground_color_setup_card);
         foregroundSetupExpandable = (ExpandableView) foregroundCard.findViewById(R.id.expandable_view);
-        View header = foregroundSetupExpandable.getHeaderView();
-        header.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                beginMenuBoundsTransition();
-                foregroundSetupExpandable.toggleExpanded();
-            }
-        });
+
+        View header = foregroundSetupExpandable.findHeaderView();
+        header.setFocusable(userExpandable);
+        header.setClickable(userExpandable);
+        if(userExpandable)
+            header.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    beginMenuBoundsTransition();
+                    foregroundSetupExpandable.toggleExpanded();
+                }
+            });
+
         TextView title = (TextView) header.findViewById(R.id.header_title);
         title.setText(R.string.foreground);
         foregroundPreview = (ImageView) header.findViewById(R.id.header_preview);
-        foregroundPreview.setImageResource(R.drawable.color_preview_mask);
-        foregroundColorPicker = (ColorPicker) foregroundSetupExpandable.getContentView().findViewById(R.id.color_picker);
-        foregroundColorPicker.setOnColorSelectionChangeListener(new ColorPicker.OnColorSelectionChangeListener() {
+        foregroundColorPicker = (HsbColorPicker) foregroundSetupExpandable.findContentView().findViewById(R.id.color_picker);
+        foregroundColorPicker.setOnColorSelectionChangedListener(new HsbColorPicker.OnColorSelectionChangedListener() {
             @Override
-            public void onColorSelectionChanged(ColorPicker colorPicker, int color, boolean fromUser) {
-                if(fromUser && foregroundColorPicker.isUserInputActive())
+            public void onColorSelectionChanged(HsbColorPicker colorPicker, int color, boolean fromUser) {
+                if(fromUser)
                     moireeColors.setForegroundColor(color);
             }
         });
@@ -139,23 +176,28 @@ public class MoireeColorsSetupMenu extends MenuFragment {
     private void initializeBackgroundColorSetup(View rootView) {
         View backgroundCard = rootView.findViewById(R.id.background_color_setup_card);
         backgroundSetupExpandable = (ExpandableView) backgroundCard.findViewById(R.id.expandable_view);
-        View header = backgroundSetupExpandable.getHeaderView();
-        header.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                beginMenuBoundsTransition();
-                backgroundSetupExpandable.toggleExpanded();
-            }
-        });
+
+        View header = backgroundSetupExpandable.findHeaderView();
+        header.setFocusable(userExpandable);
+        header.setClickable(userExpandable);
+        if(userExpandable) {
+            header.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    beginMenuBoundsTransition();
+                    backgroundSetupExpandable.toggleExpanded();
+                }
+            });
+        }
+
         TextView title = (TextView) header.findViewById(R.id.header_title);
         title.setText(R.string.background);
         backgroundPreview = (ImageView) header.findViewById(R.id.header_preview);
-        backgroundPreview.setImageResource(R.drawable.color_preview_mask);
-        backgroundColorPicker = (ColorPicker) backgroundSetupExpandable.getContentView().findViewById(R.id.color_picker);
-        backgroundColorPicker.setOnColorSelectionChangeListener(new ColorPicker.OnColorSelectionChangeListener() {
+        backgroundColorPicker = (HsbColorPicker) backgroundSetupExpandable.findContentView().findViewById(R.id.color_picker);
+        backgroundColorPicker.setOnColorSelectionChangedListener(new HsbColorPicker.OnColorSelectionChangedListener() {
             @Override
-            public void onColorSelectionChanged(ColorPicker colorPicker, int color, boolean fromUser) {
-                if(fromUser && backgroundColorPicker.isUserInputActive())
+            public void onColorSelectionChanged(HsbColorPicker colorPicker, int color, boolean fromUser) {
+                if(fromUser)
                     moireeColors.setBackgroundColor(color);
             }
         });
@@ -165,12 +207,16 @@ public class MoireeColorsSetupMenu extends MenuFragment {
     public void onDestroy() {
         super.onDestroy();
 
-        SharedPreferences.Editor preferencesEditor = preferences.edit();
-        preferencesEditor.putBoolean(KEY_FOREGROUND_SETUP_EXPANDED, foregroundSetupExpandable.isExpanded());
-        preferencesEditor.putBoolean(KEY_BACKGROUND_SETUP_EXPANDED, backgroundSetupExpandable.isExpanded());
-        preferencesEditor.apply();
+        if(userExpandable) {
+            SharedPreferences.Editor preferencesEditor = preferences.edit();
+            preferencesEditor.putBoolean(KEY_FOREGROUND_SETUP_EXPANDED, foregroundSetupExpandable.isExpanded());
+            preferencesEditor.putBoolean(KEY_BACKGROUND_SETUP_EXPANDED, backgroundSetupExpandable.isExpanded());
+            preferencesEditor.apply();
+        }
 
         moireeColors.removeMoireeColorsListener(previewColorsUpdater);
+
+//        android.util.Log.d("Moiree", String.format("colors: fg=#%s, bg=#%s", Integer.toHexString(moireeColors.getForegroundColor()), Integer.toHexString(moireeColors.getBackgroundColor())));
     }
 
     private void swapColors() {
@@ -183,5 +229,9 @@ public class MoireeColorsSetupMenu extends MenuFragment {
 
         moireeColors.setBackgroundColor(backgroundColor);
         moireeColors.setForegroundColor(foregroundColor);
+    }
+
+    private void resetColorsToDefault() {
+        setColorsWithTransition(defaultForegroundColor, defaultBackgroundColor);
     }
 }

@@ -7,11 +7,13 @@
 
     <dimen name="moiree_image_button_tile_size">5dp</dimen>
 
-    <dimen name="main_menu_max_width">300dp</dimen>
-    <dimen name="main_menu_max_height">500dp</dimen>
-    <dimen name="expanded_indicator_size">30dp</dimen>
-
     <dimen name="checkerboard_image_default_square_size">6dp</dimen>
+    <dimen name="horizontal_lines_image_default_line_thickness">5dp</dimen>
     <dimen name="random_pixels_image_default_square_size">4dp</dimen>
+
+    <dimen name="thumb_circle_diameter">15dp</dimen>
+    <dimen name="thumb_stroke_width">1dp</dimen>
+    <dimen name="thumb_rect_width">10dp</dimen>
+    <dimen name="thumb_rect_height">30dp</dimen>
 
 </resources>

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/RootMenuCard"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/RootMenuCard.SingleColumn"
     android:layout_centerInParent="true">
 
     <LinearLayout
@@ -13,10 +11,11 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            style="@style/MenuHeader"
+        <android.support.v7.widget.Toolbar
+            style="@style/MenuTitle"
             android:layout_width="match_parent"
-            android:text="@string/settings"/>
+            android:layout_height="wrap_content"
+            app:title="@string/menu_settings"/>
 
         <ScrollView
             android:layout_width="match_parent"
@@ -35,14 +34,14 @@
                     android:name="de.lennartmeinhardt.android.moiree.menu.settings.MenuTransparencySetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:tag="menuTransparencySetup"
+                    android:id="@+id/fragment_menu_transparency_setup"
                     tools:layout="@layout/fragment_menu_transparency_setup"/>
 
                 <fragment
                     android:name="de.lennartmeinhardt.android.moiree.menu.settings.InputMethodsSetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:tag="inputMethodsSetup"
+                    android:id="@+id/fragment_input_methods_setup"
                     tools:layout="@layout/fragment_input_methods_setup"/>
 
             </LinearLayout>

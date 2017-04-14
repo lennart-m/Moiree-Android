@@ -1,10 +1,8 @@
 <resources>
 
-    <!-- Base application theme. -->
+    <style name="Base" />
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <!--<item name="android:windowFullscreen">true</item>-->
-        <!--<item name="android:windowContentOverlay">@null</item>-->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -15,16 +13,17 @@
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
-    <style name="MainMenuButtonCard">
+    <style name="Base.MainMenuButtonCard">
         <item name="android:clickable">true</item>
         <item name="android:layout_marginLeft">3dp</item>
         <item name="android:layout_marginRight">3dp</item>
         <item name="android:focusable">true</item>
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
-        <item name="android:stateListAnimator">@animator/lift_on_touch</item>
         <item name="cardUseCompatPadding">true</item>
         <item name="cardPreventCornerOverlap">false</item>
     </style>
+
+    <style name="MainMenuButtonCard" parent="Base.MainMenuButtonCard"/>
 
     <style name="BaseMenuCard">
         <item name="contentPadding">10dp</item>
@@ -50,21 +49,33 @@
         <item name="android:layout_marginRight">@dimen/activity_horizontal_margin</item>
         <item name="android:layout_marginTop">@dimen/activity_vertical_margin</item>
         <item name="android:layout_marginBottom">@dimen/activity_vertical_margin</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="MenuHeader">
+    <style name="RootMenuCard.SingleColumn">
+        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <style name="RootMenuCard.TwoColumns">
+        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <style name="TitleTextAppearance" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="MenuTitle">
+        <item name="titleTextAppearance">@style/TitleTextAppearance</item>
+    </style>
+
+    <style name="MainMenuHeader">
         <item name="android:gravity">center</item>
-        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_gravity">center_horizontal</item>
-        <item name="android:layout_height">40dp</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
-    </style>
-
-    <style name="MainMenuHeader" parent="MenuHeader">
         <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
-        <item name="android:fontFamily">serif</item>
         <!--<item name="android:gravity">center</item>-->
         <item name="android:textStyle">italic</item>
+        <item name="android:fontFamily">serif</item>
     </style>
 
     <style name="Divider">
@@ -98,20 +109,20 @@
         <item name="minValue">@integer/rotation_min_degrees</item>
         <item name="maxValue">@integer/rotation_max_degrees</item>
         <item name="textFormatter">@string/degrees_formatter</item>
-        <item name="value">@integer/rotation_default_degrees</item>
+        <item name="value">@integer/identity_transformation_rotation_degrees</item>
     </style>
 
     <style name="TransformationValueSetup.Scaling">
         <item name="minValue">@integer/scaling_min_percent</item>
         <item name="maxValue">@integer/scaling_max_percent</item>
         <item name="textFormatter">@string/percentage_formatter</item>
-        <item name="value">@integer/scaling_default_percent</item>
+        <item name="value">@integer/identity_transformation_scalings_percents</item>
     </style>
 
     <style name="TransformationValueSetup.Translation">
         <item name="minValue">@integer/translation_min_pixels</item>
         <item name="maxValue">@integer/translation_max_pixels</item>
-        <item name="value">@integer/translation_default_pixels</item>
+        <item name="value">@integer/identity_transformation_translations</item>
         <item name="textFormatter">@string/integer_pixel_formatter</item>
     </style>
 

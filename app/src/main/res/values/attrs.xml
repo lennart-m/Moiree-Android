@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="ColorPicker">
+    <declare-styleable name="HsbColorPicker">
         <attr name="selectedColor" format="color"/>
     </declare-styleable>
 
@@ -29,8 +29,6 @@
 
     <declare-styleable name="ExpandableView">
         <attr name="expanded" format="boolean"/>
-        <attr name="keepHeaderReference" format="boolean"/>
-        <attr name="keepContentReference" format="boolean"/>
     </declare-styleable>
 
 </resources>

@@ -48,7 +48,7 @@ public class MenuTransparencySetupFragment extends MenuFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         expandableView = (ExpandableView) view.findViewById(R.id.expandable_view);
 
-        View header = expandableView.getHeaderView();
+        View header = expandableView.findHeaderView();
         menuTransparencySwitch = (Switch) header;
         menuTransparencySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -59,7 +59,7 @@ public class MenuTransparencySetupFragment extends MenuFragment {
             }
         });
 
-        View content = expandableView.getContentView();
+        View content = expandableView.findContentView();
 
         resetButton = (Button) content.findViewById(R.id.reset_button);
         resetButton.setOnClickListener(new View.OnClickListener() {

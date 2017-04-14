@@ -87,7 +87,7 @@ public class MoireeViewFragment extends Fragment {
         fixedImageView = (ImageView) view.findViewById(R.id.moiree_image_fixed);
         transformedImageView = (ImageView) view.findViewById(R.id.moiree_image_transformed);
     }
-
+    
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -127,7 +127,6 @@ public class MoireeViewFragment extends Fragment {
             }
             if(drawable instanceof DrawableWrapper) {
                 drawable = ((DrawableWrapper) drawable).getWrappedDrawable();
-                continue;
             }
         }
     }
@@ -141,8 +140,8 @@ public class MoireeViewFragment extends Fragment {
     }
 
     public void setMoireeViewsVisible(boolean visible) {
-        int visibility = visible ? View.VISIBLE : View.INVISIBLE;
-        fixedImageView.setVisibility(visibility);
-        transformedImageView.setVisibility(visibility);
+        float alpha = visible ? 1 : 0;
+        fixedImageView.setAlpha(alpha);
+        transformedImageView.setAlpha(alpha);
     }
 }

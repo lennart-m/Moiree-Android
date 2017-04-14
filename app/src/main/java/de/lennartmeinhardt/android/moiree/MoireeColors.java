@@ -1,29 +1,21 @@
 package de.lennartmeinhardt.android.moiree;
 
 import android.content.SharedPreferences;
-import android.graphics.Color;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO die colors etc haben defaultValues welche aus resources kommen. auch die moireeImageCreators haben defaults welche sie aus resources (oder context) auslesen
-public class MoireeColors {
+import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
-	// TODO ohne prefix
+public class MoireeColors implements PreferenceIO {
+
 	private static final String KEY_BACKGROUND_COLOR = "moireeColors:backgroundColor";
 	private static final String KEY_FOREGROUND_COLOR = "moireeColors:foregroundColor";
 
-	public static final int DEF_BACKGROUND_COLOR = Color.rgb(15, 90, 135); // Color.BLACK;
-	public static final int DEF_FOREGROUND_COLOR = Color.rgb(200, 200, 150); // Color.LTGRAY;
-	
 	private final List<MoireeColorsListener> listeners = new ArrayList<>();
 
 	private int backgroundColor;
 	private int foregroundColor;
-
-	public MoireeColors() {
-		this(DEF_FOREGROUND_COLOR, DEF_BACKGROUND_COLOR);
-	}
 
 	public MoireeColors(int foregroundColor, int backgroundColor) {
 		this.foregroundColor = foregroundColor;
@@ -68,18 +60,20 @@ public class MoireeColors {
 		void onForegroundColorChanged(int newColor);
 	}
 
+	@Override
 	public void loadFromPreferences(SharedPreferences preferences) {
-		setBackgroundColor(preferences.getInt(KEY_BACKGROUND_COLOR, DEF_BACKGROUND_COLOR));
-		setForegroundColor(preferences.getInt(KEY_FOREGROUND_COLOR, DEF_FOREGROUND_COLOR));
+		setBackgroundColor(preferences.getInt(KEY_BACKGROUND_COLOR, backgroundColor));
+		setForegroundColor(preferences.getInt(KEY_FOREGROUND_COLOR, foregroundColor));
 	}
 
+	@Override
 	public void storeToPreferences(SharedPreferences.Editor preferencesEditor) {
 		preferencesEditor.putInt(KEY_BACKGROUND_COLOR, backgroundColor);
 		preferencesEditor.putInt(KEY_FOREGROUND_COLOR, foregroundColor);
 	}
 
-	public void resetToDefault() {
-		setBackgroundColor(DEF_BACKGROUND_COLOR);
-		setForegroundColor(DEF_FOREGROUND_COLOR);
+	@Override
+	public String toString() {
+		return String.format("[fg=#%s, bg=#%s]", Integer.toHexString(foregroundColor), Integer.toHexString(backgroundColor));
 	}
 }

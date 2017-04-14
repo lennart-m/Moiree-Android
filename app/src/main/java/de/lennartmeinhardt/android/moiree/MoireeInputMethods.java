@@ -2,7 +2,9 @@ package de.lennartmeinhardt.android.moiree;
 
 import android.content.SharedPreferences;
 
-public class MoireeInputMethods {
+import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
+
+public class MoireeInputMethods implements PreferenceIO {
 
     private static final String KEY_INPUT_ROTATION_ENABLED = "moireeInputMethods:rotationInputEnabled";
     private static final String KEY_INPUT_SCALING_ENABLED = "moireeInputMethods:scalingInputEnabled";
@@ -55,6 +57,7 @@ public class MoireeInputMethods {
         return this.translationInputEnabled;
     }
 
+    @Override
     public void loadFromPreferences(SharedPreferences preferences) {
         this.rotationInputEnabled = preferences.getBoolean(KEY_INPUT_ROTATION_ENABLED, rotationInputEnabled);
         this.scalingInputEnabled = preferences.getBoolean(KEY_INPUT_SCALING_ENABLED, scalingInputEnabled);
@@ -65,6 +68,7 @@ public class MoireeInputMethods {
         this.translationSensitivity = preferences.getFloat(KEY_TRANSLATION_SENSITIVITY, translationSensitivity);
     }
 
+    @Override
     public void storeToPreferences(SharedPreferences.Editor preferencesEditor) {
         preferencesEditor.putBoolean(KEY_INPUT_ROTATION_ENABLED, rotationInputEnabled);
         preferencesEditor.putBoolean(KEY_INPUT_SCALING_ENABLED, scalingInputEnabled);

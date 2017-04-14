@@ -14,7 +14,7 @@ import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.util.ExpandableView;
 import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
 
-public class TranslationSetupFragment extends BaseTransformationSetupFragment implements Expandable {
+public class TranslationSetupFragment extends BaseTransformationSetupFragment {
 
     private ExpandableView expandableView;
 
@@ -58,7 +58,7 @@ public class TranslationSetupFragment extends BaseTransformationSetupFragment im
     }
 
     private void initializeContentView() {
-        View contentView = expandableView.getContentView();
+        View contentView = expandableView.findContentView();
 
         translationXValueSetup = (IntValueSetup) contentView.findViewById(R.id.translation_x_value_setup);
         translationYValueSetup = (IntValueSetup) contentView.findViewById(R.id.translation_y_value_setup);
@@ -95,16 +95,16 @@ public class TranslationSetupFragment extends BaseTransformationSetupFragment im
         title.setText(R.string.translations);
 
         final int arrowCollapsedDegrees = getResources().getInteger(R.integer.indicator_arrow_collapsed_rotation);
-        expandableView.setOnExpandedStateChangedListener(new ExpandableView.OnExpandedStateChangedListener() {
+        expandableView.addOnExpandedStateChangedListener(new Expandable.OnExpandedStateChangedListener() {
             @Override
-            public void onExpandedStateChanged(ExpandableView expandableView, boolean expanded) {
+            public void onExpandedStateChanged(Expandable expandable, boolean expanded) {
                 expandedIndicator.setRotation(expanded ? 0 : arrowCollapsedDegrees);
             }
         });
         header.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                beginMenuTransition(TransformationSetupMenu.createExpandTransition());
+                beginMenuTransition(createMenuBoundsAndHeaderIndicatorTransition());
                 expandableView.toggleExpanded();
             }
         });
@@ -173,18 +173,7 @@ public class TranslationSetupFragment extends BaseTransformationSetupFragment im
         return Math.round(translation);
     }
 
-    @Override
-    public boolean isExpanded() {
-        return expandableView.isExpanded();
-    }
-
-    @Override
-    public void setExpanded(boolean expanded) {
-        expandableView.setExpanded(expanded);
-    }
-
-    @Override
-    public void toggleExpanded() {
-        expandableView.toggleExpanded();
+    public ExpandableView getExpandableView() {
+        return expandableView;
     }
 }

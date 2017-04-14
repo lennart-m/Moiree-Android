@@ -72,7 +72,7 @@ public class IntValueSetup extends BaseValueSetup {
                     @Override
                     public String formatInt(int value) {
                         return getResources().getString(formatterId, value);
-                    };
+                    }
                 });
             }
         } finally {
@@ -181,18 +181,25 @@ public class IntValueSetup extends BaseValueSetup {
 
     protected void onIncreaseButtonClicked() {
         increaseButtonInputActive = true;
-        stepValue(stepSize, false);
+        stepAndTrimValue(stepSize, false);
         increaseButtonInputActive = false;
     }
 
     protected void onDecreaseButtonClicked() {
         decreaseButtonInputActive = true;
-        stepValue(-stepSize, false);
+        stepAndTrimValue(-stepSize, false);
         decreaseButtonInputActive = false;
     }
 
-    private void stepValue(int stepSize, boolean forceUpdate) {
-        setValueInternal(value + stepSize, forceUpdate);
+    private void stepAndTrimValue(int stepSize, boolean forceUpdate) {
+        int newValue = value + stepSize;
+        if(! allowStepOutOfBounds)
+            newValue = trimValue(newValue);
+        setValueInternal(newValue, forceUpdate);
+    }
+
+    private int trimValue(int value) {
+        return Math.max(minValue, Math.min(maxValue, value));
     }
 
     private String valueToText(int value) {

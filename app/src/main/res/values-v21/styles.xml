@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MainMenuButtonCard" parent="Base.MainMenuButtonCard">
+        <item name="android:stateListAnimator">@animator/lift_on_touch</item>
+    </style>
+
+</resources>

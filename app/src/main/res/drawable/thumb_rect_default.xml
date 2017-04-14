@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <size
+        android:width="@dimen/thumb_rect_width"
+        android:height="@dimen/thumb_rect_height"/>
+    <solid
+        android:color="@color/thumb_solid_default"/>
+    <stroke
+        android:width="@dimen/thumb_stroke_width"
+        android:color="@color/thumb_stroke_default"/>
+</shape>

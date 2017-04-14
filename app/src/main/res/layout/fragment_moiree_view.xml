@@ -5,19 +5,19 @@
     android:layout_height="match_parent">
 
     <View
-        android:id="@id/moiree_background"
+        android:id="@+id/moiree_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
     <ImageView
-        android:id="@id/moiree_image_fixed"
+        android:id="@+id/moiree_image_fixed"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@null"
         android:scaleType="center"/>
 
     <ImageView
-        android:id="@id/moiree_image_transformed"
+        android:id="@+id/moiree_image_transformed"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@null"

@@ -16,11 +16,10 @@ import de.lennartmeinhardt.android.moiree.MoireeInputMethods;
 import de.lennartmeinhardt.android.moiree.MoireeInputMethodsHolder;
 import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.menu.MenuFragment;
-import de.lennartmeinhardt.android.moiree.menu.transformation.TransformationSetupMenu;
 import de.lennartmeinhardt.android.moiree.util.ExpandableView;
 import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
 
-public class InputMethodsSetupFragment extends MenuFragment implements Expandable {
+public class InputMethodsSetupFragment extends MenuFragment {
 
     private MoireeInputMethods moireeInputMethods;
 
@@ -62,20 +61,20 @@ public class InputMethodsSetupFragment extends MenuFragment implements Expandabl
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         expandableView = (ExpandableView) view.findViewById(R.id.expandable_view);
         final View indicatorView = view.findViewById(R.id.header_expanded_indicator);
-        expandableView.getHeaderView().setOnClickListener(new View.OnClickListener() {
+        expandableView.findHeaderView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Transition transition = TransformationSetupMenu.createExpandTransition();
+                Transition transition = createMenuBoundsAndHeaderIndicatorTransition();
                 beginMenuTransition(transition);
                 expandableView.toggleExpanded();
             }
         });
 
         final int arrowCollapsedDegrees = getResources().getInteger(R.integer.indicator_arrow_collapsed_rotation);
-        expandableView.setOnExpandedStateChangedListener(new ExpandableView.OnExpandedStateChangedListener() {
+        expandableView.addOnExpandedStateChangedListener(new Expandable.OnExpandedStateChangedListener() {
             @Override
-            public void onExpandedStateChanged(ExpandableView expandableView, boolean expanded) {
-                indicatorView.setRotation(expandableView.isExpanded() ? 0 : arrowCollapsedDegrees);
+            public void onExpandedStateChanged(Expandable expandable, boolean expanded) {
+                indicatorView.setRotation(expandable.isExpanded() ? 0 : arrowCollapsedDegrees);
             }
         });
         TextView title = (TextView) expandableView.findViewById(R.id.header_title);
@@ -88,7 +87,7 @@ public class InputMethodsSetupFragment extends MenuFragment implements Expandabl
 
     private void initializeRotationInputSetupViews(View rootView) {
         rotationSetupExpandable = (ExpandableView) rootView.findViewById(R.id.rotation_input_setup_root);
-        rotationInputSwitch = (Switch) rotationSetupExpandable.getHeaderView().findViewById(R.id.input_method_switch);
+        rotationInputSwitch = (Switch) rotationSetupExpandable.findHeaderView().findViewById(R.id.input_method_switch);
         rotationSensitivitySetup = (IntValueSetup) rotationSetupExpandable.findViewById(R.id.sensitivity_value_setup);
         rotationSensitivityResetButton = (Button) rotationSetupExpandable.findViewById(R.id.reset_button);
 
@@ -136,7 +135,7 @@ public class InputMethodsSetupFragment extends MenuFragment implements Expandabl
 
     private void initializeScalingInputSetupViews(View rootView) {
         scalingSetupExpandable = (ExpandableView) rootView.findViewById(R.id.scaling_input_setup_root);
-        scalingInputSwitch = (Switch) scalingSetupExpandable.getHeaderView().findViewById(R.id.input_method_switch);
+        scalingInputSwitch = (Switch) scalingSetupExpandable.findHeaderView().findViewById(R.id.input_method_switch);
         scalingSensitivitySetup = (IntValueSetup) scalingSetupExpandable.findViewById(R.id.sensitivity_value_setup);
         scalingSensitivityResetButton = (Button) scalingSetupExpandable.findViewById(R.id.reset_button);
 
@@ -185,7 +184,7 @@ public class InputMethodsSetupFragment extends MenuFragment implements Expandabl
 
     private void initializeTranslationInputSetupViews(View rootView) {
         translationSetupExpandable = (ExpandableView) rootView.findViewById(R.id.translation_input_setup_root);
-        translationInputSwitch = (Switch) translationSetupExpandable.getHeaderView().findViewById(R.id.input_method_switch);
+        translationInputSwitch = (Switch) translationSetupExpandable.findHeaderView().findViewById(R.id.input_method_switch);
         translationSensitivitySetup = (IntValueSetup) translationSetupExpandable.findViewById(R.id.sensitivity_value_setup);
         translationSensitivityResetButton = (Button) translationSetupExpandable.findViewById(R.id.reset_button);
 
@@ -251,18 +250,7 @@ public class InputMethodsSetupFragment extends MenuFragment implements Expandabl
         return value / 100f;
     }
 
-    @Override
-    public boolean isExpanded() {
-        return expandableView.isExpanded();
-    }
-
-    @Override
-    public void setExpanded(boolean expanded) {
-        expandableView.setExpanded(expanded);
-    }
-
-    @Override
-    public void toggleExpanded() {
-        expandableView.toggleExpanded();
+    public ExpandableView getExpandableView() {
+        return expandableView;
     }
 }

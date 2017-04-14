@@ -2,10 +2,10 @@ package de.lennartmeinhardt.android.moiree.menu.imagesetup;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,14 +15,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import de.lennartmeinhardt.android.moiree.Expandable;
 import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.imaging.RandomPixelsImageCreator;
 import de.lennartmeinhardt.android.moiree.imaging.RescaledDrawable;
 import de.lennartmeinhardt.android.moiree.util.ExpandableView;
 import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
 
-public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragment<RandomPixelsImageCreator> implements Expandable {
+public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragment<RandomPixelsImageCreator> {
 
     private ProgressBar calculatingPreviewProgressBar;
     private ExpandableView expandableView;
@@ -65,7 +64,7 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
     }
 
     private void initializeHeaderView() {
-        View headerView = expandableView.getHeaderView();
+        View headerView = expandableView.findHeaderView();
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,10 +80,7 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
         previewHolder.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if(Build.VERSION.SDK_INT < 16)
-                    previewHolder.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                else
-                    previewHolder.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                previewHolder.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                 calculateImageFirstTime();
             }
@@ -94,7 +90,7 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
     }
 
     private void initializeContentView(View rootView) {
-        View contentView = expandableView.getContentView();
+        View contentView = expandableView.findContentView();
 
         squareSizeSetup = (IntValueSetup) contentView.findViewById(R.id.pixel_size_value_setup);
         densitySetup = (IntValueSetup) contentView.findViewById(R.id.density_value_setup);
@@ -117,11 +113,9 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
         densitySetup.setOnValueChangedListener(new IntValueSetup.OnValueChangedListener() {
             @Override
             public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
-                if(fromUser) {
-                    float density = valueToDensity(value);
-                    imageCreator.setDensity(density);
-                    calculateImageFollowUp();
-                }
+                float density = valueToDensity(value);
+                imageCreator.setDensity(density);
+                calculateImageFollowUp();
                 updateResetButtonEnabledState();
             }
         });
@@ -176,19 +170,8 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
         new FirstTimePreviewImageCreator().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    @Override
-    public boolean isExpanded() {
-        return expandableView.isExpanded();
-    }
-
-    @Override
-    public void setExpanded(boolean expanded) {
-        expandableView.setExpanded(expanded);
-    }
-
-    @Override
-    public void toggleExpanded() {
-        expandableView.toggleExpanded();
+    public ExpandableView getExpandableView() {
+        return expandableView;
     }
 
     private abstract class PreviewImageCreator<Result> extends AsyncTask<Void, Void, Result> {
@@ -243,7 +226,7 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
             if(getActivity() != null) {
                 previewBitmap = bitmap;
                 previewDrawable = imageCreator.createDrawableFromBitmap(getResources(), bitmap);
-                previewHolder.setImageDrawable(previewDrawable);
+                ViewCompat.setBackground(previewHolder, previewDrawable);
 
                 if (nextCalculatorToExecute != null)
                     nextCalculatorToExecute.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);

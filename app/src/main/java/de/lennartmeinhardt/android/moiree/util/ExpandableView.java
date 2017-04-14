@@ -8,6 +8,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lennartmeinhardt.android.moiree.Expandable;
 import de.lennartmeinhardt.android.moiree.R;
 
@@ -18,13 +21,7 @@ public class ExpandableView extends FrameLayout implements Expandable {
 
     private boolean expanded = true;
 
-    private boolean keepHeaderReference = false;
-    private boolean keepContentReference = false;
-
-    private OnExpandedStateChangedListener onExpandedStateChangedListener;
-
-    private View headerView;
-    private View contentView;
+    private final List<OnExpandedStateChangedListener> onExpandedStateChangedListeners = new ArrayList<>();
 
 
     public ExpandableView(Context context) {
@@ -41,45 +38,17 @@ public class ExpandableView extends FrameLayout implements Expandable {
         loadAttributes(context, attrs);
     }
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-
-        if(keepHeaderReference)
-            headerView = findHeaderView();
-
-        if(keepContentReference)
-            contentView = findContentView();
-    }
-
-    private View findHeaderView() {
+    public View findHeaderView() {
         return findViewById(R.id.expandable_view_header);
     }
-
-    public View getHeaderView() {
-        if(keepHeaderReference)
-            return headerView;
-        else
-            return findHeaderView();
-    }
-
-    private View findContentView() {
+    public View findContentView() {
         return findViewById(R.id.expandable_view_content);
-    }
-
-    public View getContentView() {
-        if(keepContentReference)
-            return contentView;
-        else
-            return findContentView();
     }
 
     private void loadAttributes(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ExpandableView, 0, 0);
         try {
             setExpandedInternal(a.getBoolean(R.styleable.ExpandableView_expanded, expanded), true);
-            keepHeaderReference = a.getBoolean(R.styleable.ExpandableView_keepHeaderReference, keepHeaderReference);
-            keepContentReference = a.getBoolean(R.styleable.ExpandableView_keepContentReference, keepContentReference);
         } finally {
             a.recycle();
         }
@@ -111,34 +80,12 @@ public class ExpandableView extends FrameLayout implements Expandable {
     private void setExpandedInternal(boolean expanded, boolean forceUpdate) {
         if(this.expanded != expanded || forceUpdate) {
             this.expanded = expanded;
-            View contentView = getContentView();
+            View contentView = findContentView();
             if(contentView != null)
                 contentView.setVisibility(expanded ? View.VISIBLE : View.GONE);
-            if(onExpandedStateChangedListener != null)
+            for(OnExpandedStateChangedListener onExpandedStateChangedListener : onExpandedStateChangedListeners)
                 onExpandedStateChangedListener.onExpandedStateChanged(this, expanded);
         }
-    }
-
-    public boolean isKeepHeaderReference() {
-        return keepHeaderReference;
-    }
-    public void setKeepHeaderReference(boolean keepHeaderReference) {
-        this.keepHeaderReference = keepHeaderReference;
-        if(keepHeaderReference)
-            headerView = findHeaderView();
-        else
-            headerView = null;
-    }
-
-    public boolean isKeepContentReference() {
-        return keepContentReference;
-    }
-    public void setKeepContentReference(boolean keepContentReference) {
-        this.keepContentReference = keepContentReference;
-        if(keepContentReference)
-            contentView = findContentView();
-        else
-            contentView = null;
     }
 
     @Override
@@ -150,11 +97,13 @@ public class ExpandableView extends FrameLayout implements Expandable {
         setExpandedInternal(expanded, true);
     }
 
-    public void setOnExpandedStateChangedListener(OnExpandedStateChangedListener onExpandedStateChangedListener) {
-        this.onExpandedStateChangedListener = onExpandedStateChangedListener;
+    @Override
+    public void addOnExpandedStateChangedListener(OnExpandedStateChangedListener onExpandedStateChangedListener) {
+        onExpandedStateChangedListeners.add(onExpandedStateChangedListener);
     }
 
-    public interface OnExpandedStateChangedListener {
-        void onExpandedStateChanged(ExpandableView expandableView, boolean expanded);
+    @Override
+    public void removeOnExpandedStateChangedListener(OnExpandedStateChangedListener onExpandedStateChangedListener) {
+        onExpandedStateChangedListeners.remove(onExpandedStateChangedListener);
     }
 }

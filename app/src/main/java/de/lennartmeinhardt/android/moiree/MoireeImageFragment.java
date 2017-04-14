@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -85,10 +84,7 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if (Build.VERSION.SDK_INT < 16)
-                    rootView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                else
-                    rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                 if(reusedSavedImage)
                     notifyActivity();
@@ -208,7 +204,7 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
         } finally {
             try {
                 outputStream.close();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -225,7 +221,7 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
     private void notifyActivity() {
         // check if the activity is null as it may have been closed before some calculation was finished
         if(getActivity() != null)
-            ((MainActivity) getActivity()).onMoireeImageCreated(moireeImage);
+            ((MoireeImaging) getActivity()).onMoireeImageCreated(moireeImage);
     }
 
     private void recreateImageInBackground() {
@@ -254,10 +250,10 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
             nextTaskToCalculate = null;
 
             imageCreatorToUse = moireeImageCreator;
-            MainActivity mainActivity = (MainActivity) getActivity();
-            width = mainActivity.getMoireeImageWidth();
-            height = mainActivity.getMoireeImageHeight();
-            mainActivity.onPreCreateMoireeImage();
+            MoireeImaging moireeImaging = (MoireeImaging) getActivity();
+            width = moireeImaging.getMoireeImageWidth();
+            height = moireeImaging.getMoireeImageHeight();
+            moireeImaging.onPreCreateMoireeImage();
 
             t = t();
         }

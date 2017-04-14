@@ -2,7 +2,6 @@ package de.lennartmeinhardt.android.moiree.menu.transformation;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 
 import de.lennartmeinhardt.android.moiree.MoireeTransformation;
 import de.lennartmeinhardt.android.moiree.MoireeTransformationHolder;

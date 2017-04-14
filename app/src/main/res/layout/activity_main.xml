@@ -6,38 +6,44 @@
     android:layout_height="match_parent"
     android:clipChildren="false"
     android:clipToPadding="false"
-    tools:context="de.lennartmeinhardt.android.moiree.MainActivity">
+    tools:context="de.lennartmeinhardt.android.moiree.MoireeActivity">
 
     <fragment
-        android:id="@id/fragment_moiree_view"
+        android:id="@+id/fragment_moiree_view"
         android:name="de.lennartmeinhardt.android.moiree.MoireeViewFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_moiree_view"/>
 
-    <fragment
-        android:id="@id/fragment_touch_handler"
-        android:name="de.lennartmeinhardt.android.moiree.TouchHandlerFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout="@layout/fragment_touch_handler"
-        tools:visibility="gone"/>
-
     <FrameLayout
-        android:id="@id/menu_holder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:fitsSystemWindows="true"/>
+        android:fitsSystemWindows="true">
 
-    <fragment
-        android:id="@+id/moiree_image_fragment"
-        android:name="de.lennartmeinhardt.android.moiree.MoireeImageFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        tools:layout="@layout/fragment_image_creator"/>
+        <fragment
+            android:id="@+id/fragment_touch_handler"
+            android:name="de.lennartmeinhardt.android.moiree.InputHandlerFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_touch_handler"
+            tools:visibility="gone"/>
+
+        <fragment
+            android:id="@+id/menu_holder"
+            android:name="de.lennartmeinhardt.android.moiree.menu.MenuHolderFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            tools:layout="@layout/fragment_menu_holder"/>
+
+        <fragment
+            android:id="@+id/moiree_image_fragment"
+            android:name="de.lennartmeinhardt.android.moiree.MoireeImageFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:layout="@layout/fragment_image_creator"/>
+
+    </FrameLayout>
 
 </android.support.design.widget.CoordinatorLayout>

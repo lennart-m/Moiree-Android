@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--<color name="colorPrimary">@android:color/transparent</color>-->
     <color name="colorPrimary">#618ca5</color>
-    <color name="menuBackground">#cfff</color>
-    <color name="menuButtonBackgroundTint">#d1d8dc</color>
-    <color name="menuButtonText">#062f48</color>
-    <color name="menuText">@color/menuButtonBackgroundTint</color>
-    <!--<color name="colorPrimaryDark">@android:color/transparent</color>-->
     <color name="colorPrimaryDark">#2d556d</color>
     <color name="colorAccent">#FF4081</color>
 
@@ -19,5 +13,22 @@
     <color name="color_picker_default">#000</color>
 
     <color name="image_setup_card_preview_color">#d2d2d2</color>
+
+    <color name="red">#c0265a</color>
+    <color name="lightyellow">#ffff86</color>
+
+    <color name="moiree_background_default">@color/lightyellow</color>
+    <color name="moiree_foreground_default">@color/red</color>
+
+    <color name="gold">#c8c896</color>
+    <color name="darkblue">#0f5a87</color>
+
+    <color name="thumb_solid_input_active">#9000</color>
+    <color name="thumb_solid_focused">#bfff</color>
+    <color name="thumb_solid_default">#6fff</color>
+
+    <color name="thumb_stroke_input_active">#9fff</color>
+    <color name="thumb_stroke_focused">#b000</color>
+    <color name="thumb_stroke_default">#6000</color>
 
 </resources>

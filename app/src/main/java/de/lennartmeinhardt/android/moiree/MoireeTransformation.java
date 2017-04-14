@@ -1,9 +1,22 @@
 package de.lennartmeinhardt.android.moiree;
 
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class MoireeTransformation {
+import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
+
+public class MoireeTransformation implements PreferenceIO {
+
+	private static final String KEY_ROTATION = "moireeTransformation:rotation";
+	private static final String KEY_TRANSLATION_X = "moireeTransformation:translationX";
+	private static final String KEY_TRANSLATION_Y = "moireeTransformation:translationY";
+	private static final String KEY_COMMON_SCALING = "moireeTransformation:commonScaling";
+	private static final String KEY_SCALING_X = "moireeTransformation:scalingX";
+	private static final String KEY_SCALING_Y = "moireeTransformation:scalingY";
+	private static final String KEY_USE_COMMON_SCALING = "moireeTransformation:useCommonScaling";
 
 	public static final float ID_ROTATION = 0;
 	public static final float ID_TRANSLATION_X = 0;
@@ -167,6 +180,29 @@ public class MoireeTransformation {
 	}
 
 
+	@Override
+	public void loadFromPreferences(SharedPreferences preferences) {
+		setRotation(preferences.getFloat(KEY_ROTATION, rotation));
+		setCommonScaling(preferences.getFloat(KEY_COMMON_SCALING, commonScaling));
+		setScalingX(preferences.getFloat(KEY_SCALING_X, scalingX));
+		setScalingY(preferences.getFloat(KEY_SCALING_Y, scalingY));
+		setTranslationX(preferences.getFloat(KEY_TRANSLATION_X, translationX));
+		setTranslationY(preferences.getFloat(KEY_TRANSLATION_Y, translationY));
+		setUseCommonScaling(preferences.getBoolean(KEY_USE_COMMON_SCALING, useCommonScaling));
+	}
+
+	@Override
+	public void storeToPreferences(SharedPreferences.Editor preferencesEditor) {
+		preferencesEditor.putFloat(KEY_ROTATION, rotation);
+		preferencesEditor.putFloat(KEY_TRANSLATION_X, translationX);
+		preferencesEditor.putFloat(KEY_TRANSLATION_Y, translationY);
+		preferencesEditor.putFloat(KEY_COMMON_SCALING, commonScaling);
+		preferencesEditor.putFloat(KEY_SCALING_X, scalingX);
+		preferencesEditor.putFloat(KEY_SCALING_Y, scalingY);
+		preferencesEditor.putBoolean(KEY_USE_COMMON_SCALING, useCommonScaling);
+	}
+
+
 	public interface OnTransformationChangedListener {
 		void onRotationChanged(float newRotation);
 
@@ -208,5 +244,32 @@ public class MoireeTransformation {
 			public void onTranslationYChanged(float newTranslationY) {
 			}
 		}
+	}
+
+	public static MoireeTransformation loadDefaultTransformationFromResources(Resources resources) {
+		MoireeTransformation transformation = new MoireeTransformation();
+
+		float defaultRotation = 1f * resources.getInteger(R.integer.default_transformation_rotation_degrees);
+		transformation.setRotation(defaultRotation);
+
+		int defaultCommonScalingPercents = resources.getInteger(R.integer.default_transformation_common_scaling_percents);
+		int defaultScalingXPercents = resources.getInteger(R.integer.default_transformation_scaling_x_percents);
+		int defaultScalingYPercents = resources.getInteger(R.integer.default_transformation_scaling_y_percents);
+		float defaultCommonScaling = defaultCommonScalingPercents / 100f;
+		float defaultScalingX = defaultScalingXPercents / 100f;
+		float defaultScalingY = defaultScalingYPercents / 100f;
+		transformation.setCommonScaling(defaultCommonScaling);
+		transformation.setScalingX(defaultScalingX);
+		transformation.setScalingY(defaultScalingY);
+
+		float defaultTranslationX = resources.getInteger(R.integer.default_transformation_translation_x_pixels);
+		float defaultTranslationY = resources.getInteger(R.integer.default_transformation_translation_y_pixels);
+		transformation.setTranslationX(defaultTranslationX);
+		transformation.setTranslationY(defaultTranslationY);
+
+		boolean defaultUseCommonScaling = resources.getBoolean(R.bool.default_transformation_use_common_scaling);
+		transformation.setUseCommonScaling(defaultUseCommonScaling);
+
+		return transformation;
 	}
 }

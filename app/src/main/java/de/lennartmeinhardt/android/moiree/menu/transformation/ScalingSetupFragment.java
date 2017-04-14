@@ -16,7 +16,7 @@ import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.util.ExpandableView;
 import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
 
-public class ScalingSetupFragment extends BaseTransformationSetupFragment implements Expandable {
+public class ScalingSetupFragment extends BaseTransformationSetupFragment {
 
     private ExpandableView expandableView;
 
@@ -112,7 +112,7 @@ public class ScalingSetupFragment extends BaseTransformationSetupFragment implem
     }
 
     private void initializeHeaderView() {
-        View header = expandableView.getHeaderView();
+        View header = expandableView.findHeaderView();
         TextView title = (TextView) header.findViewById(R.id.header_title);
         final View expandedIndicator = header.findViewById(R.id.header_expanded_indicator);
 
@@ -120,21 +120,21 @@ public class ScalingSetupFragment extends BaseTransformationSetupFragment implem
         header.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                beginMenuTransition(TransformationSetupMenu.createExpandTransition());
+                beginMenuTransition(createMenuBoundsAndHeaderIndicatorTransition());
                 expandableView.toggleExpanded();
             }
         });
         final int arrowCollapsedDegrees = getResources().getInteger(R.integer.indicator_arrow_collapsed_rotation);
-        expandableView.setOnExpandedStateChangedListener(new ExpandableView.OnExpandedStateChangedListener() {
+        expandableView.addOnExpandedStateChangedListener(new Expandable.OnExpandedStateChangedListener() {
             @Override
-            public void onExpandedStateChanged(ExpandableView expandableView, boolean expanded) {
+            public void onExpandedStateChanged(Expandable expandable, boolean expanded) {
                 expandedIndicator.setRotation(expanded ? 0 : arrowCollapsedDegrees);
             }
         });
     }
 
     private void initializeContentView() {
-        View contentView = expandableView.getContentView();
+        View contentView = expandableView.findContentView();
 
         useCommonScalingSwitch = (Switch) contentView.findViewById(R.id.common_scaling_switch);
         useCommonScalingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -244,18 +244,7 @@ public class ScalingSetupFragment extends BaseTransformationSetupFragment implem
         return (int) (relativeProgress * scalingSliderRange);*/
     }
 
-    @Override
-    public boolean isExpanded() {
-        return expandableView.isExpanded();
-    }
-
-    @Override
-    public void setExpanded(boolean expanded) {
-        expandableView.setExpanded(expanded);
-    }
-
-    @Override
-    public void toggleExpanded() {
-        expandableView.toggleExpanded();
+    public ExpandableView getExpandableView() {
+        return expandableView;
     }
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- value formatters -->
+    <string name="degrees_formatter" translatable="false">%1$d\u2009°</string>
+    <string name="integer_pixel_formatter" translatable="false">%1$d\u2009px</string>
+    <string name="percentage_formatter" translatable="false">%1$d\u2009%%</string>
+
+    <!-- help and about menus -->
+    <string name="email_address" translatable="false">lennart.meinhardt+moireeandroid@googlemail.com</string>
+    <string name="youtube_link_freaky_dot_patterns" translatable="false">https://www.youtube.com/watch?v=QAja2jp1VjE</string>
+
+</resources>

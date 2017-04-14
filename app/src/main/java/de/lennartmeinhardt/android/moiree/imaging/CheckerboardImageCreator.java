@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
-import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.util.BundleIO;
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
@@ -22,10 +21,6 @@ public class CheckerboardImageCreator extends BaseBitmapMoireeImageCreator<Resca
 
     public CheckerboardImageCreator() {
         this(1);
-    }
-
-    public CheckerboardImageCreator(Resources resources) {
-        this(resources.getDimensionPixelSize(R.dimen.checkerboard_image_default_square_size));
     }
 
     public CheckerboardImageCreator(int squareSizeInPixels) {

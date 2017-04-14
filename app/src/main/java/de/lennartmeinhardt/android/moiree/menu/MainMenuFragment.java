@@ -1,7 +1,6 @@
 package de.lennartmeinhardt.android.moiree.menu;
 
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
@@ -46,15 +45,12 @@ public class MainMenuFragment extends MenuFragment {
         moireeImageCard.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if(Build.VERSION.SDK_INT < 16)
-                    moireeImageCard.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                else
-                    moireeImageCard.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                moireeImageCard.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                 CheckerboardImageCreator imageCreator = new CheckerboardImageCreator(tileSize);
                 int width = moireeImageBackgroundView1.getWidth();
                 int height = moireeImageBackgroundView1.getHeight();
-                // TODO das ist hässlich. liegt daran, dass bei popbackstack alle fragments (auch dieses) neu erzeugt und dann gelöscht werden. evtl ist es heil wenn "menu invisible" implementiert wurde
+                // necessary because this fragment may be created while clearing the back stack
                 if(width > 0 && height > 0) {
                     Drawable image = imageCreator.createMoireeImageForDimensions(getResources(), width, height);
 
@@ -67,7 +63,7 @@ public class MainMenuFragment extends MenuFragment {
         moireeImageCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openMoireeImageSetupMenu();
+                getMenuHolderFragment().openMenuFragment(new ImageSetupMenu(), "moireeImageSetup");
             }
         });
     }
@@ -77,7 +73,7 @@ public class MainMenuFragment extends MenuFragment {
         colorSetupCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openColorSetupMenu();
+                getMenuHolderFragment().openMenuFragment(new MoireeColorsSetupMenu(), "moireeColorsSetup");
             }
         });
     }
@@ -87,7 +83,7 @@ public class MainMenuFragment extends MenuFragment {
         moireeTransformationSetupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openMoireeTransformationSetupMenu();
+                getMenuHolderFragment().openMenuFragment(new TransformationSetupMenu(), "moireeTransformationSetup");
             }
         });
     }
@@ -96,7 +92,7 @@ public class MainMenuFragment extends MenuFragment {
         root.findViewById(R.id.main_menu_settings).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openInputSettingsSubMenu();
+                getMenuHolderFragment().openMenuFragment(new SettingsMenu(), "inputSettings");
             }
         });
     }
@@ -105,7 +101,7 @@ public class MainMenuFragment extends MenuFragment {
         root.findViewById(R.id.main_menu_help).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openSubMenu(new HelpMenu(), "help");
+                getMenuHolderFragment().openMenuFragment(new HelpMenu(), "help");
             }
         });
     }
@@ -114,25 +110,8 @@ public class MainMenuFragment extends MenuFragment {
         root.findViewById(R.id.main_menu_about).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openSubMenu(new AboutMenu(), "about");
+                getMenuHolderFragment().openMenuFragment(new AboutMenu(), "about");
             }
         });
-    }
-
-
-    private void openMoireeImageSetupMenu() {
-        openSubMenu(new ImageSetupMenu(), "moireeImageSetup");
-    }
-
-    private void openColorSetupMenu() {
-        openSubMenu(new MoireeColorsSetupMenu(), "moireeColorsSetup");
-    }
-
-    private void openMoireeTransformationSetupMenu() {
-        openSubMenu(new TransformationSetupMenu(), "moireeTransformationSetup");
-    }
-
-    private void openInputSettingsSubMenu() {
-        openSubMenu(new SettingsMenu(), "inputSettings");
     }
 }

@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,16 +16,16 @@ import android.view.ViewGroup;
 import de.lennartmeinhardt.android.moiree.gesture.AngleDetector;
 import de.lennartmeinhardt.android.moiree.gesture.DistanceDetector;
 import de.lennartmeinhardt.android.moiree.gesture.PositionDetector;
+import de.lennartmeinhardt.android.moiree.menu.MenuHolder;
 
-public class TouchHandlerFragment extends Fragment {
+public class InputHandlerFragment extends Fragment {
+
+    private MenuHolder menuHolder;
 
     private SharedPreferences preferences;
 
     private MoireeTransformation moireeTransformation;
     private MoireeInputMethods moireeInputMethods;
-    private boolean inputEnabled = true;
-
-    private int statusBarHeight;
 
 
     private final DistanceDetector commonScalingDetector = new DistanceDetector(new DistanceDetector.DistanceListener.Adapter() {
@@ -158,10 +159,6 @@ public class TouchHandlerFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if(resourceId != 0)
-            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-
         int defaultSensitivityPercents = getResources().getInteger(R.integer.sensitivity_default_percents);
         moireeInputMethods = new MoireeInputMethods(true, defaultSensitivityPercents / 100f);
         moireeInputMethods.loadFromPreferences(preferences);
@@ -175,12 +172,10 @@ public class TouchHandlerFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        // TODO alternative: menuFragment übernimmt die ganze klick geschichte. der menuHolder wird dann klickbar (gucken ob er alles abfängt). das view hier ist nicht fokussierbar und die im moireeViewFragment sind es auch nicht
-
         final GestureDetector tapDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
-                ((MainActivity) getActivity()).toggleMenuShowing();
+                menuHolder.toggleMenuShowing();
 
                 return true;
             }
@@ -192,8 +187,7 @@ public class TouchHandlerFragment extends Fragment {
                 if(tapDetector.onTouchEvent(event))
                     return false;
 
-                if(event.getY() <= statusBarHeight)
-                    return false;
+                System.out.println("-----\ntouch handler onTouch");
 
                 // handle rotation
                 rotationDetector.onTouchEvent(event);
@@ -211,6 +205,22 @@ public class TouchHandlerFragment extends Fragment {
         });
     }
 
+    public boolean onKeyDown(int keyCode) {
+        switch(keyCode) {
+            case KeyEvent.KEYCODE_MENU:
+                menuHolder.toggleMenuShowing();
+                return true;
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+            case KeyEvent.KEYCODE_SPACE:
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_NUMPAD_ENTER:
+                menuHolder.showMenuIfHidden();
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private float getNewScaling(float distance, float startDistance, float startScaling) {
         float distanceQuotient = distance / startDistance;
         float sensitivity = moireeInputMethods.getScalingSensitivity();
@@ -222,6 +232,7 @@ public class TouchHandlerFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         this.moireeTransformation = ((MoireeTransformationHolder) getActivity()).getMoireeTransformation();
+        this.menuHolder = (MenuHolder) getActivity();
     }
 
     @Override
@@ -235,12 +246,5 @@ public class TouchHandlerFragment extends Fragment {
 
     public MoireeInputMethods getMoireeInputMethods() {
         return moireeInputMethods;
-    }
-
-    public boolean isInputEnabled() {
-        return inputEnabled;
-    }
-    public void setInputEnabled(boolean inputEnabled) {
-        this.inputEnabled = inputEnabled;
     }
 }

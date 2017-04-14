@@ -14,7 +14,6 @@ import android.view.View;
 
 import de.lennartmeinhardt.android.moiree.R;
 
-// TODO in eigenes modul
 public class SeekPane extends View {
 
     private static final int[] STATE_INPUT_ACTIVE = {R.attr.state_input_active};
@@ -57,6 +56,8 @@ public class SeekPane extends View {
         stepX = 5;
         stepY = 5;
         setThumbDrawable(ContextCompat.getDrawable(context, R.drawable.thumb_circle));
+        setClickable(true);
+        setFocusable(true);
     }
 
     private void loadFromAttrs(Context context, AttributeSet attributeSet) {
@@ -218,38 +219,34 @@ public class SeekPane extends View {
         // if input is active handle the arrow keys (if they point in a direction where the value is not at the boundary)
         if(inputActive) {
             switch(keyCode) {
-                // TODO jeweils step nur wenn der wert nicht schon min/max ist. ansonsten super.onKeyDown damit der fokus weiterläuft
                 case KeyEvent.KEYCODE_DPAD_UP:
                     if(positionY < maxY) {
-                        stepY(stepY);
-                        return true;
+                        stepY(stepY, true);
                     }
-                    break;
+                    return true;
                 case KeyEvent.KEYCODE_DPAD_DOWN:
                     if(positionY > 0) {
-                        stepY(-stepY);
-                        return true;
+                        stepY(-stepY, true);
                     }
-                    break;
+                    return true;
                 // TODO RTL
                 case KeyEvent.KEYCODE_DPAD_RIGHT:
                     if(positionX < maxX) {
-                        stepX(stepX);
-                        return true;
+                        stepX(stepX, true);
                     }
-                    break;
+                    return true;
                 case KeyEvent.KEYCODE_DPAD_LEFT:
                     if(positionX > 0) {
-                        stepX(-stepX);
-                        return true;
+                        stepX(-stepX, true);
                     }
-                    break;
+                    return true;
             }
         }
 
-        // nothing particular was clicked. proceed with focus etc
+        // nothing particular was clicked, or input mode isn't active. proceed with focus etc
         return super.onKeyDown(keyCode, event);
     }
+
 
     @Override
     protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
@@ -387,15 +384,19 @@ public class SeekPane extends View {
         this.stepY = stepY;
     }
 
-    private void stepX(int stepSize) {
-        setPositionX(getPositionX() + stepSize);
+    private void stepX(int stepSize, boolean fromUser) {
+        internalSetPositionX(getPositionX() + stepSize, fromUser);
     }
-    private void stepY(int stepSize) {
-        setPositionY(getPositionY() + stepSize);
+    private void stepY(int stepSize, boolean fromUser) {
+        internalSetPositionY(getPositionY() + stepSize, fromUser);
     }
 
     public void setOnPosition2DChangeListener(OnPosition2DChangeListener changeListener) {
         this.changeListener = changeListener;
+    }
+
+    public boolean isInputActive() {
+        return inputActive;
     }
 
 
