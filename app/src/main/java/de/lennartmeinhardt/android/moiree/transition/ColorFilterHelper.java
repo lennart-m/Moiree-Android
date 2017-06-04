@@ -1,5 +1,6 @@
 package de.lennartmeinhardt.android.moiree.transition;
 
+import android.databinding.BindingAdapter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.view.View;
@@ -15,6 +16,7 @@ import de.lennartmeinhardt.android.moiree.R;
  */
 public class ColorFilterHelper {
 
+    @BindingAdapter("colorTag")
     public static void setColorTag(View view, int color) {
         view.setTag(R.id.key_porter_duff_color, color);
     }
@@ -25,7 +27,12 @@ public class ColorFilterHelper {
         return (int) view.getTag(R.id.key_porter_duff_color);
     }
 
+    @BindingAdapter("backgroundColor")
+    public static void setBackgroundColor(View view, int color) {
+        view.setBackgroundColor(color);
+    }
 
+    @BindingAdapter("modeTag")
     public static void setModeTag(View view, PorterDuff.Mode mode) {
         view.setTag(R.id.key_porter_duff_mode, mode);
     }

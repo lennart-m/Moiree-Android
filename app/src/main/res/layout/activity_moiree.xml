@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <variable
+            name="moireeTransformation"
+            type="de.lennartmeinhardt.android.moiree.MoireeTransformation"/>
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        tools:context="de.lennartmeinhardt.android.moiree.MoireeActivity">
+
+        <fragment
+            android:id="@+id/fragment_moiree_view"
+            android:name="de.lennartmeinhardt.android.moiree.MoireeViewFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_moiree_view"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
+
+            <fragment
+                android:id="@+id/fragment_touch_handler"
+                android:name="de.lennartmeinhardt.android.moiree.InputHandlerFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout="@layout/fragment_touch_handler"
+                tools:visibility="gone"/>
+
+            <fragment
+                android:id="@+id/menu_holder"
+                android:name="de.lennartmeinhardt.android.moiree.menu.MenuHolderFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                tools:layout="@layout/fragment_menu_holder"/>
+
+            <fragment
+                android:id="@+id/moiree_image_fragment"
+                android:name="de.lennartmeinhardt.android.moiree.ImageCreatorFragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                tools:layout="@layout/fragment_image_creator"/>
+
+        </FrameLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

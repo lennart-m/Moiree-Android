@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <variable
+            name="moireeColors"
+            type="de.lennartmeinhardt.android.moiree.MoireeColors"/>
+    </data>
+
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/RootMenuCard.SingleColumn">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                style="@style/MenuTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:displayOptions="showHome|homeAsUp"
+                app:navigationIcon="?homeAsUpIndicator"
+                app:title="@string/menu_colors"/>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="false">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/foreground_color_setup_card"
+                        layout="@layout/color_setup_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:color="@={moireeColors.foregroundColor}"
+                        app:title="@{@string/foreground}"/>
+
+                    <include
+                        android:id="@+id/background_color_setup_card"
+                        layout="@layout/color_setup_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:color="@={moireeColors.backgroundColor}"
+                        app:title="@{@string/background}"/>
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</layout>

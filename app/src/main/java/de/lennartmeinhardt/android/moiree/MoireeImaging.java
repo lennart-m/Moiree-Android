@@ -11,9 +11,9 @@ public interface MoireeImaging extends ImageCreatorHolder {
 
     int getMoireeImageHeight();
 
-    void onPreCreateMoireeImage();
-
     void onMoireeImageCreated(Drawable moireeImage);
+
+    void onBeforeCreatingMoireeImage();
 
     void setImageCreatorAndRecreateImage(MoireeImageCreator imageCreator);
 

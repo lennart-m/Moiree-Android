@@ -2,54 +2,78 @@ package de.lennartmeinhardt.android.moiree.imaging;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.databinding.ObservableInt;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
 import de.lennartmeinhardt.android.moiree.util.BundleIO;
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
-public class HorizontalLinesImageCreator extends BaseBitmapMoireeImageCreator <RescaledDrawable> implements BundleIO, PreferenceIO {
+public class HorizontalLinesImageCreator extends BaseBitmapMoireeImageCreator<BitmapDrawable> implements BundleIO, PreferenceIO {
 
 	private static final String KEY_LINE_THICKNESS_IN_PX = "horizontalLinesImageCreator:lineThicknessInPixels";
 
-	private int lineThicknessInPixels;
+	public final ObservableInt lineThicknessInPixels = new ObservableInt();
 
+
+	public HorizontalLinesImageCreator() {
+	}
 
 	public HorizontalLinesImageCreator(int lineThicknessInPixels) {
-		this.lineThicknessInPixels = lineThicknessInPixels;
+		this.lineThicknessInPixels.set(lineThicknessInPixels);
 	}
+
 
 	@Override
 	public void storeToPreferences(SharedPreferences.Editor preferencesEditor) {
-		preferencesEditor.putInt(KEY_LINE_THICKNESS_IN_PX, lineThicknessInPixels);
+		preferencesEditor.putInt(KEY_LINE_THICKNESS_IN_PX, lineThicknessInPixels.get());
 	}
 
 	@Override
 	public void loadFromPreferences(SharedPreferences preferences) {
-		this.lineThicknessInPixels = preferences.getInt(KEY_LINE_THICKNESS_IN_PX, lineThicknessInPixels);
+		this.lineThicknessInPixels.set(preferences.getInt(KEY_LINE_THICKNESS_IN_PX, lineThicknessInPixels.get()));
 	}
 
 	@Override
 	public void storeToBundle(Bundle bundle) {
-		bundle.putInt(KEY_LINE_THICKNESS_IN_PX, lineThicknessInPixels);
+		bundle.putInt(KEY_LINE_THICKNESS_IN_PX, lineThicknessInPixels.get());
 	}
 
 	@Override
 	public void loadFromBundle(Bundle bundle) {
-		this.lineThicknessInPixels = bundle.getInt(KEY_LINE_THICKNESS_IN_PX, lineThicknessInPixels);
+		this.lineThicknessInPixels.set(bundle.getInt(KEY_LINE_THICKNESS_IN_PX, lineThicknessInPixels.get()));
 	}
 
 	@Override
 	public Bitmap createBitmapForDimensions(int width, int height) {
-		int imageWidth = (width + lineThicknessInPixels - 1) / lineThicknessInPixels;
-		int imageHeight = (height + lineThicknessInPixels - 1) / lineThicknessInPixels;
-		Bitmap bitmap = createEmptyBitmap(imageWidth, imageHeight);
-		drawHorizontalLinesToImage(bitmap);
+		Bitmap bitmap = createEmptyBitmap(width, height);
+		drawHorizontalLinesToImage(bitmap, lineThicknessInPixels.get());
 		return bitmap;
 	}
 
+	private static void drawHorizontalLinesToImage(Bitmap bitmap, int lineThicknessInPixels) {
+		int w = bitmap.getWidth(), h = bitmap.getHeight();
+		Canvas canvas = new Canvas(bitmap);
+		canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+		Paint fillBlack = new Paint();
+
+		final int segmentsPerImageHalf = (int) Math.ceil((h / 2f) / lineThicknessInPixels);
+		for(int j = - segmentsPerImageHalf; j < segmentsPerImageHalf; j++) {
+			if(j % 2 == 0) {
+				float y = h / 2 + j * lineThicknessInPixels;
+				canvas.drawRect(0, y, w, y + lineThicknessInPixels, fillBlack);
+			}
+		}
+	}
+
+	/*
+	 * extremely slow when compared to the canvas method
+	 */
 	private static void drawHorizontalLinesToImage(Bitmap bitmap) {
 		int w = bitmap.getWidth(), h = bitmap.getHeight();
 		for(int y = 0; y < h; y++) {
@@ -60,24 +84,17 @@ public class HorizontalLinesImageCreator extends BaseBitmapMoireeImageCreator <R
 	}
 
 	@Override
-	public RescaledDrawable createDrawableFromBitmap(Resources resources, Bitmap bitmap) {
+	public BitmapDrawable createDrawableFromBitmap(Resources resources, Bitmap bitmap) {
 		BitmapDrawable drawable = new BitmapDrawable(resources, bitmap);
 		drawable.setAntiAlias(false);
 		drawable.setFilterBitmap(false);
 		drawable.setDither(false);
-		return new RescaledDrawable(drawable, lineThicknessInPixels);
+		return drawable;
 	}
 
 	@Override
-	public Bitmap getBitmapFromDrawable(RescaledDrawable drawable) {
-		return ((BitmapDrawable) drawable.getWrappedDrawable()).getBitmap();
-	}
-
-	public int getLineThicknessInPixels() {
-		return lineThicknessInPixels;
-	}
-	public void setLineThicknessInPixels(int lineThicknessInPixels) {
-		this.lineThicknessInPixels = lineThicknessInPixels;
+	public Bitmap getBitmapFromDrawable(BitmapDrawable drawable) {
+		return drawable.getBitmap();
 	}
 
 	@Override
@@ -87,12 +104,12 @@ public class HorizontalLinesImageCreator extends BaseBitmapMoireeImageCreator <R
 
 		HorizontalLinesImageCreator that = (HorizontalLinesImageCreator) o;
 
-		return lineThicknessInPixels == that.lineThicknessInPixels;
+		return lineThicknessInPixels.get() == that.lineThicknessInPixels.get();
 
 	}
 
 	@Override
 	public int hashCode() {
-		return lineThicknessInPixels;
+		return lineThicknessInPixels.get();
 	}
 }

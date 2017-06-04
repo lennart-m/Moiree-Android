@@ -1,6 +1,7 @@
 package de.lennartmeinhardt.android.moiree.menu;
 
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
@@ -10,19 +11,17 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 
-import de.lennartmeinhardt.android.moiree.AboutMenu;
-import de.lennartmeinhardt.android.moiree.HelpMenu;
 import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.imaging.CheckerboardImageCreator;
 import de.lennartmeinhardt.android.moiree.menu.settings.SettingsMenu;
 import de.lennartmeinhardt.android.moiree.menu.transformation.TransformationSetupMenu;
 
-public class MainMenuFragment extends MenuFragment {
+public class MainMenu extends MenuFragment {
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main_menu, container, false);
+        return inflater.inflate(R.layout.menu_main, container, false);
     }
 
     @Override
@@ -45,7 +44,10 @@ public class MainMenuFragment extends MenuFragment {
         moireeImageCard.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                moireeImageCard.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                if (Build.VERSION.SDK_INT >= 16)
+                    moireeImageCard.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                else
+                    moireeImageCard.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 
                 CheckerboardImageCreator imageCreator = new CheckerboardImageCreator(tileSize);
                 int width = moireeImageBackgroundView1.getWidth();

@@ -1,6 +1,8 @@
 package de.lennartmeinhardt.android.moiree;
 
 import android.content.SharedPreferences;
+import android.databinding.ObservableBoolean;
+import android.databinding.ObservableFloat;
 
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
@@ -14,13 +16,13 @@ public class MoireeInputMethods implements PreferenceIO {
     private static final String KEY_SCALING_SENSITIVITY = "moireeInputMethods:scalingSensitivity";
     private static final String KEY_TRANSLATION_SENSITIVITY = "moireeInputMethods:translationSensitivity";
 
-    private boolean rotationInputEnabled;
-    private boolean translationInputEnabled;
-    private boolean scalingInputEnabled;
+    public final ObservableBoolean rotationInputEnabled = new ObservableBoolean();
+    public final ObservableBoolean translationInputEnabled = new ObservableBoolean();
+    public final ObservableBoolean scalingInputEnabled = new ObservableBoolean();
 
-    private float rotationSensitivity;
-    private float scalingSensitivity;
-    private float translationSensitivity;
+    public final ObservableFloat rotationSensitivity = new ObservableFloat();
+    public final ObservableFloat scalingSensitivity = new ObservableFloat();
+    public final ObservableFloat translationSensitivity = new ObservableFloat();
 
 
     public MoireeInputMethods(boolean allInputMethodsEnabled, float sensitivity) {
@@ -28,77 +30,34 @@ public class MoireeInputMethods implements PreferenceIO {
     }
 
     public MoireeInputMethods(boolean rotationInputEnabled, float rotationSensitivity, boolean scalingInputEnabled, float scalingSensitivity, boolean translationInputEnabled, float translationSensitivity) {
-        this.rotationSensitivity = rotationSensitivity;
-        this.scalingSensitivity = scalingSensitivity;
-        this.translationSensitivity = translationSensitivity;
-        this.rotationInputEnabled = rotationInputEnabled;
-        this.scalingInputEnabled = scalingInputEnabled;
-        this.translationInputEnabled = translationInputEnabled;
+        this.rotationSensitivity.set(rotationSensitivity);
+        this.scalingSensitivity.set(scalingSensitivity);
+        this.translationSensitivity.set(translationSensitivity);
+        this.rotationInputEnabled.set(rotationInputEnabled);
+        this.scalingInputEnabled.set(scalingInputEnabled);
+        this.translationInputEnabled.set(translationInputEnabled);
     }
 
-
-    public void setRotationInputEnabled(boolean enabled) {
-        this.rotationInputEnabled = enabled;
-    }
-    public void setScalingInputEnabled(boolean enabled) {
-        this.scalingInputEnabled = enabled;
-    }
-    public void setTranslationInputEnabled(boolean enabled) {
-        this.translationInputEnabled = enabled;
-    }
-
-    public boolean isRotationInputEnabled() {
-        return this.rotationInputEnabled;
-    }
-    public boolean isScalingInputEnabled() {
-        return this.scalingInputEnabled;
-    }
-    public boolean isTranslationInputEnabled() {
-        return this.translationInputEnabled;
-    }
 
     @Override
     public void loadFromPreferences(SharedPreferences preferences) {
-        this.rotationInputEnabled = preferences.getBoolean(KEY_INPUT_ROTATION_ENABLED, rotationInputEnabled);
-        this.scalingInputEnabled = preferences.getBoolean(KEY_INPUT_SCALING_ENABLED, scalingInputEnabled);
-        this.translationInputEnabled = preferences.getBoolean(KEY_INPUT_TRANSLATION_ENABLED, translationInputEnabled);
+        rotationInputEnabled.set(preferences.getBoolean(KEY_INPUT_ROTATION_ENABLED, rotationInputEnabled.get()));
+        scalingInputEnabled.set(preferences.getBoolean(KEY_INPUT_SCALING_ENABLED, scalingInputEnabled.get()));
+        translationInputEnabled.set(preferences.getBoolean(KEY_INPUT_TRANSLATION_ENABLED, translationInputEnabled.get()));
 
-        this.rotationSensitivity = preferences.getFloat(KEY_ROTATION_SENSITIVITY, rotationSensitivity);
-        this.scalingSensitivity = preferences.getFloat(KEY_SCALING_SENSITIVITY, scalingSensitivity);
-        this.translationSensitivity = preferences.getFloat(KEY_TRANSLATION_SENSITIVITY, translationSensitivity);
+        rotationSensitivity.set(preferences.getFloat(KEY_ROTATION_SENSITIVITY, rotationSensitivity.get()));
+        scalingSensitivity.set(preferences.getFloat(KEY_SCALING_SENSITIVITY, scalingSensitivity.get()));
+        translationSensitivity.set(preferences.getFloat(KEY_TRANSLATION_SENSITIVITY, translationSensitivity.get()));
     }
 
     @Override
     public void storeToPreferences(SharedPreferences.Editor preferencesEditor) {
-        preferencesEditor.putBoolean(KEY_INPUT_ROTATION_ENABLED, rotationInputEnabled);
-        preferencesEditor.putBoolean(KEY_INPUT_SCALING_ENABLED, scalingInputEnabled);
-        preferencesEditor.putBoolean(KEY_INPUT_TRANSLATION_ENABLED, translationInputEnabled);
+        preferencesEditor.putBoolean(KEY_INPUT_ROTATION_ENABLED, rotationInputEnabled.get());
+        preferencesEditor.putBoolean(KEY_INPUT_SCALING_ENABLED, scalingInputEnabled.get());
+        preferencesEditor.putBoolean(KEY_INPUT_TRANSLATION_ENABLED, translationInputEnabled.get());
 
-        preferencesEditor.putFloat(KEY_ROTATION_SENSITIVITY, rotationSensitivity);
-        preferencesEditor.putFloat(KEY_SCALING_SENSITIVITY, scalingSensitivity);
-        preferencesEditor.putFloat(KEY_TRANSLATION_SENSITIVITY, translationSensitivity);
-    }
-
-
-
-    public float getRotationSensitivity() {
-        return rotationSensitivity;
-    }
-    public void setRotationSensitivity(float rotationSensitivity) {
-        this.rotationSensitivity = rotationSensitivity;
-    }
-
-    public float getScalingSensitivity() {
-        return scalingSensitivity;
-    }
-    public void setScalingSensitivity(float scalingSensitivity) {
-        this.scalingSensitivity = scalingSensitivity;
-    }
-
-    public float getTranslationSensitivity() {
-        return translationSensitivity;
-    }
-    public void setTranslationSensitivity(float translationSensitivity) {
-        this.translationSensitivity = translationSensitivity;
+        preferencesEditor.putFloat(KEY_ROTATION_SENSITIVITY, rotationSensitivity.get());
+        preferencesEditor.putFloat(KEY_SCALING_SENSITIVITY, scalingSensitivity.get());
+        preferencesEditor.putFloat(KEY_TRANSLATION_SENSITIVITY, translationSensitivity.get());
     }
 }

@@ -1,34 +1,28 @@
 package de.lennartmeinhardt.android.moiree.menu.imagesetup;
 
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import de.lennartmeinhardt.android.moiree.R;
+import de.lennartmeinhardt.android.moiree.databinding.FragmentRandomPixelsImageSetupBinding;
 import de.lennartmeinhardt.android.moiree.imaging.RandomPixelsImageCreator;
 import de.lennartmeinhardt.android.moiree.imaging.RescaledDrawable;
-import de.lennartmeinhardt.android.moiree.util.ExpandableView;
-import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
+import de.lennartmeinhardt.android.moiree.util.Expandable;
+import de.lennartmeinhardt.android.moiree.util.Expandables;
 
-public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragment<RandomPixelsImageCreator> {
+public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragment implements Expandable {
 
-    private ProgressBar calculatingPreviewProgressBar;
-    private ExpandableView expandableView;
-    private IntValueSetup densitySetup;
-    private IntValueSetup squareSizeSetup;
-    private ImageView previewHolder;
-    private Button resetButton;
+    private RandomPixelsImageCreator imageCreator;
 
     private RescaledDrawable previewDrawable;
     private Bitmap previewBitmap;
@@ -36,121 +30,99 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
     private PreviewImageCreator<?> calculatingCreator;
     private PreviewImageCreator<?> nextCalculatorToExecute;
 
-    private int defaultSquareSize;
-    private int defaultDensityPercents;
+    private FragmentRandomPixelsImageSetupBinding binding;
+
 
     @Override
-    RandomPixelsImageCreator initializeImageCreator() {
-        defaultSquareSize = getResources().getDimensionPixelSize(R.dimen.random_pixels_image_default_square_size);
-        defaultDensityPercents = getResources().getInteger(R.integer.random_pixels_density_default_percents);
-        float defaultDensity = valueToDensity(defaultDensityPercents);
+    protected RandomPixelsImageCreator getMoireeImageCreator() {
+        if(imageCreator == null) {
+            int defaultSquareSize = getResources().getDimensionPixelSize(R.dimen.random_pixels_image_default_square_size);
+            int defaultDensityPercents = getResources().getInteger(R.integer.random_pixels_density_default_percents);
+            float defaultDensity = defaultDensityPercents / 100f;
 
-        return new RandomPixelsImageCreator(defaultSquareSize, defaultDensity);
+            imageCreator = new RandomPixelsImageCreator(defaultSquareSize, defaultDensity);
+        }
+        return imageCreator;
     }
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_random_pixels_image_setup, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_random_pixels_image_setup, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        expandableView = (ExpandableView) view.findViewById(R.id.expandable_view);
+        // make sure the lazily initialized image creator exists
+        getMoireeImageCreator();
+
+        binding.setRandomPixelsImageCreator(imageCreator);
+
+        int defaultSquareSize = getResources().getDimensionPixelSize(R.dimen.random_pixels_image_default_square_size);
+        int defaultDensityPercents = getResources().getInteger(R.integer.random_pixels_density_default_percents);
+        binding.setDefaultSquareSizeInPixels(defaultSquareSize);
+        binding.setDefaultDensity(defaultDensityPercents / 100f);
 
         initializeHeaderView();
-        initializeContentView(view);
+        initializeContentView();
     }
 
     private void initializeHeaderView() {
-        View headerView = expandableView.findHeaderView();
-        headerView.setOnClickListener(new View.OnClickListener() {
+        binding.expandableViewHeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 beginMenuBoundsTransition();
-                expandableView.toggleExpanded();
+                binding.expandableView.toggleExpanded();
             }
         });
 
-        TextView titleView = (TextView) headerView.findViewById(R.id.header_title);
-        titleView.setText(R.string.random_pixels_title);
-
-        previewHolder = (ImageView) headerView.findViewById(R.id.header_preview);
-        previewHolder.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        binding.expandableViewHeader.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                previewHolder.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                if (Build.VERSION.SDK_INT >= 16)
+                    binding.expandableViewHeader.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                else
+                    binding.expandableViewHeader.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 
                 calculateImageFirstTime();
             }
         });
-
-        calculatingPreviewProgressBar = (ProgressBar) headerView.findViewById(R.id.header_progress);
     }
 
-    private void initializeContentView(View rootView) {
-        View contentView = expandableView.findContentView();
-
-        squareSizeSetup = (IntValueSetup) contentView.findViewById(R.id.pixel_size_value_setup);
-        densitySetup = (IntValueSetup) contentView.findViewById(R.id.density_value_setup);
-        resetButton = (Button) rootView.findViewById(R.id.reset_button);
-        View createImageButton = rootView.findViewById(R.id.create_button);
-
-        squareSizeSetup.setOnValueChangedListener(new IntValueSetup.OnValueChangedListener() {
+    private void initializeContentView() {
+        imageCreator.squareSizeInPixels.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
-            public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
-                imageCreator.setSquareSizeInPixels(value);
+            public void onPropertyChanged(Observable observable, int i) {
                 if (previewDrawable != null) {
-                    previewDrawable.setScaleX(value);
-                    previewDrawable.setScaleY(value);
+                    previewDrawable.setScaleX(imageCreator.squareSizeInPixels.get());
+                    previewDrawable.setScaleY(imageCreator.squareSizeInPixels.get());
                 }
-                updateResetButtonEnabledState();
             }
         });
-        squareSizeSetup.setValue(imageCreator.getSquareSizeInPixels());
 
-        densitySetup.setOnValueChangedListener(new IntValueSetup.OnValueChangedListener() {
+        imageCreator.density.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
-            public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
-                float density = valueToDensity(value);
-                imageCreator.setDensity(density);
+            public void onPropertyChanged(Observable observable, int i) {
                 calculateImageFollowUp();
-                updateResetButtonEnabledState();
             }
         });
-        densitySetup.setValue(densityToValue(imageCreator.getDensity()));
 
-        createImageButton.setOnClickListener(new View.OnClickListener() {
+        binding.createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onCreateNewImageClicked();
             }
         });
 
-        resetButton.setOnClickListener(new View.OnClickListener() {
+        binding.resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                squareSizeSetup.setValue(defaultSquareSize);
-                densitySetup.setValue(defaultDensityPercents);
+                imageCreator.squareSizeInPixels.set(binding.getDefaultSquareSizeInPixels());
+                imageCreator.density.set(binding.getDefaultDensity());
             }
         });
-
-        updateResetButtonEnabledState();
-    }
-
-    private void updateResetButtonEnabledState() {
-        boolean isDefaultSquareSize = squareSizeSetup.getValue() == defaultSquareSize;
-        boolean isDefaultDensity = densitySetup.getValue() == defaultDensityPercents;
-        resetButton.setEnabled(! isDefaultSquareSize || ! isDefaultDensity);
-    }
-
-    private int densityToValue(float density) {
-        return Math.round(density * 100f);
-    }
-
-    private float valueToDensity(int value) {
-        return value / 100f;
     }
 
     private void calculateImageFollowUp() {
@@ -170,21 +142,39 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
         new FirstTimePreviewImageCreator().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public ExpandableView getExpandableView() {
-        return expandableView;
+    @Override
+    public boolean isExpanded() {
+        return binding.expandableView.isExpanded();
+    }
+
+    @Override
+    public void setExpanded(boolean expanded) {
+        binding.expandableView.setExpanded(expanded);
+    }
+
+    @Override
+    public void toggleExpanded() {
+        binding.expandableView.toggleExpanded();
+    }
+
+    @Override
+    public void setOnExpandedStateChangedListener(OnExpandedStateChangedListener onExpandedStateChangedListener) {
+        Expandables.setExpandedListenerForWrappedExpandable(this, binding.expandableView, onExpandedStateChangedListener);
     }
 
     private abstract class PreviewImageCreator<Result> extends AsyncTask<Void, Void, Result> {
 
         float density;
+        int squareSizeInPixels;
 
         @CallSuper
         @Override
         protected void onPreExecute() {
-            density = valueToDensity(densitySetup.getValue());
+            squareSizeInPixels = imageCreator.squareSizeInPixels.get();
+            density = imageCreator.density.get();
             calculatingCreator = this;
             nextCalculatorToExecute = null;
-            calculatingPreviewProgressBar.setVisibility(View.VISIBLE);
+            binding.expandableViewHeader.setBusy(true);
         }
 
         @CallSuper
@@ -209,8 +199,8 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            width = previewHolder.getWidth();
-            height = previewHolder.getHeight();
+            width = binding.expandableViewHeader.getPreviewImageView().getWidth();
+            height = binding.expandableViewHeader.getPreviewImageView().getHeight();
             squareSizeOne = new RandomPixelsImageCreator(1, density);
         }
 
@@ -225,13 +215,15 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
 
             if(getActivity() != null) {
                 previewBitmap = bitmap;
-                previewDrawable = imageCreator.createDrawableFromBitmap(getResources(), bitmap);
-                ViewCompat.setBackground(previewHolder, previewDrawable);
+                previewDrawable = new RescaledDrawable(imageCreator.createDrawableFromBitmap(getResources(), bitmap));
+                previewDrawable.setScaleX(imageCreator.squareSizeInPixels.get());
+                previewDrawable.setScaleY(imageCreator.squareSizeInPixels.get());
+                binding.expandableViewHeader.setDrawable(previewDrawable);
 
                 if (nextCalculatorToExecute != null)
                     nextCalculatorToExecute.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 else
-                    calculatingPreviewProgressBar.setVisibility(View.INVISIBLE);
+                    binding.expandableViewHeader.setBusy(false);
             }
         }
     }
@@ -240,14 +232,14 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
 
         @Override
         protected Void doInBackground(Void... params) {
-            RandomPixelsImageCreator.drawRandomPixelsToImage(previewBitmap, density);
+            RandomPixelsImageCreator.drawRandomPixelsToImage(previewBitmap, 1, density);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            calculatingPreviewProgressBar.setVisibility(View.INVISIBLE);
+            binding.expandableViewHeader.setBusy(false);
             previewDrawable.invalidateSelf();
         }
 

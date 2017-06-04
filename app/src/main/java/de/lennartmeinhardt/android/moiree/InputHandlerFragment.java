@@ -35,16 +35,16 @@ public class InputHandlerFragment extends Fragment {
         @Override
         public void onGestureStarted(float startDistance) {
             this.startDistance = startDistance;
-            startCommonScaling = moireeTransformation.getCommonScaling();
+            startCommonScaling = moireeTransformation.commonScaling.get();
         }
 
         @Override
         public void onDistanceChanged(float newDistance) {
-            if(startDistance <= 0 || !moireeInputMethods.isScalingInputEnabled())
+            if(startDistance <= 0 || !moireeInputMethods.scalingInputEnabled.get())
                 return;
 
             float newCommonScaling = getNewScaling(newDistance, startDistance, startCommonScaling);
-            moireeTransformation.setCommonScaling(newCommonScaling);
+            moireeTransformation.commonScaling.set(newCommonScaling);
         }
     });
 
@@ -55,15 +55,15 @@ public class InputHandlerFragment extends Fragment {
         @Override
         public void onGestureStarted(float startAngle) {
             this.startAngle = startAngle;
-            startRotation = moireeTransformation.getRotation();
+            startRotation = moireeTransformation.rotation.get();
         }
 
         @Override
         public void onAngleChanged(float newAngle) {
-            if(moireeInputMethods.isRotationInputEnabled()) {
+            if(moireeInputMethods.rotationInputEnabled.get()) {
                 float angleDifference = newAngle - startAngle;
-                float newRot = startRotation + moireeInputMethods.getRotationSensitivity() * angleDifference;
-                moireeTransformation.setRotation(newRot);
+                float newRot = startRotation + moireeInputMethods.rotationSensitivity.get() * angleDifference;
+                moireeTransformation.rotation.set(newRot);
             }
         }
     });
@@ -76,18 +76,18 @@ public class InputHandlerFragment extends Fragment {
         public void onGestureStarted(float startX, float startY) {
             this.startX = startX;
             this.startY = startY;
-            startTranslationX = moireeTransformation.getTranslationX();
-            startTranslationY = moireeTransformation.getTranslationY();
+            startTranslationX = moireeTransformation.translationX.get();
+            startTranslationY = moireeTransformation.translationY.get();
         }
 
         @Override
         public void onPositionChanged(float newX, float newY) {
-            if(moireeInputMethods.isTranslationInputEnabled()) {
-                float newTranslationX = startTranslationX + moireeInputMethods.getTranslationSensitivity() * (newX - startX);
-                moireeTransformation.setTranslationX(newTranslationX);
+            if(moireeInputMethods.translationInputEnabled.get()) {
+                float newTranslationX = startTranslationX + moireeInputMethods.translationSensitivity.get() * (newX - startX);
+                moireeTransformation.translationX.set(newTranslationX);
                 // reverse y translation because bottom > top in android's coordinate system
-                float newTranslationY = startTranslationY - moireeInputMethods.getTranslationSensitivity() * (newY - startY);
-                moireeTransformation.setTranslationY(newTranslationY);
+                float newTranslationY = startTranslationY - moireeInputMethods.translationSensitivity.get() * (newY - startY);
+                moireeTransformation.translationY.set(newTranslationY);
             }
         }
     });
@@ -103,26 +103,26 @@ public class InputHandlerFragment extends Fragment {
         public void onGestureStarted(float startDistance) {
             this.startDistance = startDistance;
             float pointersAngle = rotationDetector.getStartAngle();
-            float rotationAngle = moireeTransformation.getRotation();
+            float rotationAngle = moireeTransformation.rotation.get();
             float scalingDirectionAngle = pointersAngle - rotationAngle;
             shallScaleHorizontally = ! isDirectionVerticalOnly(scalingDirectionAngle);
             shallScaleVertically = ! isDirectionHorizontalOnly(scalingDirectionAngle);
-            this.startScalingX = moireeTransformation.getScalingX();
-            this.startScalingY = moireeTransformation.getScalingY();
+            this.startScalingX = moireeTransformation.scalingX.get();
+            this.startScalingY = moireeTransformation.scalingY.get();
         }
 
         @Override
         public void onDistanceChanged(float newDistance) {
-            if(startDistance <= 0 || ! moireeInputMethods.isScalingInputEnabled())
+            if(startDistance <= 0 || ! moireeInputMethods.scalingInputEnabled.get())
                 return;
 
             if(shallScaleHorizontally) {
                 float newScalingX = getNewScaling(newDistance, startDistance, startScalingX);
-                moireeTransformation.setScalingX(newScalingX);
+                moireeTransformation.scalingX.set(newScalingX);
             }
             if(shallScaleVertically) {
                 float newScalingY = getNewScaling(newDistance, startDistance, startScalingY);
-                moireeTransformation.setScalingY(newScalingY);
+                moireeTransformation.scalingY.set(newScalingY);
             }
         }
 
@@ -187,12 +187,10 @@ public class InputHandlerFragment extends Fragment {
                 if(tapDetector.onTouchEvent(event))
                     return false;
 
-                System.out.println("-----\ntouch handler onTouch");
-
                 // handle rotation
                 rotationDetector.onTouchEvent(event);
                 // handle scaling
-                if(moireeTransformation.isUseCommonScaling())
+                if(moireeTransformation.useCommonScaling.get())
                     commonScalingDetector.onTouchEvent(event);
                 else
                     xyScalingDetector.onTouchEvent(event);
@@ -223,7 +221,7 @@ public class InputHandlerFragment extends Fragment {
 
     private float getNewScaling(float distance, float startDistance, float startScaling) {
         float distanceQuotient = distance / startDistance;
-        float sensitivity = moireeInputMethods.getScalingSensitivity();
+        float sensitivity = moireeInputMethods.scalingSensitivity.get();
         return (float) (startScaling * Math.pow(distanceQuotient, sensitivity));
     }
 

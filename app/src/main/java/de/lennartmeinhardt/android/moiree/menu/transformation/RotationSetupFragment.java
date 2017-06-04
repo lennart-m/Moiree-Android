@@ -1,136 +1,60 @@
 package de.lennartmeinhardt.android.moiree.menu.transformation;
 
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
-import de.lennartmeinhardt.android.moiree.Expandable;
-import de.lennartmeinhardt.android.moiree.MoireeTransformation;
+import de.lennartmeinhardt.android.moiree.BR;
 import de.lennartmeinhardt.android.moiree.R;
-import de.lennartmeinhardt.android.moiree.util.ExpandableView;
-import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
+import de.lennartmeinhardt.android.moiree.databinding.FragmentRotationSetupBinding;
 
 public class RotationSetupFragment extends BaseTransformationSetupFragment {
 
-    private ExpandableView expandableView;
-
-    private ImageButton resetButton;
-
-    private IntValueSetup rotationValueSetup;
-
-    private final IntValueSetup.OnValueChangedListener rotationSetter = new IntValueSetup.OnValueChangedListener() {
-        @Override
-        public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
-            if(fromUser) {
-                float rotation = valueToRotation(value);
-                moireeTransformation.setRotation(rotation);
-            }
-            updateResetButtonEnabledState();
-        }
-    };
-
-    private final MoireeTransformation.OnTransformationChangedListener uiUpdater = new MoireeTransformation.OnTransformationChangedListener.Adapter() {
-        @Override
-        public void onRotationChanged(float newRotation) {
-            if(! rotationValueSetup.isUserInputActive()) {
-                int value = rotationToValue(newRotation);
-                rotationValueSetup.setValue(value);
-            }
-        }
-    };
-
-    private final View.OnClickListener rotationResetter = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            beginMoireeTransformationTransitionIfWanted();
-            moireeTransformation.setRotationToIdentity();
-        }
-    };
+    private FragmentRotationSetupBinding binding;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_rotation_setup, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_rotation_setup, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        expandableView = (ExpandableView) view.findViewById(R.id.expandable_view);
-
-        initializeHeaderView();
-        initializeContentView();
-    }
-
-    private void initializeHeaderView() {
-        View header = expandableView.findHeaderView();
-        final View expandedIndicator = header.findViewById(R.id.header_expanded_indicator);
-        TextView rotationSetupTitle = (TextView) header.findViewById(R.id.header_title);
-
-        header.setOnClickListener(new View.OnClickListener() {
+        binding.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                // start the transition only if the expanded property has changed
+                if(i == BR.expanded)
+                    beginMenuTransition(createMenuBoundsAndHeaderIndicatorTransition());
+            }
+        });
+        binding.resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                beginMenuTransition(createMenuBoundsAndHeaderIndicatorTransition());
-                expandableView.toggleExpanded();
+                beginMoireeTransformationTransitionIfWanted();
+                moireeTransformation.setRotationToIdentity();
             }
         });
-
-        final int arrowCollapsedDegrees = getResources().getInteger(R.integer.indicator_arrow_collapsed_rotation);
-        expandableView.addOnExpandedStateChangedListener(new Expandable.OnExpandedStateChangedListener() {
-            @Override
-            public void onExpandedStateChanged(Expandable expandable, boolean expanded) {
-                expandedIndicator.setRotation(expanded ? 0 : arrowCollapsedDegrees);
-            }
-        });
-
-        rotationSetupTitle.setText(R.string.rotation);
-    }
-
-    private void initializeContentView() {
-        View content = expandableView.findContentView();
-
-        rotationValueSetup = (IntValueSetup) content.findViewById(R.id.rotation_value_setup);
-        resetButton = (ImageButton) content.findViewById(R.id.reset_button);
-
-        rotationValueSetup.setOnValueChangedListener(rotationSetter);
-
-        resetButton.setImageResource(R.drawable.ic_reset_rotation);
-        resetButton.setOnClickListener(rotationResetter);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        moireeTransformation.addAndFireOnTransformationChangedListener(uiUpdater);
-        updateResetButtonEnabledState();
+        binding.setMoireeTransformation(moireeTransformation);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        moireeTransformation.removeOnTransformationChangedListener(uiUpdater);
+    public boolean isExpanded() {
+        return binding.getExpanded();
     }
 
-    private void updateResetButtonEnabledState() {
-        boolean isDefaultRotation = rotationValueSetup.getValue() == rotationToValue(MoireeTransformation.ID_ROTATION);
-        resetButton.setEnabled(! isDefaultRotation);
-    }
-
-    private float valueToRotation(int value) {
-        return value;
-    }
-
-    private int rotationToValue(float rotation) {
-        return Math.round(rotation);
-    }
-
-    public ExpandableView getExpandableView() {
-        return expandableView;
+    public void setExpanded(boolean expanded) {
+        binding.setExpanded(expanded);
     }
 }

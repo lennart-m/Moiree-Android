@@ -1,5 +1,7 @@
 package de.lennartmeinhardt.android.moiree.menu.settings;
 
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.transition.Transition;
@@ -7,91 +9,45 @@ import android.support.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.Switch;
 
 import de.lennartmeinhardt.android.moiree.MenuTransparencyConfig;
 import de.lennartmeinhardt.android.moiree.MenuTransparencyConfigHolder;
 import de.lennartmeinhardt.android.moiree.R;
+import de.lennartmeinhardt.android.moiree.databinding.FragmentMenuTransparencySetupBinding;
 import de.lennartmeinhardt.android.moiree.menu.MenuFragment;
 import de.lennartmeinhardt.android.moiree.transition.ChangeAlpha;
-import de.lennartmeinhardt.android.moiree.util.ExpandableView;
-import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
 
 public class MenuTransparencySetupFragment extends MenuFragment {
 
     private MenuTransparencyConfig menuTransparencyConfig;
 
-    private Switch menuTransparencySwitch;
-    private IntValueSetup opacityValueSetup;
-    private ExpandableView expandableView;
-    private Button resetButton;
+    private FragmentMenuTransparencySetupBinding binding;
 
-    private int defaultMenuTransparencyPercents;
+    private final Observable.OnPropertyChangedCallback menuTransitionStarter = new Observable.OnPropertyChangedCallback() {
+        @Override
+        public void onPropertyChanged(Observable observable, int i) {
+            beginMenuTransition(createBoundsAndAlphaTransition());
+        }
+    };
 
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        defaultMenuTransparencyPercents = getResources().getInteger(R.integer.menu_opacity_default_percents);
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_menu_transparency_setup, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_menu_transparency_setup, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        expandableView = (ExpandableView) view.findViewById(R.id.expandable_view);
-
-        View header = expandableView.findHeaderView();
-        menuTransparencySwitch = (Switch) header;
-        menuTransparencySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                beginMenuTransition(createBoundsAndAlphaTransition());
-                menuTransparencyConfig.setTransparencyEnabled(isChecked);
-                updateUI(false);
-            }
-        });
-
-        View content = expandableView.findContentView();
-
-        resetButton = (Button) content.findViewById(R.id.reset_button);
-        resetButton.setOnClickListener(new View.OnClickListener() {
+        final int defaultMenuTransparencyPercents = getResources().getInteger(R.integer.menu_opacity_default_percents);
+        binding.resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 beginMenuTransition(createMenuTransparencyTransition());
-                opacityValueSetup.setValue(defaultMenuTransparencyPercents);
+                menuTransparencyConfig.menuAlpha.set(defaultMenuTransparencyPercents / 100f);
             }
         });
-
-        opacityValueSetup = (IntValueSetup) content.findViewById(R.id.opacity_value_setup);
-        opacityValueSetup.setOnValueChangedListener(new IntValueSetup.OnValueChangedListener() {
-            @Override
-            public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
-                float alpha = valueToAlpha(value);
-                menuTransparencyConfig.setMenuAlpha(alpha);
-                updateUI(true);
-            }
-        });
-    }
-
-    private void updateUI(boolean fromValueSetup) {
-        boolean transparencyEnabled = menuTransparencyConfig.isTransparencyEnabled();
-        float menuAlpha = menuTransparencyConfig.getMenuAlpha();
-        int opacityPercents = alphaToValue(menuAlpha);
-
-        menuTransparencySwitch.setChecked(transparencyEnabled);
-        expandableView.setExpanded(transparencyEnabled);
-        resetButton.setEnabled(opacityPercents != defaultMenuTransparencyPercents);
-
-        if(! fromValueSetup)
-            opacityValueSetup.setValue(opacityPercents);
     }
 
     @Override
@@ -99,18 +55,16 @@ public class MenuTransparencySetupFragment extends MenuFragment {
         super.onActivityCreated(savedInstanceState);
 
         menuTransparencyConfig = ((MenuTransparencyConfigHolder) getActivity()).getMenuTransparencyConfig();
+        menuTransparencyConfig.transparencyEnabled.addOnPropertyChangedCallback(menuTransitionStarter);
 
-        updateUI(false);
-        int value = alphaToValue(menuTransparencyConfig.getMenuAlpha());
-        opacityValueSetup.setValue(value);
+        binding.setMenuTransparencyConfig(menuTransparencyConfig);
     }
 
-    private int alphaToValue(float alpha) {
-        return (int) (alpha * 100);
-    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
 
-    private float valueToAlpha(int value) {
-        return value / 100f;
+        menuTransparencyConfig.transparencyEnabled.removeOnPropertyChangedCallback(menuTransitionStarter);
     }
 
     private static Transition createBoundsAndAlphaTransition() {

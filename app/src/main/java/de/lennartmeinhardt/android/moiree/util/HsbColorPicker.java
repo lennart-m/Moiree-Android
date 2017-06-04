@@ -2,6 +2,10 @@ package de.lennartmeinhardt.android.moiree.util;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.databinding.BindingAdapter;
+import android.databinding.InverseBindingListener;
+import android.databinding.InverseBindingMethod;
+import android.databinding.InverseBindingMethods;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -15,6 +19,9 @@ import android.widget.RelativeLayout;
 import de.lennartmeinhardt.android.moiree.R;
 
 // TODO mirror sat-val-selection in RTL mode
+@InverseBindingMethods(
+        @InverseBindingMethod(type = HsbColorPicker.class, attribute = "selectedColor")
+)
 public class HsbColorPicker extends RelativeLayout {
 
     private final float[] tmpHsv = new float[3];
@@ -26,8 +33,6 @@ public class HsbColorPicker extends RelativeLayout {
     private ColorDrawable backgroundColorDrawable;
 
     private int selectedColor;
-
-    private boolean hueUserInputActive, satValUserInputActive;
 
     private OnColorSelectionChangedListener onColorSelectionChangedListener;
 
@@ -99,12 +104,10 @@ public class HsbColorPicker extends RelativeLayout {
 
             @Override
             public void onStartTrackingTouch(SeekPane seekPane) {
-                satValUserInputActive = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekPane seekPane) {
-                satValUserInputActive = false;
             }
         });
     }
@@ -122,22 +125,25 @@ public class HsbColorPicker extends RelativeLayout {
 
             @Override
             public void onStartTrackingTouch(SeekPane seekPane) {
-                hueUserInputActive = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekPane seekPane) {
-                hueUserInputActive = false;
             }
         });
     }
 
     private void updateUiFromColor() {
         Color.colorToHSV(selectedColor, tmpHsv);
-        setHueProgressFromValue(tmpHsv[0]);
-        setSatValPositionFromValues(tmpHsv[1], tmpHsv[2]);
 
-        updateSatValSelectionBackground(tmpHsv[0]);
+        final float hue = tmpHsv[0],
+                    sat = tmpHsv[1],
+                    val = tmpHsv[2];
+
+        setHueProgressFromValue(hue);
+        setSatValPositionFromValues(sat, val);
+
+        updateSatValSelectionBackground(hue);
     }
     private void setHueProgressFromValue(float hue) {
         int hueSelectionProgress = (int) (hueSelection.getMaxX() * hue / 360f);
@@ -186,8 +192,10 @@ public class HsbColorPicker extends RelativeLayout {
     }
 
     public void setSelectedColor(int color) {
-        setColorInternal(color, false);
-        updateUiFromColor();
+        if(! isUserInputActive()) {
+            setColorInternal(color, false);
+            updateUiFromColor();
+        }
     }
 
     public int getSelectedColor() {
@@ -205,5 +213,19 @@ public class HsbColorPicker extends RelativeLayout {
 
     public interface OnColorSelectionChangedListener {
         void onColorSelectionChanged(HsbColorPicker colorPicker, int color, boolean fromUser);
+    }
+
+    @BindingAdapter("selectedColorAttrChanged")
+    public static void setColorSelectionListener(HsbColorPicker colorPicker, final InverseBindingListener bindingListener) {
+        if(bindingListener == null)
+            colorPicker.setOnColorSelectionChangedListener(null);
+        else
+            colorPicker.setOnColorSelectionChangedListener(new OnColorSelectionChangedListener() {
+                @Override
+                public void onColorSelectionChanged(HsbColorPicker colorPicker, int color, boolean fromUser) {
+                    if(fromUser)
+                        bindingListener.onChange();
+                }
+            });
     }
 }

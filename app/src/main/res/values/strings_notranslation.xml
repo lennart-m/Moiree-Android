@@ -9,5 +9,7 @@
     <!-- help and about menus -->
     <string name="email_address" translatable="false">lennart.meinhardt+moireeandroid@googlemail.com</string>
     <string name="youtube_link_freaky_dot_patterns" translatable="false">https://www.youtube.com/watch?v=QAja2jp1VjE</string>
+    <string name="desktop_version_address" translatable="false">https://github.com/lennart-m/Moiree</string>
+    <string name="source_code_address" translatable="false">https://github.com/lennart-m/Moiree-Android</string>
 
 </resources>

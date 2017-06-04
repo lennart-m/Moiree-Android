@@ -1,63 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<de.lennartmeinhardt.android.moiree.util.ExpandableView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:saveEnabled="false">
+<layout>
 
-    <LinearLayout
+    <data>
+
+        <variable
+            name="title"
+            type="String"/>
+
+        <variable
+            name="description"
+            type="String"/>
+
+        <variable
+            name="sensitivity"
+            type="float"/>
+
+        <variable
+            name="inputMethodEnabled"
+            type="boolean"/>
+    </data>
+
+    <de.lennartmeinhardt.android.moiree.util.ExpandableView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:saveEnabled="false"
+        app:expanded="@{inputMethodEnabled}">
 
         <LinearLayout
-            android:id="@id/expandable_view_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <Switch
-                android:id="@+id/input_method_switch"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:saveEnabled="false"
-                tools:text="Name"/>
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/description_text"
+                <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="@={inputMethodEnabled}"
+                    android:saveEnabled="false"
+                    android:text="@{title}"
+                    tools:text="Name"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{description}"
+                    tools:text="Description"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/expandable_view_content"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:text="Description"/>
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <de.lennartmeinhardt.android.moiree.util.IntValueSetup
+                    style="@style/SensitivityValueSetup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:saveEnabled="false"
+                    app:name="@string/input_sensitivity_name"
+                    app:value="@={(int) (sensitivity * 100)}"/>
+
+                <Button
+                    android:id="@+id/reset_button"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:text="@string/reset"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@id/expandable_view_content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+    </de.lennartmeinhardt.android.moiree.util.ExpandableView>
 
-            <de.lennartmeinhardt.android.moiree.util.IntValueSetup
-                android:id="@+id/sensitivity_value_setup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:saveEnabled="false"
-                style="@style/SensitivityValueSetup"
-                app:name="@string/input_sensitivity_name"/>
-
-            <Button
-                android:id="@+id/reset_button"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:text="@string/reset"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-</de.lennartmeinhardt.android.moiree.util.ExpandableView>
+</layout>

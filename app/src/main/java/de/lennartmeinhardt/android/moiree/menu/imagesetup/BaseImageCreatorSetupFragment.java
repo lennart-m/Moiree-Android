@@ -12,11 +12,13 @@ import de.lennartmeinhardt.android.moiree.menu.MenuFragment;
 import de.lennartmeinhardt.android.moiree.util.BundleIO;
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
-abstract class BaseImageCreatorSetupFragment <C extends MoireeImageCreator> extends MenuFragment {
+/**
+ * Base class for image creator setup fragments.
+ * Handles loading and storing image creator config from preferences or instance state.
+ */
+abstract class BaseImageCreatorSetupFragment extends MenuFragment {
 
     private SharedPreferences preferences;
-
-    C imageCreator;
 
 
     @Override
@@ -29,7 +31,7 @@ abstract class BaseImageCreatorSetupFragment <C extends MoireeImageCreator> exte
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        imageCreator = initializeImageCreator();
+        MoireeImageCreator imageCreator = getMoireeImageCreator();
 
         if(savedInstanceState != null) {
             if (imageCreator instanceof BundleIO)
@@ -44,21 +46,25 @@ abstract class BaseImageCreatorSetupFragment <C extends MoireeImageCreator> exte
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        MoireeImageCreator imageCreator = getMoireeImageCreator();
         if(imageCreator instanceof BundleIO)
             ((BundleIO) imageCreator).storeToBundle(outState);
     }
 
     void onCreateNewImageClicked() {
         storeImageCreatorToPreferences();
-        ((MoireeImaging) getActivity()).setImageCreatorAndRecreateImage(imageCreator);
+        ((MoireeImaging) getActivity()).setImageCreatorAndRecreateImage(getMoireeImageCreator());
     }
 
-    private void storeImageCreatorToPreferences() {
-        SharedPreferences.Editor preferencesEditor = preferences.edit();
-        if(imageCreator instanceof PreferenceIO)
+    protected void storeImageCreatorToPreferences() {
+        MoireeImageCreator imageCreator = getMoireeImageCreator();
+
+        if(imageCreator instanceof PreferenceIO) {
+            SharedPreferences.Editor preferencesEditor = preferences.edit();
             ((PreferenceIO) imageCreator).storeToPreferences(preferencesEditor);
-        preferencesEditor.apply();
+            preferencesEditor.apply();
+        }
     }
 
-    abstract C initializeImageCreator();
+    protected abstract MoireeImageCreator getMoireeImageCreator();
 }

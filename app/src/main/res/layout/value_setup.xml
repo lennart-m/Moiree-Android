@@ -16,7 +16,9 @@
         android:layout_gravity="center_vertical"
         android:layout_toStartOf="@id/value_setup_decrease_button"
         android:gravity="center_vertical"
-        tools:text="Name"/>
+        tools:text="Name"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@id/value_setup_decrease_button"/>
 
     <ImageButton
         android:id="@id/value_setup_decrease_button"
@@ -28,7 +30,8 @@
         android:layout_toStartOf="@id/value_setup_value"
         android:adjustViewBounds="true"
         android:contentDescription="@string/accessibility_decrease"
-        android:src="@drawable/ic_decrease"/>
+        android:src="@drawable/ic_decrease"
+        android:layout_toLeftOf="@id/value_setup_value"/>
 
     <TextView
         android:id="@id/value_setup_value"
@@ -40,7 +43,8 @@
         android:layout_toStartOf="@id/value_setup_increase_button"
         android:ems="@integer/value_setup_value_ems"
         android:gravity="center"
-        tools:text="value"/>
+        tools:text="value"
+        android:layout_toLeftOf="@id/value_setup_increase_button"/>
 
     <ImageButton
         android:id="@id/value_setup_increase_button"
@@ -51,7 +55,8 @@
         android:layout_alignParentTop="true"
         android:adjustViewBounds="true"
         android:contentDescription="@string/accessibility_increase"
-        android:src="@drawable/ic_increase"/>
+        android:src="@drawable/ic_increase"
+        android:layout_alignParentRight="true"/>
 
     <SeekBar
         android:id="@id/value_setup_slider"

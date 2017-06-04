@@ -1,98 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/BaseMenuCard"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<layout>
 
-    <de.lennartmeinhardt.android.moiree.util.ExpandableView
-        android:id="@+id/expandable_view"
+    <data>
+
+        <import type="de.lennartmeinhardt.android.moiree.util.Expandable"/>
+
+        <variable
+            name="expanded"
+            type="boolean"/>
+
+        <variable
+            name="moireeTransformation"
+            type="de.lennartmeinhardt.android.moiree.MoireeTransformation"/>
+    </data>
+
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/BaseMenuCard"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
+        <de.lennartmeinhardt.android.moiree.util.ExpandableView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            app:expanded="@{expanded}">
 
-            <include
-                android:id="@id/expandable_view_header"
-                layout="@layout/header_with_arrow"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <RelativeLayout
-                android:id="@id/expandable_view_content"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <de.lennartmeinhardt.android.moiree.util.IntValueSetup
-                    android:id="@+id/translation_x_value_setup"
-                    style="@style/TransformationValueSetup.Translation"
+                <de.lennartmeinhardt.android.moiree.util.ArrowExpandableHeader
+                    style="@style/ClickableHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:name="@string/horizontal"/>
+                    android:onClick="@{v -> ((Expandable) v).toggleExpanded()}"
+                    app:expanded="@={expanded}"
+                    app:title="@string/translations"/>
 
-                <de.lennartmeinhardt.android.moiree.util.IntValueSetup
-                    android:id="@+id/translation_y_value_setup"
-                    style="@style/TransformationValueSetup.Translation"
+                <RelativeLayout
+                    android:id="@id/expandable_view_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/translation_x_value_setup"
-                    app:name="@string/vertical"/>
+                    android:orientation="vertical">
 
-                <ImageButton
-                    android:id="@+id/reset_translation_both"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_below="@id/translation_y_value_setup"
-                    android:layout_marginStart="5dp"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/accessibility_reset_translations_both"
-                    android:src="@drawable/ic_reset_translation_both"/>
+                    <de.lennartmeinhardt.android.moiree.util.IntValueSetup
+                        android:id="@+id/translation_x_value_setup"
+                        style="@style/TransformationValueSetup.Translation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:name="@string/horizontal"
+                        app:value="@={(int) moireeTransformation.translationX}"/>
 
-                <ImageButton
-                    android:id="@+id/reset_translation_y"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/translation_y_value_setup"
-                    android:layout_marginStart="5dp"
-                    android:layout_toStartOf="@id/reset_translation_both"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/accessibility_reset_translation_vertical"
-                    android:src="@drawable/ic_reset_translation_vertical"/>
+                    <de.lennartmeinhardt.android.moiree.util.IntValueSetup
+                        android:id="@+id/translation_y_value_setup"
+                        style="@style/TransformationValueSetup.Translation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/translation_x_value_setup"
+                        app:name="@string/vertical"
+                        app:value="@={(int) moireeTransformation.translationY}"/>
 
-                <ImageButton
-                    android:id="@+id/reset_translation_x"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/translation_y_value_setup"
-                    android:layout_marginStart="5dp"
-                    android:layout_toStartOf="@id/reset_translation_y"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/accessibility_reset_translation_horizontal"
-                    android:src="@drawable/ic_reset_translation_horizontal"/>
+                    <ImageButton
+                        android:id="@+id/reset_translation_both"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@id/translation_y_value_setup"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/accessibility_reset_translations_both"
+                        android:enabled="@{moireeTransformation.translationX != 0 || moireeTransformation.translationY != 0}"
+                        android:src="@drawable/ic_reset_translation_both"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/reset_translation_x"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignTop="@id/reset_translation_x"
-                    android:layout_toStartOf="@id/reset_translation_x"
-                    android:gravity="center_vertical"
-                    android:text="@string/reset"/>
+                    <ImageButton
+                        android:id="@+id/reset_translation_y"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/translation_y_value_setup"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_toLeftOf="@id/reset_translation_both"
+                        android:layout_toStartOf="@id/reset_translation_both"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/accessibility_reset_translation_vertical"
+                        android:enabled="@{moireeTransformation.translationY != 0}"
+                        android:src="@drawable/ic_reset_translation_vertical"/>
 
-            </RelativeLayout>
+                    <ImageButton
+                        android:id="@+id/reset_translation_x"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/translation_y_value_setup"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_toLeftOf="@id/reset_translation_y"
+                        android:layout_toStartOf="@id/reset_translation_y"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/accessibility_reset_translation_horizontal"
+                        android:enabled="@{moireeTransformation.translationX != 0}"
+                        android:src="@drawable/ic_reset_translation_horizontal"/>
 
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/reset_translation_x"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignTop="@id/reset_translation_x"
+                        android:layout_toLeftOf="@id/reset_translation_x"
+                        android:layout_toStartOf="@id/reset_translation_x"
+                        android:gravity="center_vertical"
+                        android:text="@string/reset"/>
 
-    </de.lennartmeinhardt.android.moiree.util.ExpandableView>
+                </RelativeLayout>
 
-</android.support.v7.widget.CardView>
+            </LinearLayout>
+
+        </de.lennartmeinhardt.android.moiree.util.ExpandableView>
+
+    </android.support.v7.widget.CardView>
+
+</layout>

@@ -2,21 +2,23 @@ package de.lennartmeinhardt.android.moiree.imaging;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.databinding.ObservableInt;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
 import de.lennartmeinhardt.android.moiree.util.BundleIO;
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
-import static android.graphics.Color.BLACK;
-import static android.graphics.Color.TRANSPARENT;
-
-public class CheckerboardImageCreator extends BaseBitmapMoireeImageCreator<RescaledDrawable> implements BundleIO, PreferenceIO {
+public class CheckerboardImageCreator extends BaseBitmapMoireeImageCreator<BitmapDrawable> implements BundleIO, PreferenceIO {
 
     private static final String KEY_SQUARE_SIZE = "checkerboardImageCreator:squareSizeInPixels";
 
-    private int squareSizeInPixels;
+    public final ObservableInt squareSizeInPixels = new ObservableInt();
 
 
     public CheckerboardImageCreator() {
@@ -24,58 +26,49 @@ public class CheckerboardImageCreator extends BaseBitmapMoireeImageCreator<Resca
     }
 
     public CheckerboardImageCreator(int squareSizeInPixels) {
-        this.squareSizeInPixels = squareSizeInPixels;
+        this.squareSizeInPixels.set(squareSizeInPixels);
     }
 
 
     @Override
     public void loadFromPreferences(SharedPreferences preferences) {
-        squareSizeInPixels = preferences.getInt(KEY_SQUARE_SIZE, squareSizeInPixels);
+        squareSizeInPixels.set(preferences.getInt(KEY_SQUARE_SIZE, squareSizeInPixels.get()));
     }
 
     @Override
     public void storeToPreferences(SharedPreferences.Editor preferencesEditor) {
-        preferencesEditor.putInt(KEY_SQUARE_SIZE, squareSizeInPixels);
+        preferencesEditor.putInt(KEY_SQUARE_SIZE, squareSizeInPixels.get());
     }
 
     @Override
     public void loadFromBundle(Bundle bundle) {
-        squareSizeInPixels = bundle.getInt(KEY_SQUARE_SIZE, squareSizeInPixels);
+        squareSizeInPixels.set(bundle.getInt(KEY_SQUARE_SIZE, squareSizeInPixels.get()));
     }
 
     @Override
     public void storeToBundle(Bundle bundle) {
-        bundle.putInt(KEY_SQUARE_SIZE, squareSizeInPixels);
-    }
-
-    public int getSquareSizeInPixels() {
-        return squareSizeInPixels;
-    }
-    public void setSquareSizeInPixels(int squareSizeInPixels) {
-        this.squareSizeInPixels = squareSizeInPixels;
+        bundle.putInt(KEY_SQUARE_SIZE, squareSizeInPixels.get());
     }
 
     @Override
     public Bitmap createBitmapForDimensions(int width, int height) {
-        int imageWidth = (width + squareSizeInPixels - 1) / squareSizeInPixels;
-        int imageHeight = (height + squareSizeInPixels - 1) / squareSizeInPixels;
-        Bitmap bitmap = createEmptyBitmap(imageWidth, imageHeight);
-        drawCheckerboardToImage(bitmap);
+        Bitmap bitmap = createEmptyBitmap(width, height);
+        drawCheckerboardToImage(bitmap, squareSizeInPixels.get());
         return bitmap;
     }
 
     @Override
-    public RescaledDrawable createDrawableFromBitmap(Resources resources, Bitmap bitmap) {
+    public BitmapDrawable createDrawableFromBitmap(Resources resources, Bitmap bitmap) {
         BitmapDrawable drawable = new BitmapDrawable(resources, bitmap);
         drawable.setAntiAlias(false);
         drawable.setDither(false);
         drawable.setFilterBitmap(false);
-        return new RescaledDrawable(drawable, squareSizeInPixels);
+        return drawable;
     }
 
     @Override
-    public Bitmap getBitmapFromDrawable(RescaledDrawable drawable) {
-        return ((BitmapDrawable) drawable.getWrappedDrawable()).getBitmap();
+    public Bitmap getBitmapFromDrawable(BitmapDrawable drawable) {
+        return drawable.getBitmap();
     }
 
     @Override
@@ -85,27 +78,31 @@ public class CheckerboardImageCreator extends BaseBitmapMoireeImageCreator<Resca
 
         CheckerboardImageCreator that = (CheckerboardImageCreator) o;
 
-        return squareSizeInPixels == that.squareSizeInPixels;
+        return squareSizeInPixels.get() == that.squareSizeInPixels.get();
     }
 
     @Override
     public int hashCode() {
-        return squareSizeInPixels;
+        return squareSizeInPixels.get();
     }
 
-    private static void drawCheckerboardToImage(Bitmap image) {
-        double width = image.getWidth();
-        double height = image.getHeight();
+    private static void drawCheckerboardToImage(Bitmap image, int squareSizeInPixels) {
+        int width = image.getWidth();
+        int height = image.getHeight();
 
-        int argb;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if ((x + y) % 2 == 0)
-                    argb = BLACK;
-                else
-                    argb = TRANSPARENT;
+        final int segmentsPerImageHalfX = (int) Math.ceil((width / 2f) / squareSizeInPixels);
+        final int segmentsPerImageHalfY = (int) Math.ceil((height / 2f) / squareSizeInPixels);
 
-                image.setPixel(x, y, argb);
+        Canvas canvas = new Canvas(image);
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        Paint fillBlack = new Paint();
+
+        for (int i = - segmentsPerImageHalfX; i < segmentsPerImageHalfX; i++) {
+            final float x = width / 2f + i * squareSizeInPixels;
+            for (int j = -segmentsPerImageHalfY; j < segmentsPerImageHalfY; j++) {
+                final float y = height / 2f + j * squareSizeInPixels;
+                if ((i + j) % 2 == 0)
+                    canvas.drawRect(x, y, x + squareSizeInPixels, y + squareSizeInPixels, fillBlack);
             }
         }
     }

@@ -27,7 +27,7 @@
     <string name="translation_input_description">Bewege einen Finger auf dem Bildschirm, um das Bild zu verschieben.</string>
     <string name="thickness">Stärke</string>
     <string name="swap_colors">Vertauschen</string>
-    <string name="square_size">Größe</string>
+    <string name="size">Größe</string>
     <string name="set_transformation_to_identity">Auf Identität setzen</string>
     <string name="send_email">E-Mail schicken</string>
     <string name="scalings">Skalierungen</string>
@@ -38,6 +38,7 @@
     <string name="rotation">Rotation</string>
     <string name="reset">Zurücksetzen</string>
     <string name="random_pixels_title">Zufällige Pixel</string>
+    <string name="triangles_title">Dreiecke</string>
     <string name="menu_transparency_value_name">Deckkraft</string>
     <string name="menu_transparency_title">Transparente Menüs</string>
     <string name="menu_transformation">Transformation</string>

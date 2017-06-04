@@ -10,9 +10,12 @@
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             style="@style/MenuTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:displayOptions="showHome|homeAsUp"
+            app:navigationIcon="?homeAsUpIndicator"
             app:title="@string/menu_help"/>
 
         <ScrollView

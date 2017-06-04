@@ -182,6 +182,7 @@ public class SeekPane extends View {
                 onStopTrackingTouch();
                 break;
         }
+
         return true;
     }
 
@@ -257,9 +258,9 @@ public class SeekPane extends View {
     }
 
     private void onStopTrackingTouch() {
-        setInputActive(false);
         if (changeListener != null)
             changeListener.onStopTrackingTouch(this);
+        setInputActive(false);
     }
 
 
@@ -405,8 +406,6 @@ public class SeekPane extends View {
 
         void onPositionYChanged(SeekPane seekPane, int positionY, boolean fromUser);
 
-        //        void onRelativeXChanged(SeekPane seekBar, float relativeX, boolean fromUser);
-//        void onRelativeYChanged(SeekPane seekBar, float relativeY, boolean fromUser);
         void onStartTrackingTouch(SeekPane seekPane);
 
         void onStopTrackingTouch(SeekPane seekPane);

@@ -10,6 +10,7 @@
     <dimen name="checkerboard_image_default_square_size">6dp</dimen>
     <dimen name="horizontal_lines_image_default_line_thickness">5dp</dimen>
     <dimen name="random_pixels_image_default_square_size">4dp</dimen>
+    <dimen name="triangles_image_default_triangle_size">20dp</dimen>
 
     <dimen name="thumb_circle_diameter">15dp</dimen>
     <dimen name="thumb_stroke_width">1dp</dimen>

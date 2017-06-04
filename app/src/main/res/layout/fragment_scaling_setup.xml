@@ -1,108 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/BaseMenuCard"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<layout>
 
-    <de.lennartmeinhardt.android.moiree.util.ExpandableView
-        android:id="@+id/expandable_view"
+    <data>
+
+        <import type="android.view.View"/>
+
+        <import type="de.lennartmeinhardt.android.moiree.util.Expandable"/>
+
+        <variable
+            name="expanded"
+            type="boolean"/>
+
+        <variable
+            name="moireeTransformation"
+            type="de.lennartmeinhardt.android.moiree.MoireeTransformation"/>
+    </data>
+
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/BaseMenuCard"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
+        <de.lennartmeinhardt.android.moiree.util.ExpandableView
+            android:id="@+id/expandable_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <include
-                android:id="@id/expandable_view_header"
-                layout="@layout/header_with_arrow"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"
+            app:expanded="@{expanded}">
 
             <LinearLayout
-                android:id="@id/expandable_view_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <Switch
-                    android:id="@+id/common_scaling_switch"
+                <de.lennartmeinhardt.android.moiree.util.ArrowExpandableHeader
+                    style="@style/ClickableHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/use_common_scaling"/>
-
-                <de.lennartmeinhardt.android.moiree.util.IntValueSetup
-                    android:id="@+id/common_scaling_value_setup"
-                    style="@style/TransformationValueSetup.Scaling"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:name="@string/common_scaling"/>
-
-                <de.lennartmeinhardt.android.moiree.util.IntValueSetup
-                    android:id="@+id/scaling_x_value_setup"
-                    style="@style/TransformationValueSetup.Scaling"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:name="@string/horizontal"/>
-
-                <de.lennartmeinhardt.android.moiree.util.IntValueSetup
-                    android:id="@+id/scaling_y_value_setup"
-                    style="@style/TransformationValueSetup.Scaling"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:name="@string/vertical"/>
+                    android:onClick="@{v -> ((Expandable) v).toggleExpanded()}"
+                    app:expanded="@={expanded}"
+                    app:title="@string/scalings"/>
 
                 <LinearLayout
+                    android:id="@id/expandable_view_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="@string/reset"/>
+                    <Switch
+                        android:id="@+id/common_scaling_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="@={moireeTransformation.useCommonScaling}"
+                        android:text="@string/use_common_scaling"/>
 
-                    <ImageButton
-                        android:id="@+id/reset_scaling_x"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="5dp"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@string/accessibility_reset_scaling_horizontal"
-                        android:src="@drawable/ic_reset_scaling_horizontal"/>
+                    <de.lennartmeinhardt.android.moiree.util.IntValueSetup
+                        android:id="@+id/common_scaling_value_setup"
+                        style="@style/TransformationValueSetup.Scaling"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="@{moireeTransformation.useCommonScaling ? View.VISIBLE : View.GONE}"
+                        app:name="@string/common_scaling"
+                        app:value="@={(int) (moireeTransformation.commonScaling * 100)}"/>
 
-                    <ImageButton
-                        android:id="@+id/reset_scaling_y"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="5dp"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@string/accessibility_reset_scaling_vertical"
-                        android:src="@drawable/ic_reset_scaling_vertical"/>
+                    <de.lennartmeinhardt.android.moiree.util.IntValueSetup
+                        android:id="@+id/scaling_x_value_setup"
+                        style="@style/TransformationValueSetup.Scaling"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="@{moireeTransformation.useCommonScaling ? View.GONE : View.VISIBLE}"
+                        app:name="@string/horizontal"
+                        app:value="@={(int) (moireeTransformation.scalingX * 100)}"/>
 
-                    <ImageButton
-                        android:id="@+id/reset_scaling_both"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="5dp"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@string/accessibility_reset_scaling_both"
-                        android:src="@drawable/ic_reset_scaling_both"/>
+                    <de.lennartmeinhardt.android.moiree.util.IntValueSetup
+                        android:id="@+id/scaling_y_value_setup"
+                        style="@style/TransformationValueSetup.Scaling"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="@{moireeTransformation.useCommonScaling ? View.GONE : View.VISIBLE}"
+                        app:name="@string/vertical"
+                        app:value="@={(int) (moireeTransformation.scalingY * 100)}"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:text="@string/reset"/>
+
+                        <ImageButton
+                            android:id="@+id/reset_scaling_x"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/accessibility_reset_scaling_horizontal"
+                            android:enabled="@{moireeTransformation.scalingX != 1}"
+                            android:src="@drawable/ic_reset_scaling_horizontal"
+                            android:visibility="@{moireeTransformation.useCommonScaling ? View.GONE : View.VISIBLE}"/>
+
+                        <ImageButton
+                            android:id="@+id/reset_scaling_y"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/accessibility_reset_scaling_vertical"
+                            android:enabled="@{moireeTransformation.scalingY != 1}"
+                            android:src="@drawable/ic_reset_scaling_vertical"
+                            android:visibility="@{moireeTransformation.useCommonScaling ? View.GONE : View.VISIBLE}"/>
+
+                        <ImageButton
+                            android:id="@+id/reset_scaling_both"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/accessibility_reset_scaling_both"
+                            android:enabled="@{moireeTransformation.useCommonScaling ? (moireeTransformation.commonScaling != 1) : (moireeTransformation.scalingX != 1 || moireeTransformation.scalingY != 1)}"
+                            android:src="@drawable/ic_reset_scaling_both"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </de.lennartmeinhardt.android.moiree.util.ExpandableView>
 
-    </de.lennartmeinhardt.android.moiree.util.ExpandableView>
+    </android.support.v7.widget.CardView>
 
-</android.support.v7.widget.CardView>
+</layout>

@@ -1,5 +1,6 @@
 package de.lennartmeinhardt.android.moiree;
 
+import android.databinding.DataBindingUtil;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -9,113 +10,39 @@ import android.support.v7.graphics.drawable.DrawableWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
-import de.lennartmeinhardt.android.moiree.transition.ColorFilterHelper;
+import de.lennartmeinhardt.android.moiree.databinding.FragmentMoireeViewBinding;
 
 public class MoireeViewFragment extends Fragment {
 
-    private ImageView fixedImageView;
-    private ImageView transformedImageView;
-    private View backgroundView;
-
-    private MoireeTransformation moireeTransformation;
-    private MoireeColors moireeColors;
-
-    private final MoireeColors.MoireeColorsListener moireeColorsUpdater = new MoireeColors.MoireeColorsListener() {
-        @Override
-        public void onBackgroundColorChanged(int newColor) {
-            backgroundView.setBackgroundColor(newColor);
-        }
-        @Override
-        public void onForegroundColorChanged(int newColor) {
-            ColorFilterHelper.setColorFilterAndTag(fixedImageView, newColor);
-            ColorFilterHelper.setColorFilterAndTag(transformedImageView, newColor);
-        }
-    };
-
-    private MoireeTransformation.OnTransformationChangedListener transformedViewUpdater = new MoireeTransformation.OnTransformationChangedListener() {
-        @Override
-        public void onRotationChanged(float newRotation) {
-            transformedImageView.setRotation(newRotation);
-        }
-
-        @Override
-        public void onCommonScalingChanged(float newCommonScaling) {
-            transformedImageView.setScaleX(moireeTransformation.getEffectiveScalingX());
-            transformedImageView.setScaleY(moireeTransformation.getEffectiveScalingY());
-        }
-
-        @Override
-        public void onScalingXChanged(float newScalingX) {
-            transformedImageView.setScaleX(moireeTransformation.getEffectiveScalingX());
-        }
-
-        @Override
-        public void onScalingYChanged(float newScalingY) {
-            transformedImageView.setScaleY(moireeTransformation.getEffectiveScalingY());
-        }
-
-        @Override
-        public void onUseCommonScalingChanged(boolean newUseCommonScaling) {
-            transformedImageView.setScaleX(moireeTransformation.getEffectiveScalingX());
-            transformedImageView.setScaleY(moireeTransformation.getEffectiveScalingY());
-        }
-
-        @Override
-        public void onTranslationXChanged(float newTranslationX) {
-            transformedImageView.setTranslationX(newTranslationX);
-        }
-
-        @Override
-        public void onTranslationYChanged(float newTranslationY) {
-            // reverse y translation because bottom > top in android's coordinate system
-            transformedImageView.setTranslationY(- newTranslationY);
-        }
-    };
+    private FragmentMoireeViewBinding binding;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_moiree_view, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_moiree_view, container, false);
+        return binding.getRoot();
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        backgroundView = view.findViewById(R.id.moiree_background);
-        fixedImageView = (ImageView) view.findViewById(R.id.moiree_image_fixed);
-        transformedImageView = (ImageView) view.findViewById(R.id.moiree_image_transformed);
-    }
-    
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        this.moireeColors = ((MoireeColorsHolder) getActivity()).getMoireeColors();
-        this.moireeTransformation = ((MoireeTransformationHolder) getActivity()).getMoireeTransformation();
-
-        moireeColors.addAndFireMoireeColorsListener(moireeColorsUpdater);
-        moireeTransformation.addAndFireOnTransformationChangedListener(transformedViewUpdater);
+        MoireeColors moireeColors = ((MoireeColorsHolder) getActivity()).getMoireeColors();
+        MoireeTransformation moireeTransformation = ((MoireeTransformationHolder) getActivity()).getMoireeTransformation();
+        binding.setMoireeTransformation(moireeTransformation);
+        binding.setMoireeColors(moireeColors);
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        moireeColors.removeMoireeColorsListener(moireeColorsUpdater);
-        moireeTransformation.removeOnTransformationChangedListener(transformedViewUpdater);
-    }
-
 
     public void setMoireeImage(Drawable drawable, boolean shouldRecycleOld) {
-        Drawable oldDrawable = fixedImageView.getDrawable();
+        Drawable oldDrawable = binding.moireeImageFixed.getDrawable();
         if(drawable != oldDrawable) {
             if (shouldRecycleOld)
                 recycleRecursivelyIfPossible(oldDrawable);
 
-            fixedImageView.setImageDrawable(drawable);
-            transformedImageView.setImageDrawable(drawable);
+            binding.moireeImageFixed.setImageDrawable(drawable);
+            binding.moireeImageTransformed.setImageDrawable(drawable);
         }
     }
 
@@ -132,16 +59,29 @@ public class MoireeViewFragment extends Fragment {
     }
 
     public int getMoireeImageWidth() {
-        return fixedImageView.getWidth();
+        return binding.moireeImageFixed.getWidth();
     }
 
     public int getMoireeImageHeight() {
-        return fixedImageView.getHeight();
+        return binding.moireeImageFixed.getHeight();
     }
 
     public void setMoireeViewsVisible(boolean visible) {
-        float alpha = visible ? 1 : 0;
-        fixedImageView.setAlpha(alpha);
-        transformedImageView.setAlpha(alpha);
+        /*
+         * This could has been tested using binding as well; however it's buggy.
+         * In a previous version the binding contained boolean moireeViewsVisible and the image views' visibility was bound like this
+         * android:visibility="@{moireeViewsVisible ? View.VISIBLE : View.INVISIBLE}"
+         * However, when using transitions (Fade.OUT followed by Fade.IN) the visibility was still set to invisible, after both transitions ran.
+         *
+         * By the way, this solution is the easiest and least verbose (code-wise).
+         */
+        float targetAlpha = visible ? 1 : 0;
+        binding.imageViewsHolder.animate().alpha(targetAlpha);
+    }
+
+    public void setMoireeTransformation(MoireeTransformation moireeTransformation) {
+        binding.setMoireeTransformation(moireeTransformation);
+        // update the UI now
+        binding.executePendingBindings();
     }
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     style="@style/RootMenuCard.SingleColumn">
 
     <LinearLayout
@@ -11,10 +11,12 @@
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             style="@style/MenuTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/toolbar"
+            app:displayOptions="showHome|homeAsUp"
+            app:navigationIcon="?homeAsUpIndicator"
             app:title="@string/menu_transformation"/>
 
         <ScrollView
@@ -29,24 +31,24 @@
                 android:orientation="vertical">
 
                 <fragment
+                    android:id="@+id/fragment_rotation_setup"
                     android:name="de.lennartmeinhardt.android.moiree.menu.transformation.RotationSetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/fragment_rotation_setup"
                     tools:layout="@layout/fragment_rotation_setup"/>
 
                 <fragment
+                    android:id="@+id/fragment_scaling_setup"
                     android:name="de.lennartmeinhardt.android.moiree.menu.transformation.ScalingSetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/fragment_scaling_setup"
                     tools:layout="@layout/fragment_scaling_setup"/>
 
                 <fragment
+                    android:id="@+id/fragment_translation_setup"
                     android:name="de.lennartmeinhardt.android.moiree.menu.transformation.TranslationSetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/fragment_translation_setup"
                     tools:layout="@layout/fragment_translation_setup"/>
 
             </LinearLayout>

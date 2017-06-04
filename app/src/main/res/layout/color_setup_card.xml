@@ -1,53 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/BaseMenuCard"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+<layout>
 
-    <de.lennartmeinhardt.android.moiree.util.ExpandableView
-        android:id="@+id/expandable_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:saveEnabled="false">
+    <data>
 
-        <LinearLayout
+        <variable
+            name="color"
+            type="int"/>
+
+        <variable
+            name="title"
+            type="String"/>
+    </data>
+
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/BaseMenuCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <de.lennartmeinhardt.android.moiree.util.ExpandableView
+            android:id="@+id/expandable_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:orientation="vertical">
+            android:saveEnabled="false">
 
-            <include
-                android:id="@id/expandable_view_header"
-                layout="@layout/header_with_preview"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <FrameLayout
-                android:id="@id/expandable_view_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
                 android:clipChildren="false"
-                android:clipToPadding="false">
+                android:clipToPadding="false"
+                android:orientation="vertical">
 
-                <de.lennartmeinhardt.android.moiree.util.HsbColorPicker
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/color_picker"
+                <de.lennartmeinhardt.android.moiree.util.ColorPreviewHeader
+                    android:id="@+id/color_preview_header"
+                    style="@style/ColorPreviewHeader"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_height="wrap_content"
+                    app:color="@{color}"
+                    app:title="@{title}"/>
+
+                <FrameLayout
+                    android:id="@id/expandable_view_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:clipChildren="false"
-                    android:clipToPadding="false"
-                    android:padding="8dp"/>
+                    android:clipToPadding="false">
 
-            </FrameLayout>
+                    <de.lennartmeinhardt.android.moiree.util.HsbColorPicker
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/color_picker"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginTop="5dp"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:padding="8dp"/>
+                    <!--app:selectedColor="@={color}"-->
 
-        </LinearLayout>
+                </FrameLayout>
 
-    </de.lennartmeinhardt.android.moiree.util.ExpandableView>
+            </LinearLayout>
 
-</android.support.v7.widget.CardView>
+        </de.lennartmeinhardt.android.moiree.util.ExpandableView>
+
+    </android.support.v7.widget.CardView>
+
+</layout>

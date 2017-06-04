@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +33,7 @@ public class SettingsMenu extends MenuFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        return inflater.inflate(R.layout.menu_settings, container, false);
     }
 
     @Override
@@ -39,13 +41,16 @@ public class SettingsMenu extends MenuFragment {
         inputMethodsSetupFragment = (InputMethodsSetupFragment) getChildFragmentManager().findFragmentById(R.id.fragment_input_methods_setup);
 
         if(savedInstanceState == null)
-            inputMethodsSetupFragment.getExpandableView().setExpanded(preferences.getBoolean(KEY_INPUT_METHODS_EXPANDED, false));
+            inputMethodsSetupFragment.setExpanded(preferences.getBoolean(KEY_INPUT_METHODS_EXPANDED, false));
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        preferences.edit().putBoolean(KEY_INPUT_METHODS_EXPANDED, inputMethodsSetupFragment.getExpandableView().isExpanded()).apply();
+        preferences.edit().putBoolean(KEY_INPUT_METHODS_EXPANDED, inputMethodsSetupFragment.isExpanded()).apply();
     }
 }

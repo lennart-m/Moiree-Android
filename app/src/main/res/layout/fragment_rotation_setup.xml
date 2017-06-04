@@ -1,64 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/BaseMenuCard"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<layout>
 
-    <de.lennartmeinhardt.android.moiree.util.ExpandableView
-        android:id="@+id/expandable_view"
+    <data>
+
+        <import
+            type="de.lennartmeinhardt.android.moiree.util.Expandable"/>
+
+        <variable
+            name="expanded"
+            type="boolean"/>
+
+        <variable
+            name="moireeTransformation"
+            type="de.lennartmeinhardt.android.moiree.MoireeTransformation"/>
+    </data>
+
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/BaseMenuCard"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
+        <de.lennartmeinhardt.android.moiree.util.ExpandableView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            app:expanded="@{expanded}">
 
-            <include
-                android:id="@id/expandable_view_header"
-                layout="@layout/header_with_arrow"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-            <RelativeLayout
-                android:id="@id/expandable_view_content"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <de.lennartmeinhardt.android.moiree.util.IntValueSetup
-                    android:id="@+id/rotation_value_setup"
-                    style="@style/TransformationValueSetup.Rotation"
+                <de.lennartmeinhardt.android.moiree.util.ArrowExpandableHeader
+                    style="@style/ClickableHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:name="@string/degrees"/>
+                    android:onClick="@{v -> ((Expandable) v).toggleExpanded()}"
+                    app:expanded="@={expanded}"
+                    app:title="@string/rotation"/>
 
-                <ImageButton
-                    android:id="@+id/reset_button"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_below="@id/rotation_value_setup"
-                    android:layout_marginStart="5dp"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/reset"/>
-
-                <TextView
+                <RelativeLayout
+                    android:id="@id/expandable_view_content"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/reset_button"
-                    android:layout_alignTop="@id/reset_button"
-                    android:layout_below="@id/rotation_value_setup"
-                    android:layout_toStartOf="@id/reset_button"
-                    android:gravity="center_vertical"
-                    android:text="@string/reset"/>
+                    android:layout_height="match_parent">
 
-            </RelativeLayout>
+                    <de.lennartmeinhardt.android.moiree.util.IntValueSetup
+                        android:id="@+id/rotation_value_setup"
+                        style="@style/TransformationValueSetup.Rotation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:name="@string/degrees"
+                        app:value="@={(int) moireeTransformation.rotation}"/>
 
-        </LinearLayout>
+                    <ImageButton
+                        android:id="@+id/reset_button"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@id/rotation_value_setup"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/reset"
+                        android:enabled="@{moireeTransformation.rotation != 0}"
+                        android:src="@drawable/ic_reset_rotation"/>
 
-    </de.lennartmeinhardt.android.moiree.util.ExpandableView>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/reset_button"
+                        android:layout_alignTop="@id/reset_button"
+                        android:layout_below="@id/rotation_value_setup"
+                        android:layout_toLeftOf="@id/reset_button"
+                        android:layout_toStartOf="@id/reset_button"
+                        android:gravity="center_vertical"
+                        android:text="@string/reset"/>
 
-</android.support.v7.widget.CardView>
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </de.lennartmeinhardt.android.moiree.util.ExpandableView>
+
+    </android.support.v7.widget.CardView>
+
+</layout>

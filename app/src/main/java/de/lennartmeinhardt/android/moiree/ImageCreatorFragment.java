@@ -6,10 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +28,7 @@ import de.lennartmeinhardt.android.moiree.util.BundleIO;
 import de.lennartmeinhardt.android.moiree.util.ImageCreatorHolder;
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
-public class MoireeImageFragment extends Fragment implements ImageCreatorHolder {
+public class ImageCreatorFragment extends Fragment implements ImageCreatorHolder {
 
     private static final String KEY_IMAGE_CREATOR_CLASS = "moireeImageCreator:class";
     private static final String FILE_NAME = "moireeImageBackup.png";
@@ -84,11 +86,14 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-                if(reusedSavedImage)
-                    notifyActivity();
+                if (Build.VERSION.SDK_INT >= 16)
+                    rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 else
+                    rootView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+
+                if(reusedSavedImage) {
+                    notifyActivityImageReady();
+                } else
                     recreateImageInBackground();
             }
         });
@@ -120,15 +125,18 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
             ((BundleIO) imageCreator).storeToBundle(bundle);
     }
 
-    private static MoireeImageCreator loadImageCreatorFromPreferences(SharedPreferences preferences, MoireeImageCreator defValue) {
-        String className = preferences.getString(KEY_IMAGE_CREATOR_CLASS, null);
-        MoireeImageCreator imageCreator;
+    private static MoireeImageCreator getImageCreatorInstance(String className, MoireeImageCreator defValue) {
         try {
             Class<?> clazz = Class.forName(className);
-            imageCreator = (MoireeImageCreator) clazz.newInstance();
+            return (MoireeImageCreator) clazz.newInstance();
         } catch(Exception e) {
-            imageCreator = defValue;
+            return defValue;
         }
+    }
+
+    private static MoireeImageCreator loadImageCreatorFromPreferences(SharedPreferences preferences, MoireeImageCreator defValue) {
+        String className = preferences.getString(KEY_IMAGE_CREATOR_CLASS, null);
+        MoireeImageCreator imageCreator = getImageCreatorInstance(className, defValue);
 
         if(imageCreator instanceof PreferenceIO)
             ((PreferenceIO) imageCreator).loadFromPreferences(preferences);
@@ -138,13 +146,7 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
 
     private static MoireeImageCreator loadImageCreatorFromBundle(Bundle bundle, MoireeImageCreator defValue) {
         String className = bundle.getString(KEY_IMAGE_CREATOR_CLASS, null);
-        MoireeImageCreator imageCreator;
-        try {
-            Class<?> clazz = Class.forName(className);
-            imageCreator = (MoireeImageCreator) clazz.newInstance();
-        } catch(Exception e) {
-            imageCreator = defValue;
-        }
+        MoireeImageCreator imageCreator = getImageCreatorInstance(className, defValue);
 
         if(imageCreator instanceof PreferenceIO)
             ((BundleIO) imageCreator).loadFromBundle(bundle);
@@ -218,7 +220,7 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
         recreateImageInBackground();
     }
 
-    private void notifyActivity() {
+    private void notifyActivityImageReady() {
         // check if the activity is null as it may have been closed before some calculation was finished
         if(getActivity() != null)
             ((MoireeImaging) getActivity()).onMoireeImageCreated(moireeImage);
@@ -240,10 +242,13 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
         private MoireeImageCreator imageCreatorToUse;
 
         private int width, height;
+
         private long t;
 
         @Override
         protected void onPreExecute() {
+            // show the calculating progress
+            ((MoireeImaging) getActivity()).onBeforeCreatingMoireeImage();
             rootView.animate().alpha(1).start();
 
             calculatingTask = this;
@@ -253,22 +258,13 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
             MoireeImaging moireeImaging = (MoireeImaging) getActivity();
             width = moireeImaging.getMoireeImageWidth();
             height = moireeImaging.getMoireeImageHeight();
-            moireeImaging.onPreCreateMoireeImage();
 
-            t = t();
+            t = System.currentTimeMillis();
         }
 
         @Override
         protected Drawable doInBackground(Void... params) {
             return imageCreatorToUse.createMoireeImageForDimensions(getResources(), width, height);
-        }
-
-        private long t() {
-            return System.currentTimeMillis();
-        }
-
-        private long d(long t) {
-            return t() - t;
         }
 
         @Override
@@ -280,11 +276,14 @@ public class MoireeImageFragment extends Fragment implements ImageCreatorHolder 
 
         @Override
         protected void onPostExecute(Drawable drawable) {
+            long d = System.currentTimeMillis() - t;
+            Log.d("moiree", "created image in " + d + " ms");
+
             calculatingTask = null;
-            System.out.println("created image in " + d(t) + " ms");
             moireeImage = drawable;
+            // hide the calculating progress
             rootView.animate().alpha(0).start();
-            notifyActivity();
+            notifyActivityImageReady();
             reusedSavedImage = false;
         }
     }

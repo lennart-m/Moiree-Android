@@ -1,23 +1,25 @@
-package de.lennartmeinhardt.android.moiree;
+package de.lennartmeinhardt.android.moiree.menu;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import de.lennartmeinhardt.android.moiree.menu.MenuFragment;
+import de.lennartmeinhardt.android.moiree.R;
 
 public class AboutMenu extends MenuFragment {
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_about, container, false);
+        return inflater.inflate(R.layout.menu_about, container, false);
     }
 
     @Override
@@ -45,15 +47,20 @@ public class AboutMenu extends MenuFragment {
                 viewDesktopVersion();
             }
         });
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 
     private void viewSourceCode() {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/lennart-m/Moiree-Android"));
+        String url = getString(R.string.source_code_address);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(intent);
     }
 
     private void viewDesktopVersion() {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/lennart-m/Moiree"));
+        String url = getString(R.string.desktop_version_address);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(intent);
     }
 

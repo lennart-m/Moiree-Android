@@ -1,78 +1,53 @@
 package de.lennartmeinhardt.android.moiree;
 
 import android.content.SharedPreferences;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
+import android.databinding.ObservableFloat;
 
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
-public class MenuTransparencyConfig implements PreferenceIO {
+public class MenuTransparencyConfig extends BaseObservable implements PreferenceIO {
 
     private static final String KEY_TRANSPARENCY_ENABLED = "menuTransparency:transparencyEnabled";
     private static final String KEY_MENU_ALPHA = "menuTransparency:menuAlpha";
 
-    private final List<OnMenuTransparencyChangedListener> onMenuTransparencyChangedListeners = new ArrayList<>();
-
-    private boolean transparencyEnabled;
-    private float menuAlpha;
+    public final ObservableBoolean transparencyEnabled = new ObservableBoolean();
+    public final ObservableFloat menuAlpha = new ObservableFloat();
+    {
+        OnPropertyChangedCallback effectiveAlphaUpdater = new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                notifyPropertyChanged(BR.effectiveAlpha);
+            }
+        };
+        transparencyEnabled.addOnPropertyChangedCallback(effectiveAlphaUpdater);
+        menuAlpha.addOnPropertyChangedCallback(effectiveAlphaUpdater);
+    }
 
 
     public MenuTransparencyConfig(boolean transparencyEnabled, float defaultMenuAlpha) {
-        this.transparencyEnabled = transparencyEnabled;
-        this.menuAlpha = defaultMenuAlpha;
+        this.transparencyEnabled.set(transparencyEnabled);
+        this.menuAlpha.set(defaultMenuAlpha);
     }
 
 
     @Override
     public void loadFromPreferences(SharedPreferences preferences) {
-        setTransparencyEnabled(preferences.getBoolean(KEY_TRANSPARENCY_ENABLED, transparencyEnabled));
-        setMenuAlpha(preferences.getFloat(KEY_MENU_ALPHA, menuAlpha));
+        transparencyEnabled.set(preferences.getBoolean(KEY_TRANSPARENCY_ENABLED, transparencyEnabled.get()));
+        menuAlpha.set(preferences.getFloat(KEY_MENU_ALPHA, menuAlpha.get()));
     }
 
     @Override
     public void storeToPreferences(SharedPreferences.Editor preferencesEditor) {
-        preferencesEditor.putBoolean(KEY_TRANSPARENCY_ENABLED, transparencyEnabled);
-        preferencesEditor.putFloat(KEY_MENU_ALPHA, menuAlpha);
+        preferencesEditor.putBoolean(KEY_TRANSPARENCY_ENABLED, transparencyEnabled.get());
+        preferencesEditor.putFloat(KEY_MENU_ALPHA, menuAlpha.get());
     }
 
-    public boolean isTransparencyEnabled() {
-        return transparencyEnabled;
-    }
-    public void setTransparencyEnabled(boolean transparencyEnabled) {
-        if(this.transparencyEnabled != transparencyEnabled) {
-            this.transparencyEnabled = transparencyEnabled;
-            for(OnMenuTransparencyChangedListener onMenuTransparencyChangedListener : onMenuTransparencyChangedListeners)
-                onMenuTransparencyChangedListener.onMenuTransparencyChanged(transparencyEnabled, menuAlpha);
-        }
-    }
-
-    public float getMenuAlpha() {
-        return menuAlpha;
-    }
-    public void setMenuAlpha(float menuAlpha) {
-        if(this.menuAlpha != menuAlpha) {
-            this.menuAlpha = menuAlpha;
-            for(OnMenuTransparencyChangedListener onMenuTransparencyChangedListener : onMenuTransparencyChangedListeners)
-                onMenuTransparencyChangedListener.onMenuTransparencyChanged(transparencyEnabled, menuAlpha);
-        }
-    }
-
-    public void addMenuTransparencyListener(OnMenuTransparencyChangedListener onMenuTransparencyChangedListener) {
-        onMenuTransparencyChangedListeners.add(onMenuTransparencyChangedListener);
-    }
-    public void addAndFireMenuTransparencyListener(OnMenuTransparencyChangedListener onMenuTransparencyChangedListener) {
-        addMenuTransparencyListener(onMenuTransparencyChangedListener);
-        onMenuTransparencyChangedListener.onMenuTransparencyChanged(transparencyEnabled, menuAlpha);
-    }
-
-    public void removeMenuTransparencyListener(OnMenuTransparencyChangedListener onMenuTransparencyChangedListener) {
-        onMenuTransparencyChangedListeners.remove(onMenuTransparencyChangedListener);
-    }
-
-
-    public interface OnMenuTransparencyChangedListener {
-
-        void onMenuTransparencyChanged(boolean transparencyEnabled, float menuAlpha);
+    @Bindable
+    public float getEffectiveAlpha() {
+        return transparencyEnabled.get() ? menuAlpha.get() : 1f;
     }
 }

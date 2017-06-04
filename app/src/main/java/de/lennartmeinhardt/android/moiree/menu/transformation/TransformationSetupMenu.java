@@ -51,7 +51,7 @@ public class TransformationSetupMenu extends BaseTransformationSetupFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_transformation_setup, container, false);
+        return inflater.inflate(R.layout.menu_transformation_setup, container, false);
     }
 
     @Override
@@ -79,9 +79,9 @@ public class TransformationSetupMenu extends BaseTransformationSetupFragment {
         boolean scalingExpanded = preferences.getBoolean(KEY_SCALING_EXPANDED, DEF_EXPANDED);
         boolean translationExpanded = preferences.getBoolean(KEY_TRANSLATION_EXPANDED, DEF_EXPANDED);
 
-        rotationSetupFragment.getExpandableView().setExpanded(rotationExpanded);
-        scalingSetupFragment.getExpandableView().setExpanded(scalingExpanded);
-        translationSetupFragment.getExpandableView().setExpanded(translationExpanded);
+        rotationSetupFragment.setExpanded(rotationExpanded);
+        scalingSetupFragment.setExpanded(scalingExpanded);
+        translationSetupFragment.setExpanded(translationExpanded);
 
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -98,9 +98,9 @@ public class TransformationSetupMenu extends BaseTransformationSetupFragment {
     public void onDestroy() {
         super.onDestroy();
         SharedPreferences.Editor preferencesEditor = preferences.edit();
-        preferencesEditor.putBoolean(KEY_ROTATION_EXPANDED, rotationSetupFragment.getExpandableView().isExpanded());
-        preferencesEditor.putBoolean(KEY_SCALING_EXPANDED, scalingSetupFragment.getExpandableView().isExpanded());
-        preferencesEditor.putBoolean(KEY_TRANSLATION_EXPANDED, translationSetupFragment.getExpandableView().isExpanded());
+        preferencesEditor.putBoolean(KEY_ROTATION_EXPANDED, rotationSetupFragment.isExpanded());
+        preferencesEditor.putBoolean(KEY_SCALING_EXPANDED, scalingSetupFragment.isExpanded());
+        preferencesEditor.putBoolean(KEY_TRANSLATION_EXPANDED, translationSetupFragment.isExpanded());
         preferencesEditor.apply();
     }
 

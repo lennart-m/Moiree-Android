@@ -1,69 +1,71 @@
 package de.lennartmeinhardt.android.moiree.menu.imagesetup;
 
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import de.lennartmeinhardt.android.moiree.R;
+import de.lennartmeinhardt.android.moiree.databinding.FragmentCheckerboardImageSetupBinding;
 import de.lennartmeinhardt.android.moiree.imaging.CheckerboardImageCreator;
+import de.lennartmeinhardt.android.moiree.imaging.MoireeImageCreator;
 import de.lennartmeinhardt.android.moiree.imaging.RescaledDrawable;
-import de.lennartmeinhardt.android.moiree.util.ExpandableView;
-import de.lennartmeinhardt.android.moiree.util.IntValueSetup;
+import de.lennartmeinhardt.android.moiree.util.Expandable;
+import de.lennartmeinhardt.android.moiree.util.Expandables;
 
-public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragment<CheckerboardImageCreator> {
-
-    private ExpandableView expandableView;
-
-    private ImageView preview;
-
-    private int defSquareSize;
+public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragment implements Expandable {
 
     private RescaledDrawable previewDrawable;
 
-    private IntValueSetup squareSizeSetup;
-    private Button resetButton;
+    private FragmentCheckerboardImageSetupBinding binding;
+
+    private CheckerboardImageCreator imageCreator;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_checkerboard_image_setup, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_checkerboard_image_setup, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        expandableView = (ExpandableView) view.findViewById(R.id.expandable_view);
+        // make sure the lazily initialized image creator exists
+        getMoireeImageCreator();
+
+        binding.setCheckerboardImageCreator(imageCreator);
+
+        int defSquareSize = getResources().getDimensionPixelSize(R.dimen.checkerboard_image_default_square_size);
+        binding.setDefaultSquareSizeInPixels(defSquareSize);
 
         initializeHeaderView();
         initializeContentView();
     }
 
     private void initializeHeaderView() {
-        View headerView = expandableView.findHeaderView();
-        headerView.setOnClickListener(new View.OnClickListener() {
+        binding.expandableViewHeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 beginMenuBoundsTransition();
-                expandableView.toggleExpanded();
+                binding.expandableView.toggleExpanded();
             }
         });
 
-        TextView titleView = (TextView) headerView.findViewById(R.id.header_title);
-        titleView.setText(R.string.checkerboard_title);
-
-        preview = (ImageView) headerView.findViewById(R.id.header_preview);
-        preview.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        binding.expandableViewHeader.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                preview.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                if (Build.VERSION.SDK_INT >= 16)
+                    binding.expandableViewHeader.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                else
+                    binding.expandableViewHeader.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 
                 initializePreviewDrawable();
             }
@@ -71,64 +73,90 @@ public class CheckerboardImageSetupFragment extends BaseImageCreatorSetupFragmen
     }
 
     private void initializeContentView() {
-        View contentView = expandableView.findContentView();
-
-        resetButton = (Button) contentView.findViewById(R.id.reset_button);
-        resetButton.setOnClickListener(new View.OnClickListener() {
+        binding.resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                squareSizeSetup.setValue(defSquareSize);
+                imageCreator.squareSizeInPixels.set(binding.getDefaultSquareSizeInPixels());
             }
         });
 
-        squareSizeSetup = (IntValueSetup) contentView.findViewById(R.id.pixel_size_value_setup);
-        squareSizeSetup.setOnValueChangedListener(new IntValueSetup.OnValueChangedListener() {
+        imageCreator.squareSizeInPixels.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
-            public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
-                imageCreator.setSquareSizeInPixels(value);
+            public void onPropertyChanged(Observable observable, int i) {
                 if (previewDrawable != null) {
-                    previewDrawable.setScaleX(value);
-                    previewDrawable.setScaleY(value);
+                    previewDrawable.setScaleX(imageCreator.squareSizeInPixels.get());
+                    previewDrawable.setScaleY(imageCreator.squareSizeInPixels.get());
                 }
-                updateUI(true);
             }
         });
 
-        ImageButton applyButton = (ImageButton) contentView.findViewById(R.id.create_button);
-        applyButton.setOnClickListener(new View.OnClickListener() {
+        binding.createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onCreateNewImageClicked();
             }
         });
-
-        updateUI(false);
     }
 
     private void initializePreviewDrawable() {
-        CheckerboardImageCreator previewImageCreator = new CheckerboardImageCreator(1);
-        previewDrawable = previewImageCreator.createMoireeImageForDimensions(getResources(), preview.getWidth(), preview.getHeight());
-        previewDrawable.setScaleX(imageCreator.getSquareSizeInPixels());
-        previewDrawable.setScaleY(imageCreator.getSquareSizeInPixels());
-        ViewCompat.setBackground(preview, previewDrawable);
-    }
+        final int width = binding.expandableViewHeader.getPreviewImageView().getWidth();
+        final int height = binding.expandableViewHeader.getPreviewImageView().getHeight();
+        // create a new image creator with pixel size = 1 just for the image. the image does not have to be re-created if pixel size changes, just scale it.
+        final CheckerboardImageCreator previewImageCreator = new CheckerboardImageCreator(1);
 
-    private void updateUI(boolean fromValueSetup) {
-        int squareSize = imageCreator.getSquareSizeInPixels();
+        // create the image in background
+        new AsyncTask<Void, Void, Drawable>() {
 
-        resetButton.setEnabled(squareSize != defSquareSize);
+            @Override
+            protected void onPreExecute() {
+                binding.expandableViewHeader.setBusy(true);
+            }
 
-        if(! fromValueSetup)
-            squareSizeSetup.setValue(squareSize);
+            @Override
+            protected Drawable doInBackground(Void... params) {
+                return previewImageCreator.createMoireeImageForDimensions(getResources(), width, height);
+            }
+
+            @Override
+            protected void onPostExecute(Drawable drawable) {
+                // only operate on the ui if this fragment is attached
+                if (getActivity() != null) {
+                    binding.expandableViewHeader.setBusy(false);
+                    previewDrawable = new RescaledDrawable(drawable);
+                    previewDrawable.setScaleX(imageCreator.squareSizeInPixels.get());
+                    previewDrawable.setScaleY(imageCreator.squareSizeInPixels.get());
+                    binding.expandableViewHeader.setDrawable(previewDrawable);
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
-    CheckerboardImageCreator initializeImageCreator() {
-        defSquareSize = getResources().getDimensionPixelSize(R.dimen.checkerboard_image_default_square_size);
-        return new CheckerboardImageCreator(defSquareSize);
+    protected MoireeImageCreator getMoireeImageCreator() {
+        if (imageCreator == null) {
+            int defSquareSize = getResources().getDimensionPixelSize(R.dimen.checkerboard_image_default_square_size);
+            imageCreator = new CheckerboardImageCreator(defSquareSize);
+        }
+        return imageCreator;
     }
 
-    public ExpandableView getExpandableView() {
-        return expandableView;
+    @Override
+    public boolean isExpanded() {
+        return binding.expandableView.isExpanded();
+    }
+
+    @Override
+    public void setExpanded(boolean expanded) {
+        binding.expandableView.setExpanded(expanded);
+    }
+
+    @Override
+    public void toggleExpanded() {
+        binding.expandableView.toggleExpanded();
+    }
+
+    @Override
+    public void setOnExpandedStateChangedListener(final OnExpandedStateChangedListener onExpandedStateChangedListener) {
+        Expandables.setExpandedListenerForWrappedExpandable(this, binding.expandableView, onExpandedStateChangedListener);
     }
 }

@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/menu_holder"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:clipChildren="false"
-    android:clipToPadding="false"/>
+<layout>
+
+    <data>
+
+        <variable
+            name="menuTransparencyConfig"
+            type="de.lennartmeinhardt.android.moiree.MenuTransparencyConfig"/>
+    </data>
+
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/menu_holder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:alpha="@{menuTransparencyConfig.effectiveAlpha}"
+        android:clipChildren="false"
+        android:clipToPadding="false"/>
+
+</layout>

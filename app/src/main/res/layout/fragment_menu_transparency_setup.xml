@@ -1,52 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/BaseMenuCard"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<layout>
 
-    <de.lennartmeinhardt.android.moiree.util.ExpandableView
-        android:id="@+id/expandable_view"
+    <data>
+
+        <variable
+            name="menuTransparencyConfig"
+            type="de.lennartmeinhardt.android.moiree.MenuTransparencyConfig"/>
+    </data>
+
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/BaseMenuCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
+        <de.lennartmeinhardt.android.moiree.util.ExpandableView
+            android:id="@+id/expandable_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <Switch
-                android:id="@id/expandable_view_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/menu_transparency_title"/>
+            android:layout_height="wrap_content"
+            app:expanded="@{menuTransparencyConfig.transparencyEnabled}">
 
             <LinearLayout
-                android:id="@id/expandable_view_content"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <de.lennartmeinhardt.android.moiree.util.IntValueSetup
-                    android:id="@+id/opacity_value_setup"
-                    style="@style/MenuTransparencyValueSetup"
+                <Switch
+                    android:id="@id/expandable_view_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:name="@string/menu_transparency_value_name"/>
+                    android:checked="@={menuTransparencyConfig.transparencyEnabled}"
+                    android:text="@string/menu_transparency_title"/>
 
-                <Button
-                    android:id="@+id/reset_button"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@id/expandable_view_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:text="@string/reset"/>
+                    android:orientation="vertical">
+
+                    <de.lennartmeinhardt.android.moiree.util.IntValueSetup
+                        android:id="@+id/opacity_value_setup"
+                        style="@style/PercentageValueSetup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:maxValue="@integer/menu_opacity_max_percents"
+                        app:minValue="@integer/menu_opacity_min_percents"
+                        app:name="@string/menu_transparency_value_name"
+                        app:value="@={(int) (menuTransparencyConfig.menuAlpha * 100)}"/>
+
+                    <Button
+                        android:id="@+id/reset_button"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:text="@string/reset"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </de.lennartmeinhardt.android.moiree.util.ExpandableView>
 
-    </de.lennartmeinhardt.android.moiree.util.ExpandableView>
+    </android.support.v7.widget.CardView>
 
-</android.support.v7.widget.CardView>
+</layout>

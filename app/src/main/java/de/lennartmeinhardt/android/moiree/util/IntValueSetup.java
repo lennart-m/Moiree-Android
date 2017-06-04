@@ -2,6 +2,10 @@ package de.lennartmeinhardt.android.moiree.util;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.databinding.BindingAdapter;
+import android.databinding.InverseBindingListener;
+import android.databinding.InverseBindingMethod;
+import android.databinding.InverseBindingMethods;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -10,6 +14,9 @@ import android.widget.SeekBar;
 
 import de.lennartmeinhardt.android.moiree.R;
 
+@InverseBindingMethods({
+        @InverseBindingMethod(type = IntValueSetup.class, attribute = "value")
+})
 public class IntValueSetup extends BaseValueSetup {
 
     private static final String KEY_SUPER_STATE = "de.lennartmeinhardt.android.moiree:intValueSetup:superState";
@@ -97,7 +104,8 @@ public class IntValueSetup extends BaseValueSetup {
         valueSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                setValueInternal(progress + minValue, false);
+                if(isSeekBarInputActive)
+                    setValueInternal(progress + minValue, false);
             }
 
             @Override
@@ -257,5 +265,20 @@ public class IntValueSetup extends BaseValueSetup {
 
     public interface TextFormatter {
         String formatInt(int value);
+    }
+
+    @BindingAdapter("valueAttrChanged")
+    public static void setValueListener(IntValueSetup valueSetup, final InverseBindingListener bindingListener) {
+        if(bindingListener == null)
+            valueSetup.setOnValueChangedListener(null);
+        else
+            valueSetup.setOnValueChangedListener(new OnValueChangedListener() {
+                @Override
+                public void onValueChanged(IntValueSetup intValueSetup, int value, boolean fromUser) {
+                    // necessary to prevent value jumping sometimes
+                    if(fromUser)
+                        bindingListener.onChange();
+                }
+            });
     }
 }

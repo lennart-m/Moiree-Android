@@ -2,16 +2,16 @@
 
     <style name="Base" />
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="BaseAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorPrimary">@color/textPrimary</item>
         <item name="android:textColorSecondary">@color/textSecondary</item>
         <item name="android:textColorTertiary">@color/textTertiary</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
     </style>
+
+    <style name="AppTheme" parent="BaseAppTheme"/>
 
     <style name="Base.MainMenuButtonCard">
         <item name="android:clickable">true</item>
@@ -69,14 +69,15 @@
         <item name="titleTextAppearance">@style/TitleTextAppearance</item>
     </style>
 
-    <style name="MainMenuHeader">
+    <style name="BaseMainMenuHeader">
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
         <!--<item name="android:gravity">center</item>-->
         <item name="android:textStyle">italic</item>
-        <item name="android:fontFamily">serif</item>
     </style>
+
+    <style name="MainMenuHeader" parent="BaseMainMenuHeader"/>
 
     <style name="Divider">
         <item name="android:background">?android:attr/listDivider</item>
@@ -89,16 +90,10 @@
         <item name="android:layout_marginBottom">10dp</item>
     </style>
 
-    <style name="ExpandableHeader">
+    <style name="ClickableHeader">
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
         <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
-    </style>
-
-    <style name="ExpandableHeaderTitle">
-        <!--<item name="android:textAppearance">?android:textAppearanceMedium</item>-->
-        <!--<item name="android:textStyle">bold</item>-->
-        <item name="android:gravity">center_vertical</item>
     </style>
 
     <style name="TransformationValueSetup">
@@ -109,20 +104,17 @@
         <item name="minValue">@integer/rotation_min_degrees</item>
         <item name="maxValue">@integer/rotation_max_degrees</item>
         <item name="textFormatter">@string/degrees_formatter</item>
-        <item name="value">@integer/identity_transformation_rotation_degrees</item>
     </style>
 
     <style name="TransformationValueSetup.Scaling">
         <item name="minValue">@integer/scaling_min_percent</item>
         <item name="maxValue">@integer/scaling_max_percent</item>
         <item name="textFormatter">@string/percentage_formatter</item>
-        <item name="value">@integer/identity_transformation_scalings_percents</item>
     </style>
 
     <style name="TransformationValueSetup.Translation">
         <item name="minValue">@integer/translation_min_pixels</item>
         <item name="maxValue">@integer/translation_max_pixels</item>
-        <item name="value">@integer/identity_transformation_translations</item>
         <item name="textFormatter">@string/integer_pixel_formatter</item>
     </style>
 
@@ -134,13 +126,8 @@
     <style name="SensitivityValueSetup" parent="PercentageValueSetup">
         <item name="minValue">@integer/sensitivity_min_percents</item>
         <item name="maxValue">@integer/sensitivity_max_percents</item>
-        <item name="value">@integer/sensitivity_default_percents</item>
     </style>
 
-    <style name="MenuTransparencyValueSetup" parent="PercentageValueSetup">
-        <item name="minValue">@integer/menu_opacity_min_percents</item>
-        <item name="maxValue">@integer/menu_opacity_max_percents</item>
-        <item name="value">@integer/menu_opacity_default_percents</item>
-    </style>
+    <style name="ColorPreviewHeader" parent="ClickableHeader"/>
 
 </resources>

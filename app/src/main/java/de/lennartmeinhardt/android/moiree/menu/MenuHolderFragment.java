@@ -1,6 +1,7 @@
 package de.lennartmeinhardt.android.moiree.menu;
 
 import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import android.widget.FrameLayout;
 import de.lennartmeinhardt.android.moiree.MenuTransparencyConfig;
 import de.lennartmeinhardt.android.moiree.MenuTransparencyConfigHolder;
 import de.lennartmeinhardt.android.moiree.R;
+import de.lennartmeinhardt.android.moiree.databinding.FragmentMenuHolderBinding;
 
 public class MenuHolderFragment extends Fragment implements MenuTransparencyConfigHolder, MenuHolder {
 
@@ -26,6 +28,8 @@ public class MenuHolderFragment extends Fragment implements MenuTransparencyConf
     private OnMenuStatusChangedListener onMenuStatusChangedListener;
 
     private boolean menuShowable;
+
+    private FragmentMenuHolderBinding binding;
 
     private final FragmentManager.OnBackStackChangedListener backstackListener = new FragmentManager.OnBackStackChangedListener() {
         @Override
@@ -40,17 +44,6 @@ public class MenuHolderFragment extends Fragment implements MenuTransparencyConf
         }
     };
 
-    private final MenuTransparencyConfig.OnMenuTransparencyChangedListener menuTransparencySetter = new MenuTransparencyConfig.OnMenuTransparencyChangedListener() {
-        @Override
-        public void onMenuTransparencyChanged(boolean transparencyEnabled, float menuAlpha) {
-            float alpha;
-            if(transparencyEnabled)
-                alpha = menuAlpha;
-            else
-                alpha = 1f;
-            menuHolder.setAlpha(alpha);
-        }
-    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,17 +63,21 @@ public class MenuHolderFragment extends Fragment implements MenuTransparencyConf
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_menu_holder, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_menu_holder, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         this.menuHolder = (FrameLayout) view.findViewById(R.id.menu_holder);
-
-        menuTransparencyConfig.addAndFireMenuTransparencyListener(menuTransparencySetter);
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
+        binding.setMenuTransparencyConfig(menuTransparencyConfig);
+    }
 
     @Override
     public void onDestroy() {
@@ -122,7 +119,7 @@ public class MenuHolderFragment extends Fragment implements MenuTransparencyConf
                         R.anim.fade_slide_out_right,
                         R.anim.fade_slide_in_right,
                         R.anim.fade_slide_out_left)
-                .add(R.id.menu_holder, new MainMenuFragment())
+                .add(R.id.menu_holder, new MainMenu())
                 .addToBackStack("mainMenu")
                 .commit();
     }

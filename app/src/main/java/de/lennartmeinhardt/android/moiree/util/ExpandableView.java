@@ -2,16 +2,14 @@ package de.lennartmeinhardt.android.moiree.util;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.databinding.BindingAdapter;
+import android.databinding.InverseBindingListener;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import de.lennartmeinhardt.android.moiree.Expandable;
 import de.lennartmeinhardt.android.moiree.R;
 
 public class ExpandableView extends FrameLayout implements Expandable {
@@ -21,7 +19,7 @@ public class ExpandableView extends FrameLayout implements Expandable {
 
     private boolean expanded = true;
 
-    private final List<OnExpandedStateChangedListener> onExpandedStateChangedListeners = new ArrayList<>();
+    private OnExpandedStateChangedListener onExpandedStateChangedListener;
 
 
     public ExpandableView(Context context) {
@@ -48,7 +46,7 @@ public class ExpandableView extends FrameLayout implements Expandable {
     private void loadAttributes(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ExpandableView, 0, 0);
         try {
-            setExpandedInternal(a.getBoolean(R.styleable.ExpandableView_expanded, expanded), true);
+            setExpandedInternal(a.getBoolean(R.styleable.Expandable_expanded, expanded), true);
         } finally {
             a.recycle();
         }
@@ -83,7 +81,7 @@ public class ExpandableView extends FrameLayout implements Expandable {
             View contentView = findContentView();
             if(contentView != null)
                 contentView.setVisibility(expanded ? View.VISIBLE : View.GONE);
-            for(OnExpandedStateChangedListener onExpandedStateChangedListener : onExpandedStateChangedListeners)
+            if(onExpandedStateChangedListener != null)
                 onExpandedStateChangedListener.onExpandedStateChanged(this, expanded);
         }
     }
@@ -98,12 +96,12 @@ public class ExpandableView extends FrameLayout implements Expandable {
     }
 
     @Override
-    public void addOnExpandedStateChangedListener(OnExpandedStateChangedListener onExpandedStateChangedListener) {
-        onExpandedStateChangedListeners.add(onExpandedStateChangedListener);
+    public void setOnExpandedStateChangedListener(OnExpandedStateChangedListener onExpandedStateChangedListener) {
+        this.onExpandedStateChangedListener = onExpandedStateChangedListener;
     }
 
-    @Override
-    public void removeOnExpandedStateChangedListener(OnExpandedStateChangedListener onExpandedStateChangedListener) {
-        onExpandedStateChangedListeners.remove(onExpandedStateChangedListener);
+    @BindingAdapter("expandedAttrChanged")
+    public static void setExpandedListener(ExpandableView expandableView, final InverseBindingListener bindingListener) {
+        Expandables.setExpandedListener(expandableView, bindingListener);
     }
 }

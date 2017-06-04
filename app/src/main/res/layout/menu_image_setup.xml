@@ -11,9 +11,12 @@
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             style="@style/MenuTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:displayOptions="showHome|homeAsUp"
+            app:navigationIcon="?homeAsUpIndicator"
             app:title="@string/menu_image"/>
 
         <ScrollView
@@ -43,10 +46,17 @@
 
                 <fragment
                     android:id="@+id/horizontal_lines_image_setup"
-                    android:name="de.lennartmeinhardt.android.moiree.menu.imagesetup.HorizontalLinesSetupFragment"
+                    android:name="de.lennartmeinhardt.android.moiree.menu.imagesetup.HorizontalLinesImageSetupFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     tools:layout="@layout/fragment_horizontal_lines_image_setup"/>
+
+                <fragment
+                    android:id="@+id/triangles_image_setup"
+                    android:name="de.lennartmeinhardt.android.moiree.menu.imagesetup.TrianglesImageSetupFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:layout="@layout/fragment_triangle_image_setup"/>
 
             </LinearLayout>
 

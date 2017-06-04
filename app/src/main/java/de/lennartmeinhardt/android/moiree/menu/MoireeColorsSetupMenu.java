@@ -2,27 +2,26 @@ package de.lennartmeinhardt.android.moiree.menu;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import de.lennartmeinhardt.android.moiree.MoireeColors;
 import de.lennartmeinhardt.android.moiree.MoireeColorsHolder;
 import de.lennartmeinhardt.android.moiree.MoireeTransitionStarter;
 import de.lennartmeinhardt.android.moiree.MoireeTransitionStarterHolder;
 import de.lennartmeinhardt.android.moiree.R;
-import de.lennartmeinhardt.android.moiree.util.ExpandableView;
+import de.lennartmeinhardt.android.moiree.databinding.MenuMoireeColorsSetupBinding;
 import de.lennartmeinhardt.android.moiree.util.HsbColorPicker;
 
 public class MoireeColorsSetupMenu extends MenuFragment {
@@ -35,35 +34,12 @@ public class MoireeColorsSetupMenu extends MenuFragment {
 
     private SharedPreferences preferences;
 
-    private ExpandableView foregroundSetupExpandable;
-    private ExpandableView backgroundSetupExpandable;
-
-    private ImageView foregroundPreview;
-    private HsbColorPicker foregroundColorPicker;
-
-    private ImageView backgroundPreview;
-    private HsbColorPicker backgroundColorPicker;
-
     private int defaultForegroundColor;
     private int defaultBackgroundColor;
 
     private boolean userExpandable;
 
-    private final MoireeColors.MoireeColorsListener previewColorsUpdater = new MoireeColors.MoireeColorsListener() {
-        @Override
-        public void onBackgroundColorChanged(int newColor) {
-            backgroundPreview.setBackgroundColor(newColor);
-            if(! backgroundColorPicker.isUserInputActive())
-                backgroundColorPicker.setSelectedColor(newColor);
-        }
-
-        @Override
-        public void onForegroundColorChanged(int newColor) {
-            foregroundPreview.setBackgroundColor(newColor);
-            if(! foregroundColorPicker.isUserInputActive())
-                foregroundColorPicker.setSelectedColor(newColor);
-        }
-    };
+    private MenuMoireeColorsSetupBinding binding;
 
 
     @Override
@@ -87,13 +63,14 @@ public class MoireeColorsSetupMenu extends MenuFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_moiree_colors_setup, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.menu_moiree_colors_setup, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        initializeForegroundColorSetup(view);
-        initializeBackgroundColorSetup(view);
+        initializeForegroundColorSetup();
+        initializeBackgroundColorSetup();
 
         boolean foregroundSetupExpanded;
         boolean backgroundSetupExpanded;
@@ -105,11 +82,10 @@ public class MoireeColorsSetupMenu extends MenuFragment {
             backgroundSetupExpanded = true;
         }
 
-        foregroundSetupExpandable.setExpanded(foregroundSetupExpanded);
-        backgroundSetupExpandable.setExpanded(backgroundSetupExpanded);
+        binding.foregroundColorSetupCard.expandableView.setExpanded(foregroundSetupExpanded);
+        binding.backgroundColorSetupCard.expandableView.setExpanded(backgroundSetupExpanded);
 
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(binding.toolbar);
     }
 
     @Override
@@ -123,12 +99,45 @@ public class MoireeColorsSetupMenu extends MenuFragment {
 
         MoireeColorsHolder colorsHolderActivity = (MoireeColorsHolder) getActivity();
         moireeColors = colorsHolderActivity.getMoireeColors();
-        moireeColors.addAndFireMoireeColorsListener(previewColorsUpdater);
+        binding.setMoireeColors(moireeColors);
+
+        bindColorPickersToModelManually();
 
         if(getActivity() instanceof MoireeTransitionStarterHolder) {
             MoireeTransitionStarterHolder moireeTransitionStarterHolder = (MoireeTransitionStarterHolder) getActivity();
             moireeTransitionStarter = moireeTransitionStarterHolder.getMoireeTransitionStarter();
         }
+    }
+
+    /**
+     * Colors have to be bound to color pickers manually. It could also be done via xml data binding (see the commented line in color_picker in color_setup_card.xml.
+     * But then sometimes a bug occurs when selecting black (for example). Black has HSV values 0, 0, 0 and so any currently selected hue will be overriden by red.
+     * This also happens if in ColorPicker's setSelectedColor method there is a check for ! isUserInputActive.
+     * The reason for this is that the system executes the bindings later than when the change happens (see binding.executePendingBindings()).
+     * So a user change in color will update the model, and the model will update the colorpicker again; but at this time the color picker cannot know whether the change event came from the user or not, because isUserInputActive() always returns false when the binding is executed.
+     *
+     * Here the color picker's selected color is bound to the {@link MoireeColors}' values, and first initialization is done as well.
+     */
+    private void bindColorPickersToModelManually() {
+        moireeColors.foregroundColor.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if(! binding.foregroundColorSetupCard.colorPicker.isUserInputActive()) {
+                    binding.foregroundColorSetupCard.colorPicker.setSelectedColor(moireeColors.foregroundColor.get());
+                }
+            }
+        });
+        binding.foregroundColorSetupCard.colorPicker.setSelectedColor(moireeColors.foregroundColor.get());
+
+        moireeColors.backgroundColor.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if(! binding.backgroundColorSetupCard.colorPicker.isUserInputActive()) {
+                    binding.backgroundColorSetupCard.colorPicker.setSelectedColor(moireeColors.backgroundColor.get());
+                }
+            }
+        });
+        binding.backgroundColorSetupCard.colorPicker.setSelectedColor(moireeColors.backgroundColor.get());
     }
 
     @Override
@@ -144,61 +153,43 @@ public class MoireeColorsSetupMenu extends MenuFragment {
         }
     }
 
-    private void initializeForegroundColorSetup(View rootView) {
-        View foregroundCard = rootView.findViewById(R.id.foreground_color_setup_card);
-        foregroundSetupExpandable = (ExpandableView) foregroundCard.findViewById(R.id.expandable_view);
-
-        View header = foregroundSetupExpandable.findHeaderView();
-        header.setFocusable(userExpandable);
-        header.setClickable(userExpandable);
+    private void initializeForegroundColorSetup() {
         if(userExpandable)
-            header.setOnClickListener(new View.OnClickListener() {
+            binding.foregroundColorSetupCard.colorPreviewHeader.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     beginMenuBoundsTransition();
-                    foregroundSetupExpandable.toggleExpanded();
+                    binding.foregroundColorSetupCard.expandableView.toggleExpanded();
                 }
             });
 
-        TextView title = (TextView) header.findViewById(R.id.header_title);
-        title.setText(R.string.foreground);
-        foregroundPreview = (ImageView) header.findViewById(R.id.header_preview);
-        foregroundColorPicker = (HsbColorPicker) foregroundSetupExpandable.findContentView().findViewById(R.id.color_picker);
-        foregroundColorPicker.setOnColorSelectionChangedListener(new HsbColorPicker.OnColorSelectionChangedListener() {
+        binding.foregroundColorSetupCard.colorPicker.setOnColorSelectionChangedListener(new HsbColorPicker.OnColorSelectionChangedListener() {
             @Override
             public void onColorSelectionChanged(HsbColorPicker colorPicker, int color, boolean fromUser) {
-                if(fromUser)
-                    moireeColors.setForegroundColor(color);
+                if(fromUser) {
+                    binding.getMoireeColors().foregroundColor.set(color);
+                }
             }
         });
     }
 
-    private void initializeBackgroundColorSetup(View rootView) {
-        View backgroundCard = rootView.findViewById(R.id.background_color_setup_card);
-        backgroundSetupExpandable = (ExpandableView) backgroundCard.findViewById(R.id.expandable_view);
-
-        View header = backgroundSetupExpandable.findHeaderView();
-        header.setFocusable(userExpandable);
-        header.setClickable(userExpandable);
+    private void initializeBackgroundColorSetup() {
         if(userExpandable) {
-            header.setOnClickListener(new View.OnClickListener() {
+            binding.backgroundColorSetupCard.colorPreviewHeader.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     beginMenuBoundsTransition();
-                    backgroundSetupExpandable.toggleExpanded();
+                    binding.backgroundColorSetupCard.expandableView.toggleExpanded();
                 }
             });
         }
 
-        TextView title = (TextView) header.findViewById(R.id.header_title);
-        title.setText(R.string.background);
-        backgroundPreview = (ImageView) header.findViewById(R.id.header_preview);
-        backgroundColorPicker = (HsbColorPicker) backgroundSetupExpandable.findContentView().findViewById(R.id.color_picker);
-        backgroundColorPicker.setOnColorSelectionChangedListener(new HsbColorPicker.OnColorSelectionChangedListener() {
+        binding.backgroundColorSetupCard.colorPicker.setOnColorSelectionChangedListener(new HsbColorPicker.OnColorSelectionChangedListener() {
             @Override
             public void onColorSelectionChanged(HsbColorPicker colorPicker, int color, boolean fromUser) {
-                if(fromUser)
-                    moireeColors.setBackgroundColor(color);
+                if(fromUser) {
+                    binding.getMoireeColors().backgroundColor.set(color);
+                }
             }
         });
     }
@@ -209,26 +200,22 @@ public class MoireeColorsSetupMenu extends MenuFragment {
 
         if(userExpandable) {
             SharedPreferences.Editor preferencesEditor = preferences.edit();
-            preferencesEditor.putBoolean(KEY_FOREGROUND_SETUP_EXPANDED, foregroundSetupExpandable.isExpanded());
-            preferencesEditor.putBoolean(KEY_BACKGROUND_SETUP_EXPANDED, backgroundSetupExpandable.isExpanded());
+            preferencesEditor.putBoolean(KEY_FOREGROUND_SETUP_EXPANDED, binding.foregroundColorSetupCard.expandableView.isExpanded());
+            preferencesEditor.putBoolean(KEY_BACKGROUND_SETUP_EXPANDED, binding.backgroundColorSetupCard.expandableView.isExpanded());
             preferencesEditor.apply();
         }
-
-        moireeColors.removeMoireeColorsListener(previewColorsUpdater);
-
-//        android.util.Log.d("Moiree", String.format("colors: fg=#%s, bg=#%s", Integer.toHexString(moireeColors.getForegroundColor()), Integer.toHexString(moireeColors.getBackgroundColor())));
     }
 
     private void swapColors() {
-        setColorsWithTransition(moireeColors.getBackgroundColor(), moireeColors.getForegroundColor());
+        setColorsWithTransition(moireeColors.backgroundColor.get(), moireeColors.foregroundColor.get());
     }
 
     private void setColorsWithTransition(int foregroundColor, int backgroundColor) {
         if(moireeTransitionStarter != null)
             moireeTransitionStarter.beginColorTransitionIfWanted();
 
-        moireeColors.setBackgroundColor(backgroundColor);
-        moireeColors.setForegroundColor(foregroundColor);
+        moireeColors.backgroundColor.set(backgroundColor);
+        moireeColors.foregroundColor.set(foregroundColor);
     }
 
     private void resetColorsToDefault() {

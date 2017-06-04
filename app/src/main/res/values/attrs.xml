@@ -27,8 +27,27 @@
         <attr name="textFormatter" format="reference"/>
     </declare-styleable>
 
-    <declare-styleable name="ExpandableView">
+    <declare-styleable name="Expandable">
         <attr name="expanded" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="ExpandableView" parent="Expandable"/>
+
+    <attr name="title" format="string"/>
+
+    <declare-styleable name="ColorPreviewHeader">
+        <attr name="title"/>
+        <attr name="color" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="ArrowExpandableHeader" parent="Expandable">
+        <attr name="title"/>
+    </declare-styleable>
+
+    <declare-styleable name="DrawableProgressPreviewHeader">
+        <attr name="title"/>
+        <attr name="busy" format="boolean"/>
+        <attr name="drawable" format="reference"/>
     </declare-styleable>
 
 </resources>
