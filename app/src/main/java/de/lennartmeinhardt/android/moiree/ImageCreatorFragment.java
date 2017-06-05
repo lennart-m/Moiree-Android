@@ -27,6 +27,7 @@ import de.lennartmeinhardt.android.moiree.imaging.MoireeImageCreator;
 import de.lennartmeinhardt.android.moiree.util.BundleIO;
 import de.lennartmeinhardt.android.moiree.util.ImageCreatorHolder;
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
+import de.lennartmeinhardt.android.moiree.util.VersionHelper;
 
 public class ImageCreatorFragment extends Fragment implements ImageCreatorHolder {
 
@@ -75,7 +76,9 @@ public class ImageCreatorFragment extends Fragment implements ImageCreatorHolder
         reusedSavedImage = false;
         if(imageCreatorForBackup != null
                 && imageCreatorForBackup.equals(moireeImageCreator)
-                && imageCreatorForBackup instanceof BaseBitmapMoireeImageCreator) {
+                && imageCreatorForBackup instanceof BaseBitmapMoireeImageCreator
+                && moireeImageCreator instanceof BaseBitmapMoireeImageCreator
+                && isV2ImageOrNewer()) {
             Bitmap bitmap = loadImageFromInternalStorage();
             if(bitmap != null) {
                 moireeImage = ((BaseBitmapMoireeImageCreator) moireeImageCreator).createDrawableFromBitmap(getResources(), bitmap);
@@ -97,6 +100,13 @@ public class ImageCreatorFragment extends Fragment implements ImageCreatorHolder
                     recreateImageInBackground();
             }
         });
+    }
+
+    /**
+     * Check if "v2" flag was stored before.
+     */
+    private boolean isV2ImageOrNewer() {
+        return VersionHelper.readLastUsedVersion(preferencesForBackup) >= 2;
     }
 
     @Nullable
@@ -201,6 +211,7 @@ public class ImageCreatorFragment extends Fragment implements ImageCreatorHolder
         try {
             outputStream = new FileOutputStream(outFile);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            VersionHelper.storeCurrentVersionAsLastUsed(getActivity(), preferencesForBackup);
         } catch(IOException e) {
             e.printStackTrace();
         } finally {
