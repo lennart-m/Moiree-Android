@@ -2,12 +2,9 @@ package de.lennartmeinhardt.android.moiree.menu.imagesetup;
 
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,27 +18,55 @@ import de.lennartmeinhardt.android.moiree.util.Expandable;
 import de.lennartmeinhardt.android.moiree.util.ExpandableView;
 import de.lennartmeinhardt.android.moiree.util.Expandables;
 
-public class TrianglesImageSetupFragment extends BaseImageCreatorSetupFragment implements Expandable {
-
-    private TrianglesImageCreator imageCreator;
-
-    private BitmapDrawable previewDrawable;
-    private Bitmap previewBitmap;
-
-    private PreviewImageCreator<?> calculatingCreator;
-    private PreviewImageCreator<?> nextCalculatorToExecute;
+public class TrianglesImageSetupFragment extends BaseImageCreatorSetupFragment<TrianglesImageCreator> implements Expandable {
 
     private FragmentTriangleImageSetupBinding binding;
 
+    private ImageCreatorQueue imageCreatorQueue;
+
+    private final ImageCreatorQueue.CalculationListener previewCalculationListener = new ImageCreatorQueue.CalculationListener() {
+        @Override
+        public void onCalculationStarting() {
+            binding.expandableViewHeader.setBusy(true);
+        }
+
+        @Override
+        public void onCalculationSuccessful(@Nullable BitmapDrawable moireeImage, boolean willContinueCalculating) {
+            // only operate on the ui if this fragment is attached
+            if (getActivity() != null) {
+                binding.expandableViewHeader.setBusy(willContinueCalculating);
+                if (moireeImage != null)
+                    binding.expandableViewHeader.setDrawable(moireeImage);
+            }
+        }
+
+        @Override
+        public void onCalculationCancelled(boolean willContinueCalculating) {
+            binding.expandableViewHeader.setBusy(willContinueCalculating);
+        }
+    };
+
 
     @Override
-    protected TrianglesImageCreator getMoireeImageCreator() {
-        if(imageCreator == null) {
-            int defaultTriangleSize = getResources().getDimensionPixelSize(R.dimen.triangles_image_default_triangle_size);
-
-            imageCreator = new TrianglesImageCreator(defaultTriangleSize);
-        }
+    protected TrianglesImageCreator initializeImageCreator() {
+        int defaultTriangleSize = getResources().getDimensionPixelSize(R.dimen.triangles_image_default_triangle_size);
+        TrianglesImageCreator imageCreator = new TrianglesImageCreator(defaultTriangleSize);
+        imageCreatorQueue = new ImageCreatorQueue(imageCreator, previewCalculationListener);
+        imageCreator.triangleSizeInPixels.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                recalculatePreviewImage();
+            }
+        });
         return imageCreator;
+    }
+
+    private void recalculatePreviewImage() {
+        if(binding != null) {
+            int width = binding.expandableViewHeader.getPreviewImageView().getWidth();
+            int height = binding.expandableViewHeader.getPreviewImageView().getHeight();
+            imageCreatorQueue.recalculateImageForDimensions(getResources(), width, height);
+        }
     }
 
 
@@ -54,10 +79,7 @@ public class TrianglesImageSetupFragment extends BaseImageCreatorSetupFragment i
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        // make sure the lazily initialized image creator exists
-        getMoireeImageCreator();
-
-        binding.setTriangleImageCreator(imageCreator);
+        binding.setTriangleImageCreator(getImageCreator());
 
         int defaultTriangleSize = getResources().getDimensionPixelSize(R.dimen.triangles_image_default_triangle_size);
         binding.setDefaultTriangleSizeInPixels(defaultTriangleSize);
@@ -83,19 +105,12 @@ public class TrianglesImageSetupFragment extends BaseImageCreatorSetupFragment i
                 else
                     binding.expandableViewHeader.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 
-                calculateImageFirstTime();
+                recalculatePreviewImage();
             }
         });
     }
 
     private void initializeContentView() {
-        imageCreator.triangleSizeInPixels.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                calculateImageFollowUp();
-            }
-        });
-
         binding.createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,7 +121,7 @@ public class TrianglesImageSetupFragment extends BaseImageCreatorSetupFragment i
         binding.resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageCreator.triangleSizeInPixels.set(binding.getDefaultTriangleSizeInPixels());
+                getImageCreator().triangleSizeInPixels.set(binding.getDefaultTriangleSizeInPixels());
             }
         });
     }
@@ -131,109 +146,7 @@ public class TrianglesImageSetupFragment extends BaseImageCreatorSetupFragment i
         Expandables.setExpandedListenerForWrappedExpandable(this, binding.expandableView, onExpandedStateChangedListener);
     }
 
-    private void calculateImageFollowUp() {
-        if(previewDrawable != null) {
-            if (calculatingCreator != null) {
-                nextCalculatorToExecute = new FollowUpPreviewImageCreator();
-                // cancel the currently operating calculator, but only if it's not running for the first time
-                if (calculatingCreator instanceof FollowUpPreviewImageCreator)
-                    calculatingCreator.cancel(true);
-            } else {
-                new FollowUpPreviewImageCreator().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }
-        }
-    }
-
-    private void calculateImageFirstTime() {
-        new FirstTimePreviewImageCreator().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
     public ExpandableView getExpandableView() {
         return binding.expandableView;
-    }
-
-    private abstract class PreviewImageCreator<Result> extends AsyncTask<Void, Void, Result> {
-
-        int triangleSize;
-
-        @CallSuper
-        @Override
-        protected void onPreExecute() {
-            triangleSize = imageCreator.triangleSizeInPixels.get();
-            calculatingCreator = this;
-            nextCalculatorToExecute = null;
-            binding.expandableViewHeader.setBusy(true);
-        }
-
-        @CallSuper
-        @Override
-        protected void onPostExecute(Result result) {
-            calculatingCreator = null;
-        }
-
-        @CallSuper
-        @Override
-        protected void onCancelled(Result result) {
-            calculatingCreator = null;
-        }
-    }
-
-    private class FirstTimePreviewImageCreator extends PreviewImageCreator<Bitmap> {
-
-        private int width, height;
-
-        private TrianglesImageCreator previewImageCreator;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            width = binding.expandableViewHeader.getPreviewImageView().getWidth();
-            height = binding.expandableViewHeader.getPreviewImageView().getHeight();
-            previewImageCreator = new TrianglesImageCreator(triangleSize);
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... params) {
-            return previewImageCreator.createBitmapForDimensions(width, height);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-
-            if(getActivity() != null) {
-                previewBitmap = bitmap;
-                previewDrawable = imageCreator.createDrawableFromBitmap(getResources(), bitmap);
-                binding.expandableViewHeader.setDrawable(previewDrawable);
-
-                if (nextCalculatorToExecute != null)
-                    nextCalculatorToExecute.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                else
-                    binding.expandableViewHeader.setBusy(false);
-            }
-        }
-    }
-
-    private class FollowUpPreviewImageCreator extends PreviewImageCreator<Void> {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            TrianglesImageCreator.drawTrianglesToImage(previewBitmap, triangleSize);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            binding.expandableViewHeader.setBusy(false);
-            previewDrawable.invalidateSelf();
-        }
-
-        @Override
-        protected void onCancelled(Void aVoid) {
-            super.onCancelled(aVoid);
-            if(nextCalculatorToExecute != null)
-                nextCalculatorToExecute.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
     }
 }

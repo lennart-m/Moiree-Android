@@ -1,7 +1,6 @@
 package de.lennartmeinhardt.android.moiree.imaging;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.databinding.ObservableInt;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,13 +8,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
 import de.lennartmeinhardt.android.moiree.util.BundleIO;
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
-public class TrianglesImageCreator extends BaseBitmapMoireeImageCreator<BitmapDrawable> implements PreferenceIO, BundleIO {
+public class TrianglesImageCreator extends BaseBitmapMoireeImageCreator implements PreferenceIO, BundleIO {
 
     private static final String KEY_TRIANGLE_SIZE = "trianglesImageCreator:triangleSizeInPixels";
 
@@ -52,24 +50,8 @@ public class TrianglesImageCreator extends BaseBitmapMoireeImageCreator<BitmapDr
     }
 
     @Override
-    public Bitmap createBitmapForDimensions(int width, int height) {
-        Bitmap bitmap = createEmptyBitmap(width, height);
+    public void drawImageToBitmap(Bitmap bitmap) {
         drawTrianglesToImage(bitmap, triangleSizeInPixels.get());
-        return bitmap;
-    }
-
-    @Override
-    public BitmapDrawable createDrawableFromBitmap(Resources resources, Bitmap bitmap) {
-        BitmapDrawable drawable = new BitmapDrawable(resources, bitmap);
-        drawable.setAntiAlias(false);
-        drawable.setDither(false);
-        drawable.setFilterBitmap(false);
-        return drawable;
-    }
-
-    @Override
-    public Bitmap getBitmapFromDrawable(BitmapDrawable drawable) {
-        return drawable.getBitmap();
     }
 
     public static void drawTrianglesToImage(Bitmap image, float triangleWidth) {

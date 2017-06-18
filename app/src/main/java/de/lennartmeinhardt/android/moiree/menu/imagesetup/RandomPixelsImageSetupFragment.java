@@ -2,11 +2,9 @@ package de.lennartmeinhardt.android.moiree.menu.imagesetup;
 
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,33 +14,63 @@ import android.view.ViewTreeObserver;
 import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.databinding.FragmentRandomPixelsImageSetupBinding;
 import de.lennartmeinhardt.android.moiree.imaging.RandomPixelsImageCreator;
-import de.lennartmeinhardt.android.moiree.imaging.RescaledDrawable;
 import de.lennartmeinhardt.android.moiree.util.Expandable;
 import de.lennartmeinhardt.android.moiree.util.Expandables;
 
-public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragment implements Expandable {
+public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragment<RandomPixelsImageCreator> implements Expandable {
 
-    private RandomPixelsImageCreator imageCreator;
-
-    private RescaledDrawable previewDrawable;
-    private Bitmap previewBitmap;
-
-    private PreviewImageCreator<?> calculatingCreator;
-    private PreviewImageCreator<?> nextCalculatorToExecute;
+    private ImageCreatorQueue imageCreatorQueue;
 
     private FragmentRandomPixelsImageSetupBinding binding;
 
+    private final ImageCreatorQueue.CalculationListener previewCalculationListener = new ImageCreatorQueue.CalculationListener() {
+        @Override
+        public void onCalculationStarting() {
+            binding.expandableViewHeader.setBusy(true);
+        }
+
+        @Override
+        public void onCalculationSuccessful(@Nullable BitmapDrawable moireeImage, boolean willContinueCalculating) {
+            // only operate on the ui if this fragment is attached
+            if (getActivity() != null) {
+                binding.expandableViewHeader.setBusy(willContinueCalculating);
+                if (moireeImage != null)
+                    binding.expandableViewHeader.setDrawable(moireeImage);
+            }
+        }
+
+        @Override
+        public void onCalculationCancelled(boolean willContinueCalculating) {
+            binding.expandableViewHeader.setBusy(willContinueCalculating);
+        }
+    };
+
 
     @Override
-    protected RandomPixelsImageCreator getMoireeImageCreator() {
-        if(imageCreator == null) {
-            int defaultSquareSize = getResources().getDimensionPixelSize(R.dimen.random_pixels_image_default_square_size);
-            int defaultDensityPercents = getResources().getInteger(R.integer.random_pixels_density_default_percents);
-            float defaultDensity = defaultDensityPercents / 100f;
+    RandomPixelsImageCreator initializeImageCreator() {
+        int defaultSquareSize = getResources().getDimensionPixelSize(R.dimen.random_pixels_image_default_square_size);
+        int defaultDensityPercents = getResources().getInteger(R.integer.random_pixels_density_default_percents);
+        float defaultDensity = defaultDensityPercents / 100f;
 
-            imageCreator = new RandomPixelsImageCreator(defaultSquareSize, defaultDensity);
-        }
+        RandomPixelsImageCreator imageCreator = new RandomPixelsImageCreator(defaultSquareSize, defaultDensity);
+        imageCreatorQueue = new ImageCreatorQueue(imageCreator, previewCalculationListener);
+        Observable.OnPropertyChangedCallback calculateTaskStarter = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                recalculatePreviewImage();
+            }
+        };
+        imageCreator.squareSizeInPixels.addOnPropertyChangedCallback(calculateTaskStarter);
+        imageCreator.density.addOnPropertyChangedCallback(calculateTaskStarter);
         return imageCreator;
+    }
+
+    private void recalculatePreviewImage() {
+        if(binding != null) {
+            int width = binding.expandableViewHeader.getPreviewImageView().getWidth();
+            int height = binding.expandableViewHeader.getPreviewImageView().getHeight();
+            imageCreatorQueue.recalculateImageForDimensions(getResources(), width, height);
+        }
     }
 
 
@@ -55,10 +83,7 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        // make sure the lazily initialized image creator exists
-        getMoireeImageCreator();
-
-        binding.setRandomPixelsImageCreator(imageCreator);
+        binding.setRandomPixelsImageCreator(getImageCreator());
 
         int defaultSquareSize = getResources().getDimensionPixelSize(R.dimen.random_pixels_image_default_square_size);
         int defaultDensityPercents = getResources().getInteger(R.integer.random_pixels_density_default_percents);
@@ -86,29 +111,12 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
                 else
                     binding.expandableViewHeader.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 
-                calculateImageFirstTime();
+                recalculatePreviewImage();
             }
         });
     }
 
     private void initializeContentView() {
-        imageCreator.squareSizeInPixels.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                if (previewDrawable != null) {
-                    previewDrawable.setScaleX(imageCreator.squareSizeInPixels.get());
-                    previewDrawable.setScaleY(imageCreator.squareSizeInPixels.get());
-                }
-            }
-        });
-
-        imageCreator.density.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                calculateImageFollowUp();
-            }
-        });
-
         binding.createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,27 +127,10 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
         binding.resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageCreator.squareSizeInPixels.set(binding.getDefaultSquareSizeInPixels());
-                imageCreator.density.set(binding.getDefaultDensity());
+                getImageCreator().squareSizeInPixels.set(binding.getDefaultSquareSizeInPixels());
+                getImageCreator().density.set(binding.getDefaultDensity());
             }
         });
-    }
-
-    private void calculateImageFollowUp() {
-        if(previewDrawable != null) {
-            if (calculatingCreator != null) {
-                nextCalculatorToExecute = new FollowUpPreviewImageCreator();
-                // cancel the currently operating calculator, but only if it's not running for the first time
-                if (calculatingCreator instanceof FollowUpPreviewImageCreator)
-                    calculatingCreator.cancel(true);
-            } else {
-                new FollowUpPreviewImageCreator().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }
-        }
-    }
-
-    private void calculateImageFirstTime() {
-        new FirstTimePreviewImageCreator().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -160,94 +151,5 @@ public class RandomPixelsImageSetupFragment extends BaseImageCreatorSetupFragmen
     @Override
     public void setOnExpandedStateChangedListener(OnExpandedStateChangedListener onExpandedStateChangedListener) {
         Expandables.setExpandedListenerForWrappedExpandable(this, binding.expandableView, onExpandedStateChangedListener);
-    }
-
-    private abstract class PreviewImageCreator<Result> extends AsyncTask<Void, Void, Result> {
-
-        float density;
-        int squareSizeInPixels;
-
-        @CallSuper
-        @Override
-        protected void onPreExecute() {
-            squareSizeInPixels = imageCreator.squareSizeInPixels.get();
-            density = imageCreator.density.get();
-            calculatingCreator = this;
-            nextCalculatorToExecute = null;
-            binding.expandableViewHeader.setBusy(true);
-        }
-
-        @CallSuper
-        @Override
-        protected void onPostExecute(Result result) {
-            calculatingCreator = null;
-        }
-
-        @CallSuper
-        @Override
-        protected void onCancelled(Result result) {
-            calculatingCreator = null;
-        }
-    }
-
-    private class FirstTimePreviewImageCreator extends PreviewImageCreator<Bitmap> {
-
-        private int width, height;
-
-        private RandomPixelsImageCreator squareSizeOne;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            width = binding.expandableViewHeader.getPreviewImageView().getWidth();
-            height = binding.expandableViewHeader.getPreviewImageView().getHeight();
-            squareSizeOne = new RandomPixelsImageCreator(1, density);
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... params) {
-            return squareSizeOne.createBitmapForDimensions(width, height);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-
-            if(getActivity() != null) {
-                previewBitmap = bitmap;
-                previewDrawable = new RescaledDrawable(imageCreator.createDrawableFromBitmap(getResources(), bitmap));
-                previewDrawable.setScaleX(imageCreator.squareSizeInPixels.get());
-                previewDrawable.setScaleY(imageCreator.squareSizeInPixels.get());
-                binding.expandableViewHeader.setDrawable(previewDrawable);
-
-                if (nextCalculatorToExecute != null)
-                    nextCalculatorToExecute.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                else
-                    binding.expandableViewHeader.setBusy(false);
-            }
-        }
-    }
-
-    private class FollowUpPreviewImageCreator extends PreviewImageCreator<Void> {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            RandomPixelsImageCreator.drawRandomPixelsToImage(previewBitmap, 1, density);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            binding.expandableViewHeader.setBusy(false);
-            previewDrawable.invalidateSelf();
-        }
-
-        @Override
-        protected void onCancelled(Void aVoid) {
-            super.onCancelled(aVoid);
-            if(nextCalculatorToExecute != null)
-                nextCalculatorToExecute.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
     }
 }

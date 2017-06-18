@@ -211,6 +211,9 @@ public class SeekPane extends View {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(! isEnabled())
+            return false;
+
         // if the "okay" button is clicked toggle input mode
         if(keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
             toggleInputActive();

@@ -1,20 +1,18 @@
 package de.lennartmeinhardt.android.moiree.imaging;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.databinding.ObservableInt;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
 import de.lennartmeinhardt.android.moiree.util.BundleIO;
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
-public class HorizontalLinesImageCreator extends BaseBitmapMoireeImageCreator<BitmapDrawable> implements BundleIO, PreferenceIO {
+public class HorizontalLinesImageCreator extends BaseBitmapMoireeImageCreator implements BundleIO, PreferenceIO {
 
 	private static final String KEY_LINE_THICKNESS_IN_PX = "horizontalLinesImageCreator:lineThicknessInPixels";
 
@@ -50,17 +48,15 @@ public class HorizontalLinesImageCreator extends BaseBitmapMoireeImageCreator<Bi
 	}
 
 	@Override
-	public Bitmap createBitmapForDimensions(int width, int height) {
-		Bitmap bitmap = createEmptyBitmap(width, height);
+	public void drawImageToBitmap(Bitmap bitmap) {
 		drawHorizontalLinesToImage(bitmap, lineThicknessInPixels.get());
-		return bitmap;
 	}
 
 	private static void drawHorizontalLinesToImage(Bitmap bitmap, int lineThicknessInPixels) {
 		int w = bitmap.getWidth(), h = bitmap.getHeight();
 		Canvas canvas = new Canvas(bitmap);
 		canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-		Paint fillBlack = new Paint();
+		Paint fillBlack = new Paint(Paint.ANTI_ALIAS_FLAG);
 
 		final int segmentsPerImageHalf = (int) Math.ceil((h / 2f) / lineThicknessInPixels);
 		for(int j = - segmentsPerImageHalf; j < segmentsPerImageHalf; j++) {
@@ -81,20 +77,6 @@ public class HorizontalLinesImageCreator extends BaseBitmapMoireeImageCreator<Bi
 			for(int x = 0; x < w; x++)
 				bitmap.setPixel(x, y, argb);
 		}
-	}
-
-	@Override
-	public BitmapDrawable createDrawableFromBitmap(Resources resources, Bitmap bitmap) {
-		BitmapDrawable drawable = new BitmapDrawable(resources, bitmap);
-		drawable.setAntiAlias(false);
-		drawable.setFilterBitmap(false);
-		drawable.setDither(false);
-		return drawable;
-	}
-
-	@Override
-	public Bitmap getBitmapFromDrawable(BitmapDrawable drawable) {
-		return drawable.getBitmap();
 	}
 
 	@Override

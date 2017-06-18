@@ -1,7 +1,6 @@
 package de.lennartmeinhardt.android.moiree.imaging;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.databinding.ObservableFloat;
 import android.databinding.ObservableInt;
 import android.graphics.Bitmap;
@@ -9,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
 import java.util.Random;
@@ -17,7 +15,7 @@ import java.util.Random;
 import de.lennartmeinhardt.android.moiree.util.BundleIO;
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
-public class RandomPixelsImageCreator extends BaseBitmapMoireeImageCreator<BitmapDrawable> implements BundleIO, PreferenceIO {
+public class RandomPixelsImageCreator extends BaseBitmapMoireeImageCreator implements BundleIO, PreferenceIO {
 
 	private static final String KEY_SQ_SIZE_IN_PX = "randomPixelsImageCreator:squareSizeInPixels";
 	private static final String KEY_DENSITY = "randomPixelsImageCreator:density";
@@ -60,26 +58,9 @@ public class RandomPixelsImageCreator extends BaseBitmapMoireeImageCreator<Bitma
 	}
 
 	@Override
-	public Bitmap createBitmapForDimensions(int width, int height) {
-		Bitmap bitmap = createEmptyBitmap(width, height);
+	public void drawImageToBitmap(Bitmap bitmap) {
 		drawRandomPixelsToImage(bitmap, squareSizeInPixels.get(), density.get());
-		return bitmap;
 	}
-
-	@Override
-	public BitmapDrawable createDrawableFromBitmap(Resources resources, Bitmap bitmap) {
-		BitmapDrawable drawable = new BitmapDrawable(resources, bitmap);
-		drawable.setAntiAlias(false);
-		drawable.setFilterBitmap(false);
-		drawable.setDither(false);
-		return drawable;
-	}
-
-	@Override
-	public Bitmap getBitmapFromDrawable(BitmapDrawable drawable) {
-		return drawable.getBitmap();
-	}
-
 
 	@Override
 	public boolean equals(Object o) {
@@ -107,7 +88,7 @@ public class RandomPixelsImageCreator extends BaseBitmapMoireeImageCreator<Bitma
 
 		Canvas canvas = new Canvas(image);
 		canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-		Paint fillBlack = new Paint();
+		Paint fillBlack = new Paint(Paint.ANTI_ALIAS_FLAG);
 
 		Random random = new Random();
 		for (int i = - segmentsPerImageHalfX; i < segmentsPerImageHalfX; i++) {

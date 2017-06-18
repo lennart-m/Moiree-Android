@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -174,7 +175,7 @@ public class ImageCreatorFragment extends Fragment implements ImageCreatorHolder
         super.onDestroy();
 
         if((!reusedSavedImage) && moireeImageCreator instanceof BaseBitmapMoireeImageCreator) {
-            Bitmap bitmap = ((BaseBitmapMoireeImageCreator) moireeImageCreator).getBitmapFromDrawable(moireeImage);
+            Bitmap bitmap = ((BitmapDrawable) moireeImage).getBitmap();
             saveImageInInternalStorage(bitmap);
             SharedPreferences.Editor backupPrefsEditor = preferencesForBackup.edit();
             storeImageCreatorToPreferences(backupPrefsEditor, moireeImageCreator);
