@@ -14,7 +14,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 
 import de.lennartmeinhardt.android.moiree.R;
 
@@ -22,7 +22,7 @@ import de.lennartmeinhardt.android.moiree.R;
 @InverseBindingMethods(
         @InverseBindingMethod(type = HsbColorPicker.class, attribute = "selectedColor")
 )
-public class HsbColorPicker extends RelativeLayout {
+public class HsbColorPicker extends LinearLayout {
 
     private final float[] tmpHsv = new float[3];
 
@@ -74,6 +74,8 @@ public class HsbColorPicker extends RelativeLayout {
     private void inflateColorPicker(Context context) {
         inflate(context, R.layout.color_picker, this);
 
+        setOrientation(VERTICAL);
+
         initializeHueSelection();
         initializeSatValSelection();
 
@@ -81,7 +83,7 @@ public class HsbColorPicker extends RelativeLayout {
     }
 
     private void initializeSatValSelection() {
-        satValSelection = (SeekPane) findViewById(R.id.sat_val_selection);
+        satValSelection = findViewById(R.id.sat_val_selection);
 
         // create the sat/val preview drawable. it consist of the color layer (displays the color at full hue) and the mask
         backgroundColorDrawable = new ColorDrawable();
@@ -113,7 +115,7 @@ public class HsbColorPicker extends RelativeLayout {
     }
 
     private void initializeHueSelection() {
-        hueSelection = (SeekPane) findViewById(R.id.hue_selection);
+        hueSelection = findViewById(R.id.hue_selection);
         hueSelection.setOnPosition2DChangeListener(new SeekPane.OnPosition2DChangeListener.Adapter() {
             @Override
             public void onPositionXChanged(SeekPane seekPane, int positionX, boolean fromUser) {

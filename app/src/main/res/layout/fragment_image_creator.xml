@@ -9,7 +9,6 @@
     app:contentPadding="15dp">
 
     <ProgressBar
-        android:id="@+id/calculating_progress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:indeterminate="true"/>

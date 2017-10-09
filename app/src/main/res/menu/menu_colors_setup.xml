@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:id="@+id/swap_colors"
-        android:title="@string/swap_colors"/>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/reset_colors"
-        android:title="@string/reset"/>
+        android:icon="@drawable/ic_undo"
+        android:title="@string/revert"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/swap_colors"
+        android:icon="@drawable/ic_swap"
+        android:title="@string/swap_colors"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/save_colors"
+        android:title="@string/save_colors"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/load_colors"
+        android:title="@string/load_colors"
+        app:showAsAction="never"/>
 
 </menu>

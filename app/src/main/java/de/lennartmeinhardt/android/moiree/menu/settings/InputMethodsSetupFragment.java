@@ -13,6 +13,7 @@ import de.lennartmeinhardt.android.moiree.MoireeInputMethods;
 import de.lennartmeinhardt.android.moiree.MoireeInputMethodsHolder;
 import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.databinding.FragmentInputMethodsSetupBinding;
+import de.lennartmeinhardt.android.moiree.databinding.SensitivitySetupBinding;
 import de.lennartmeinhardt.android.moiree.menu.MenuFragment;
 
 public class InputMethodsSetupFragment extends MenuFragment {
@@ -47,28 +48,17 @@ public class InputMethodsSetupFragment extends MenuFragment {
             }
         });
 
-        initializeResetButtons();
+        initializeResetButton(binding.rotationInputSetupRoot);
+        initializeResetButton(binding.scalingInputSetupRoot);
+        initializeResetButton(binding.translationInputSetupRoot);
     }
 
-    private void initializeResetButtons() {
-        final int defaultSensitivityPercents = getResources().getInteger(R.integer.sensitivity_default_percents);
-
-        binding.rotationInputSetupRoot.resetButton.setOnClickListener(new View.OnClickListener() {
+    private void initializeResetButton(final SensitivitySetupBinding binding) {
+        binding.resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                moireeInputMethods.rotationSensitivity.set(defaultSensitivityPercents / 100f);
-            }
-        });
-        binding.scalingInputSetupRoot.resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                moireeInputMethods.scalingSensitivity.set(defaultSensitivityPercents / 100f);
-            }
-        });
-        binding.translationInputSetupRoot.resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                moireeInputMethods.translationSensitivity.set(defaultSensitivityPercents / 100f);
+            public void onClick(View view) {
+                int defaultSensitivityPercents = binding.getDefaultSensitivityPercents();
+                binding.setSensitivityPercents(defaultSensitivityPercents);
             }
         });
     }

@@ -1,6 +1,5 @@
 package de.lennartmeinhardt.android.moiree.util;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import de.lennartmeinhardt.android.moiree.BuildConfig;
@@ -13,13 +12,13 @@ public class VersionHelper {
         return preferences.getInt(KEY_LAST_USED_VERSION, -1);
     }
 
-    public static void storeCurrentVersionAsLastUsed(Context context, SharedPreferences.Editor preferencesEditor) {
+    public static void storeCurrentVersionAsLastUsed(SharedPreferences.Editor preferencesEditor) {
         preferencesEditor.putInt(KEY_LAST_USED_VERSION, BuildConfig.VERSION_CODE);
     }
 
-    public static void storeCurrentVersionAsLastUsed(Context context, SharedPreferences preferences) {
+    public static void storeCurrentVersionAsLastUsed(SharedPreferences preferences) {
         SharedPreferences.Editor preferencesEditor = preferences.edit();
-        storeCurrentVersionAsLastUsed(context, preferencesEditor);
+        storeCurrentVersionAsLastUsed(preferencesEditor);
         preferencesEditor.apply();
     }
 

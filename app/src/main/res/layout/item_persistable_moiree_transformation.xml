@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="moireeTransformation"
+            type="de.lennartmeinhardt.android.moiree.MoireeTransformation"/>
+
+        <variable
+            name="transformationName"
+            type="String"/>
+
+        <variable
+            name="deletable"
+            type="boolean"/>
+
+        <variable
+            name="busy"
+            type="boolean"/>
+
+    </data>
+
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/BaseMenuCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="2dp"><!-- TODO width fix? -->
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="30dp"
+            android:indeterminate="true"
+            android:visibility="@{busy ? View.VISIBLE : View.GONE}"/>
+
+        <LinearLayout
+            android:id="@+id/clickable_root"
+            style="@style/Clickable"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="@{busy ? View.GONE : View.VISIBLE}">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:id="@+id/name_text"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@{transformationName}"/>
+
+                <ImageButton
+                    android:id="@+id/delete_button"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/delete_transformation"
+                    android:src="@drawable/ic_delete"
+                    android:visibility="@{deletable ? View.VISIBLE : View.GONE}"/>
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:clipChildren="false">
+
+                <include
+                    layout="@layout/transformation_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    app:moireeTransformation="@{moireeTransformation}"/>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</layout>

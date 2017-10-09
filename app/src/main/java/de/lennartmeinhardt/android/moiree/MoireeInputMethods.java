@@ -1,6 +1,7 @@
 package de.lennartmeinhardt.android.moiree;
 
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableFloat;
 
@@ -24,20 +25,20 @@ public class MoireeInputMethods implements PreferenceIO {
     public final ObservableFloat scalingSensitivity = new ObservableFloat();
     public final ObservableFloat translationSensitivity = new ObservableFloat();
 
+    public final ObservableFloat translationDistanceThreshold = new ObservableFloat();
 
-    public MoireeInputMethods(boolean allInputMethodsEnabled, float sensitivity) {
-        this(allInputMethodsEnabled, sensitivity, allInputMethodsEnabled, sensitivity, allInputMethodsEnabled, sensitivity);
+
+    public void loadFromResources(Resources resources) {
+        rotationSensitivity.set(resources.getInteger(R.integer.rotation_sensitivity_default_percents) / 100f);
+        scalingSensitivity.set(resources.getInteger(R.integer.scaling_sensitivity_default_percents) / 100f);
+        translationSensitivity.set(resources.getInteger(R.integer.translation_sensitivity_default_percents) / 100f);
+
+        rotationInputEnabled.set(resources.getBoolean(R.bool.default_rotation_input_enabled));
+        scalingInputEnabled.set(resources.getBoolean(R.bool.default_scaling_input_enabled));
+        translationInputEnabled.set(resources.getBoolean(R.bool.default_translation_input_enabled));
+
+        translationDistanceThreshold.set(resources.getDimensionPixelSize(R.dimen.translation_distance_threshold));
     }
-
-    public MoireeInputMethods(boolean rotationInputEnabled, float rotationSensitivity, boolean scalingInputEnabled, float scalingSensitivity, boolean translationInputEnabled, float translationSensitivity) {
-        this.rotationSensitivity.set(rotationSensitivity);
-        this.scalingSensitivity.set(scalingSensitivity);
-        this.translationSensitivity.set(translationSensitivity);
-        this.rotationInputEnabled.set(rotationInputEnabled);
-        this.scalingInputEnabled.set(scalingInputEnabled);
-        this.translationInputEnabled.set(translationInputEnabled);
-    }
-
 
     @Override
     public void loadFromPreferences(SharedPreferences preferences) {

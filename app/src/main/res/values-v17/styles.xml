@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Divider.Vertical" parent="Base.Divider.Vertical">
+        <item name="android:layout_marginStart">@dimen/divider_margins</item>
+        <item name="android:layout_marginEnd">@dimen/divider_margins</item>
+    </style>
+
+</resources>

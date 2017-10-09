@@ -7,8 +7,13 @@
 
     <dimen name="moiree_image_button_tile_size">5dp</dimen>
 
+    <dimen name="expandable_header_height">40dp</dimen>
+    <dimen name="header_preview_width">40dp</dimen>
+    <dimen name="header_preview_height">@dimen/expandable_header_height</dimen>
+
     <dimen name="checkerboard_image_default_square_size">6dp</dimen>
     <dimen name="horizontal_lines_image_default_line_thickness">5dp</dimen>
+    <dimen name="concentric_circles_image_default_line_thickness">3dp</dimen>
     <dimen name="random_pixels_image_default_square_size">4dp</dimen>
     <dimen name="triangles_image_default_triangle_size">20dp</dimen>
 
@@ -16,5 +21,14 @@
     <dimen name="thumb_stroke_width">1dp</dimen>
     <dimen name="thumb_rect_width">10dp</dimen>
     <dimen name="thumb_rect_height">30dp</dimen>
+
+    <dimen name="preview_border_stroke_width">1dp</dimen>
+
+    <dimen name="header_content_margin">5dp</dimen>
+    <dimen name="header_spacing">5dp</dimen>
+
+    <dimen name="divider_margins">10dp</dimen>
+
+    <dimen name="translation_distance_threshold">10dp</dimen>
 
 </resources>

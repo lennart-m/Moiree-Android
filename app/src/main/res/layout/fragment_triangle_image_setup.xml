@@ -30,8 +30,8 @@
                 android:orientation="vertical">
 
                 <de.lennartmeinhardt.android.moiree.util.DrawableProgressPreviewHeader
-                    android:id="@+id/expandable_view_header"
-                    style="@style/ClickableHeader"
+                    android:id="@id/expandable_view_header"
+                    style="@style/Clickable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:title="@string/triangles_title"/>

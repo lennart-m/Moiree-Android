@@ -34,9 +34,9 @@ public class DrawableProgressPreviewHeader extends LinearLayout {
 
         inflate(context, R.layout.header_with_preview_and_progress, this);
 
-        this.titleView = (TextView) findViewById(R.id.header_title);
-        this.previewImageView = (ImageView) findViewById(R.id.header_preview);
-        this.busyIndicator = (ProgressBar) findViewById(R.id.header_progress);
+        this.titleView = findViewById(R.id.header_title);
+        this.previewImageView = findViewById(R.id.header_preview);
+        this.busyIndicator = findViewById(R.id.header_progress);
 
         setOrientation(HORIZONTAL);
 

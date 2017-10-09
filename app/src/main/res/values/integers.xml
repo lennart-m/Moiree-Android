@@ -13,8 +13,11 @@
     <integer name="sensitivity_min_percents">0</integer>
     <integer name="sensitivity_max_percents">200</integer>
     <integer name="sensitivity_default_percents">20</integer>
+    <integer name="rotation_sensitivity_default_percents">@integer/sensitivity_default_percents</integer>
+    <integer name="scaling_sensitivity_default_percents">@integer/sensitivity_default_percents</integer>
+    <integer name="translation_sensitivity_default_percents">@integer/sensitivity_default_percents</integer>
 
-    <integer name="menu_opacity_default_percents">90</integer>
+    <integer name="menu_opacity_default_percents">93</integer>
     <integer name="menu_opacity_min_percents">40</integer>
     <integer name="menu_opacity_max_percents">100</integer>
     
@@ -34,5 +37,9 @@
 
     <integer name="transformation_animation_duration_millis">2000</integer>
     <integer name="color_animation_duration_millis">300</integer>
+
+    <integer name="color_list_view_columns">2</integer>
+
+    <integer name="transformation_list_view_columns">2</integer>
 
 </resources>

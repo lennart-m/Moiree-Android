@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <variable
+            name="moireeTransformation"
+            type="de.lennartmeinhardt.android.moiree.MoireeTransformation"/>
+
+    </data>
+
+    <de.lennartmeinhardt.android.moiree.util.ForceChildrenSquareViewGroup
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cropChildren="false">
+
+        <include
+            layout="@layout/single_transformation_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:moireeTransformation="@{moireeTransformation}"
+            app:percentage="@{.0f}"/>
+
+        <include
+            layout="@layout/single_transformation_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:moireeTransformation="@{moireeTransformation}"
+            app:percentage="@{.2f}"/>
+
+        <include
+            layout="@layout/single_transformation_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:moireeTransformation="@{moireeTransformation}"
+            app:percentage="@{.4f}"/>
+
+        <include
+            layout="@layout/single_transformation_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:moireeTransformation="@{moireeTransformation}"
+            app:percentage="@{.6f}"/>
+
+        <include
+            layout="@layout/single_transformation_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:moireeTransformation="@{moireeTransformation}"
+            app:percentage="@{.8f}"/>
+
+        <include
+            layout="@layout/single_transformation_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:moireeTransformation="@{moireeTransformation}"
+            app:percentage="@{1f}"/>
+
+    </de.lennartmeinhardt.android.moiree.util.ForceChildrenSquareViewGroup>
+
+</layout>

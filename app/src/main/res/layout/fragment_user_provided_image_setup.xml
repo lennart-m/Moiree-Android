@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <import type="android.widget.ImageView.ScaleType"/>
+
+        <variable
+            name="busy"
+            type="boolean"/>
+
+        <variable
+            name="imageLoaded"
+            type="boolean"/>
+
+        <variable
+            name="userProvidedImageCreator"
+            type="de.lennartmeinhardt.android.moiree.imaging.UserProvidedImageCreator"/>
+    </data>
+
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/BaseMenuCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.lennartmeinhardt.android.moiree.util.ExpandableView
+            android:id="@+id/expandable_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <de.lennartmeinhardt.android.moiree.util.SimpleProgressHeader
+                    android:id="@id/expandable_view_header"
+                    style="@style/Clickable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:busy="@{busy}"
+                    app:title="@string/user_provided_image_title"/>
+
+                <RelativeLayout
+                    android:id="@id/expandable_view_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <de.lennartmeinhardt.android.moiree.util.ForceChildrenSquareViewGroup
+                        android:id="@+id/image_preview_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:layout_margin="10dp"
+                        android:visibility="@{imageLoaded ? View.VISIBLE : View.GONE}"
+                        app:cropChildren="false">
+
+                        <ImageView
+                            android:id="@+id/image_preview"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/preview_border"
+                            android:contentDescription="@string/accessibility_user_provided_image_preview"
+                            android:scaleType="@{userProvidedImageCreator.keepAspectRatio ? ScaleType.CENTER_CROP : ScaleType.FIT_XY}"/>
+
+                    </de.lennartmeinhardt.android.moiree.util.ForceChildrenSquareViewGroup>
+
+                    <CheckBox
+                        android:id="@+id/keep_aspect_ratio_checkbox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/image_preview_container"
+                        android:checked="@={userProvidedImageCreator.keepAspectRatio}"
+                        android:text="@string/keep_aspect_ratio"
+                        android:visibility="@{imageLoaded ? View.VISIBLE : View.GONE}"/>
+
+                    <Button
+                        android:id="@+id/load_image_button"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:enabled="@{! busy}"
+                        android:layout_below="@id/keep_aspect_ratio_checkbox"
+                        android:text="@string/load_image_button"/>
+
+                    <ImageButton
+                        android:id="@+id/delete_image_button"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/load_image_button"
+                        android:enabled="@{! busy}"
+                        android:layout_alignTop="@id/load_image_button"
+                        android:layout_alignBottom="@id/load_image_button"
+                        android:layout_toEndOf="@id/load_image_button"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/accessibility_delete_image"
+                        android:src="@drawable/ic_delete"
+                        android:visibility="@{imageLoaded ? View.VISIBLE : View.GONE}"/>
+
+                    <ImageButton
+                        android:id="@+id/show_info_button"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_alignTop="@id/load_image_button"
+                        android:layout_alignBottom="@id/load_image_button"
+                        android:layout_toRightOf="@id/delete_image_button"
+                        android:layout_toEndOf="@id/delete_image_button"
+                        android:adjustViewBounds="true"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/about_custom_images"
+                        android:src="@drawable/ic_info_light"/>
+
+                    <ImageButton
+                        android:id="@+id/create_button"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@id/keep_aspect_ratio_checkbox"
+                        android:contentDescription="@string/accessibility_create_image"
+                        android:enabled="@{imageLoaded &amp;&amp; ! busy}"
+                        android:visibility="@{imageLoaded ? View.VISIBLE : View.GONE}"
+                        android:src="@drawable/ic_checkmark"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </de.lennartmeinhardt.android.moiree.util.ExpandableView>
+
+    </android.support.v7.widget.CardView>
+
+</layout>

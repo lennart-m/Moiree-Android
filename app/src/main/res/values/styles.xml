@@ -1,7 +1,5 @@
 <resources>
 
-    <style name="Base" />
-
     <style name="BaseAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -13,17 +11,17 @@
 
     <style name="AppTheme" parent="BaseAppTheme"/>
 
-    <style name="Base.MainMenuButtonCard">
+    <style name="BaseMainMenuButtonCard">
         <item name="android:clickable">true</item>
         <item name="android:layout_marginLeft">3dp</item>
         <item name="android:layout_marginRight">3dp</item>
         <item name="android:focusable">true</item>
-        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
         <item name="cardUseCompatPadding">true</item>
         <item name="cardPreventCornerOverlap">false</item>
     </style>
 
-    <style name="MainMenuButtonCard" parent="Base.MainMenuButtonCard"/>
+    <style name="MainMenuButtonCard" parent="BaseMainMenuButtonCard"/>
 
     <style name="BaseMenuCard">
         <item name="contentPadding">10dp</item>
@@ -86,11 +84,21 @@
     <style name="Divider.Horizontal">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
-        <item name="android:layout_marginTop">10dp</item>
-        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_marginTop">@dimen/divider_margins</item>
+        <item name="android:layout_marginBottom">@dimen/divider_margins</item>
     </style>
 
-    <style name="ClickableHeader">
+    <style name="Base.Divider.Vertical" parent="Divider">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="Divider.Vertical" parent="Base.Divider.Vertical">
+        <item name="android:layout_marginLeft">@dimen/divider_margins</item>
+        <item name="android:layout_marginRight">@dimen/divider_margins</item>
+    </style>
+
+    <style name="Clickable">
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
         <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
@@ -128,6 +136,28 @@
         <item name="maxValue">@integer/sensitivity_max_percents</item>
     </style>
 
-    <style name="ColorPreviewHeader" parent="ClickableHeader"/>
+    <style name="ColorPreviewHeader" parent="Clickable"/>
+
+    <style name="NoDataText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">30dp</item>
+        <item name="android:text">@string/no_transformations_stored_placeholder</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
+    </style>
+
+    <style name="BusyIndicator">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_margin">30dp</item>
+        <item name="android:indeterminate">true</item>
+    </style>
+
+    <style name="LoadMoireeColorsMenu" parent="RootMenuCard.SingleColumn"/>
+
+    <style name="LoadMoireeTransformationMenu" parent="RootMenuCard.SingleColumn"/>
 
 </resources>

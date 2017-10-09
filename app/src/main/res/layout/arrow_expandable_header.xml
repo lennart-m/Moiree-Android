@@ -4,14 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="LinearLayout"
+    tools:ignore="UseCompoundDrawables"
     tools:orientation="horizontal"
-    tools:ignore="UseCompoundDrawables">
+    tools:parentTag="LinearLayout">
 
     <TextView
         android:id="@+id/header_title"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_marginEnd="@dimen/header_spacing"
+        android:layout_marginRight="@dimen/header_spacing"
         android:layout_weight="1"
         android:gravity="center_vertical"
         tools:text="Title"/>

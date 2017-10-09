@@ -40,7 +40,7 @@
 
                     <include
                         android:id="@+id/foreground_color_setup_card"
-                        layout="@layout/color_setup_card"
+                        layout="@layout/card_color_setup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:color="@={moireeColors.foregroundColor}"
@@ -48,7 +48,7 @@
 
                     <include
                         android:id="@+id/background_color_setup_card"
-                        layout="@layout/color_setup_card"
+                        layout="@layout/card_color_setup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:color="@={moireeColors.backgroundColor}"

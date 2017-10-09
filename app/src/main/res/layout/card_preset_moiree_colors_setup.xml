@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <import type="de.lennartmeinhardt.android.moiree.util.Expandable"/>
+
+        <variable
+            name="expanded"
+            type="boolean"/>
+
+    </data>
+
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/BaseMenuCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.lennartmeinhardt.android.moiree.util.ExpandableView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:expanded="@{expanded}">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <de.lennartmeinhardt.android.moiree.util.ArrowExpandableHeader
+                    style="@style/Clickable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{v -> ((Expandable) v).toggleExpanded()}"
+                    app:expanded="@={expanded}"
+                    app:title="@string/preset_colors"/>
+
+                <FrameLayout
+                    android:id="@id/expandable_view_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/header_content_margin">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/preset_colors_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"/>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+        </de.lennartmeinhardt.android.moiree.util.ExpandableView>
+
+    </android.support.v7.widget.CardView>
+
+</layout>

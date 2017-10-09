@@ -1,6 +1,8 @@
 package de.lennartmeinhardt.android.moiree;
 
 import android.databinding.DataBindingUtil;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -66,9 +68,20 @@ public class MoireeViewFragment extends Fragment {
         return binding.moireeImageFixed.getHeight();
     }
 
+    public void drawMoireeImageToCanvas(Canvas canvas) {
+        canvas.drawColor(binding.getMoireeColors().backgroundColor.get());
+
+        canvas.save();
+        binding.moireeImageFixed.draw(canvas);
+        Matrix matrix = binding.moireeImageTransformed.getMatrix();
+        canvas.setMatrix(matrix);
+        binding.moireeImageTransformed.draw(canvas);
+        canvas.restore();
+    }
+
     public void setMoireeViewsVisible(boolean visible) {
         /*
-         * This could has been tested using binding as well; however it's buggy.
+         * This could have been done using binding as well; however it's buggy.
          * In a previous version the binding contained boolean moireeViewsVisible and the image views' visibility was bound like this
          * android:visibility="@{moireeViewsVisible ? View.VISIBLE : View.INVISIBLE}"
          * However, when using transitions (Fade.OUT followed by Fade.IN) the visibility was still set to invisible, after both transitions ran.

@@ -1,9 +1,7 @@
 package de.lennartmeinhardt.android.moiree.menu.imagesetup;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import de.lennartmeinhardt.android.moiree.MoireeImaging;
@@ -18,16 +16,8 @@ import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
  */
 abstract class BaseImageCreatorSetupFragment <C extends MoireeImageCreator> extends MenuFragment {
 
-    private SharedPreferences preferences;
-
     private C imageCreator;
 
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

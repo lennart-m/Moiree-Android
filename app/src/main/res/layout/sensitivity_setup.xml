@@ -12,8 +12,12 @@
             type="String"/>
 
         <variable
-            name="sensitivity"
-            type="float"/>
+            name="sensitivityPercents"
+            type="int"/>
+
+        <variable
+            name="defaultSensitivityPercents"
+            type="int"/>
 
         <variable
             name="inputMethodEnabled"
@@ -67,13 +71,14 @@
                     android:layout_height="wrap_content"
                     android:saveEnabled="false"
                     app:name="@string/input_sensitivity_name"
-                    app:value="@={(int) (sensitivity * 100)}"/>
+                    app:value="@={sensitivityPercents}"/>
 
                 <Button
                     android:id="@+id/reset_button"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:enabled="@{sensitivityPercents != defaultSensitivityPercents}"
                     android:layout_gravity="end"
                     android:text="@string/reset"/>
 

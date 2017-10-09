@@ -35,7 +35,7 @@
                 android:orientation="vertical">
 
                 <de.lennartmeinhardt.android.moiree.util.ArrowExpandableHeader
-                    style="@style/ClickableHeader"
+                    style="@style/Clickable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="@{v -> ((Expandable) v).toggleExpanded()}"

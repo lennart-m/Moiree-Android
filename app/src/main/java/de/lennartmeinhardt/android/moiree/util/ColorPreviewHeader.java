@@ -34,8 +34,8 @@ public class ColorPreviewHeader extends LinearLayout {
         inflate(context, R.layout.header_with_preview, this);
         setOrientation(HORIZONTAL);
 
-        this.titleView = (TextView) findViewById(R.id.header_title);
-        this.previewImageView = (ImageView) findViewById(R.id.header_preview);
+        this.titleView = findViewById(R.id.header_title);
+        this.previewImageView = findViewById(R.id.header_preview);
 
         if(attrs != null)
             readAttributes(context, attrs);

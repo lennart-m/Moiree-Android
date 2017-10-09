@@ -27,7 +27,8 @@
         <de.lennartmeinhardt.android.moiree.util.ForceChildrenSquareViewGroup
             android:id="@+id/image_views_holder"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            app:cropChildren="true">
 
             <ImageView
                 android:id="@+id/moiree_image_fixed"

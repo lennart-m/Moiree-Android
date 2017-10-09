@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="MainMenuButtonCard" parent="Base.MainMenuButtonCard">
+    <style name="MainMenuButtonCard" parent="BaseMainMenuButtonCard">
         <item name="android:stateListAnimator">@animator/lift_on_touch</item>
     </style>
 

@@ -1,9 +1,13 @@
 package de.lennartmeinhardt.android.moiree.menu;
 
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +15,16 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 
+import de.lennartmeinhardt.android.moiree.MoireeImaging;
 import de.lennartmeinhardt.android.moiree.R;
 import de.lennartmeinhardt.android.moiree.imaging.CheckerboardImageCreator;
+import de.lennartmeinhardt.android.moiree.menu.color.MoireeColorsSetupMenu;
 import de.lennartmeinhardt.android.moiree.menu.settings.SettingsMenu;
 import de.lennartmeinhardt.android.moiree.menu.transformation.TransformationSetupMenu;
+import de.lennartmeinhardt.android.moiree.util.SharingUtil;
 
 public class MainMenu extends MenuFragment {
+
 
     @Nullable
     @Override
@@ -32,12 +40,13 @@ public class MainMenu extends MenuFragment {
         initializeSettingsButton(view);
         initializeHelpButton(view);
         initializeAboutButton(view);
+        initializeExportButton(view);
     }
 
     private void initializeMoireeImageButton(View root) {
-        final CardView moireeImageCard = (CardView) root.findViewById(R.id.main_menu_moiree_image_card);
-        final ImageView moireeImageBackgroundView1 = (ImageView) moireeImageCard.findViewById(R.id.main_menu_moiree_image_background1);
-        final ImageView moireeImageBackgroundView2 = (ImageView) moireeImageCard.findViewById(R.id.main_menu_image_background2);
+        final CardView moireeImageCard = root.findViewById(R.id.main_menu_moiree_image_card);
+        final ImageView moireeImageBackgroundView1 = moireeImageCard.findViewById(R.id.main_menu_moiree_image_background1);
+        final ImageView moireeImageBackgroundView2 = moireeImageCard.findViewById(R.id.main_menu_image_background2);
 
         final int tileSize = getResources().getDimensionPixelSize(R.dimen.moiree_image_button_tile_size);
 
@@ -65,27 +74,27 @@ public class MainMenu extends MenuFragment {
         moireeImageCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getMenuHolderFragment().openMenuFragment(new ImageSetupMenu(), "moireeImageSetup");
+                getMenuHolder().openMenuFragment(new ImageSetupMenu(), "moireeImageSetup");
             }
         });
     }
 
     private void initializeColorSetupButton(View root) {
-        CardView colorSetupCard = (CardView) root.findViewById(R.id.main_menu_colors_card);
+        CardView colorSetupCard = root.findViewById(R.id.main_menu_colors_card);
         colorSetupCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getMenuHolderFragment().openMenuFragment(new MoireeColorsSetupMenu(), "moireeColorsSetup");
+                getMenuHolder().openMenuFragment(new MoireeColorsSetupMenu(), "moireeColorsSetup");
             }
         });
     }
 
     private void initializeTransformationButton(View root) {
-        CardView moireeTransformationSetupButton = (CardView) root.findViewById(R.id.main_menu_transformation_card);
+        CardView moireeTransformationSetupButton = root.findViewById(R.id.main_menu_transformation_card);
         moireeTransformationSetupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getMenuHolderFragment().openMenuFragment(new TransformationSetupMenu(), "moireeTransformationSetup");
+                getMenuHolder().openMenuFragment(new TransformationSetupMenu(), "moireeTransformationSetup");
             }
         });
     }
@@ -94,7 +103,7 @@ public class MainMenu extends MenuFragment {
         root.findViewById(R.id.main_menu_settings).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getMenuHolderFragment().openMenuFragment(new SettingsMenu(), "inputSettings");
+                getMenuHolder().openMenuFragment(new SettingsMenu(), "inputSettings");
             }
         });
     }
@@ -103,7 +112,7 @@ public class MainMenu extends MenuFragment {
         root.findViewById(R.id.main_menu_help).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getMenuHolderFragment().openMenuFragment(new HelpMenu(), "help");
+                getMenuHolder().openMenuFragment(new HelpMenu(), "help");
             }
         });
     }
@@ -112,8 +121,41 @@ public class MainMenu extends MenuFragment {
         root.findViewById(R.id.main_menu_about).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getMenuHolderFragment().openMenuFragment(new AboutMenu(), "about");
+                getMenuHolder().openMenuFragment(new AboutMenu(), "about");
             }
         });
+    }
+
+    private void initializeExportButton(View root) {
+        root.findViewById(R.id.main_menu_export).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openExportDialog();
+            }
+        });
+    }
+
+    private void openExportDialog() {
+        MoireeImaging moireeImagingActivity = (MoireeImaging) getActivity();
+
+        final Bitmap image = Bitmap.createBitmap(moireeImagingActivity.getMoireeImageWidth(), moireeImagingActivity.getMoireeImageHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(image);
+        moireeImagingActivity.drawMoireeImageToCanvas(canvas);
+
+        View previewRoot = getLayoutInflater().inflate(R.layout.dialog_share, null, false);
+        ImageView preview = previewRoot.findViewById(R.id.image_preview);
+        preview.setImageBitmap(image);
+
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.share_image)
+                .setView(previewRoot)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        SharingUtil.saveAndShareImage(getContext(), image);
+                    }
+                })
+                .show();
     }
 }

@@ -58,6 +58,20 @@
                     android:layout_height="wrap_content"
                     tools:layout="@layout/fragment_triangle_image_setup"/>
 
+                <fragment
+                    android:id="@+id/concentric_circles_image_setup"
+                    android:name="de.lennartmeinhardt.android.moiree.menu.imagesetup.ConcentricCirclesImageSetupFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:layout="@layout/fragment_concentric_circles_image_setup"/>
+
+                <fragment
+                    android:id="@+id/user_provided_image_setup"
+                    android:name="de.lennartmeinhardt.android.moiree.menu.imagesetup.UserProvidedImageSetupFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:layout="@layout/fragment_user_provided_image_setup"/>
+
             </LinearLayout>
 
         </ScrollView>

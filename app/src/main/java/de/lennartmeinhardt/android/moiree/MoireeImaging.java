@@ -1,5 +1,6 @@
 package de.lennartmeinhardt.android.moiree;
 
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 
 import de.lennartmeinhardt.android.moiree.imaging.MoireeImageCreator;
@@ -16,5 +17,7 @@ public interface MoireeImaging extends ImageCreatorHolder {
     void onBeforeCreatingMoireeImage();
 
     void setImageCreatorAndRecreateImage(MoireeImageCreator imageCreator);
+
+    void drawMoireeImageToCanvas(Canvas canvas);
 
 }

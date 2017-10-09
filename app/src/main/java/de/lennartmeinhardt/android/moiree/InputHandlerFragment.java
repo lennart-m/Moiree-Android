@@ -1,11 +1,8 @@
 package de.lennartmeinhardt.android.moiree;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,16 +13,15 @@ import android.view.ViewGroup;
 import de.lennartmeinhardt.android.moiree.gesture.AngleDetector;
 import de.lennartmeinhardt.android.moiree.gesture.DistanceDetector;
 import de.lennartmeinhardt.android.moiree.gesture.PositionDetector;
+import de.lennartmeinhardt.android.moiree.menu.MenuFragment;
 import de.lennartmeinhardt.android.moiree.menu.MenuHolder;
 
-public class InputHandlerFragment extends Fragment {
+public class InputHandlerFragment extends MenuFragment {
 
     private MenuHolder menuHolder;
 
-    private SharedPreferences preferences;
-
     private MoireeTransformation moireeTransformation;
-    private MoireeInputMethods moireeInputMethods;
+    private final MoireeInputMethods moireeInputMethods = new MoireeInputMethods();
 
 
     private final DistanceDetector commonScalingDetector = new DistanceDetector(new DistanceDetector.DistanceListener.Adapter() {
@@ -71,23 +67,36 @@ public class InputHandlerFragment extends Fragment {
     private final PositionDetector translationDetector = new PositionDetector(new PositionDetector.PositionListener.Adapter() {
         private float startX, startY;
         private float startTranslationX, startTranslationY;
+        private boolean thresholdReached;
 
         @Override
         public void onGestureStarted(float startX, float startY) {
             this.startX = startX;
             this.startY = startY;
-            startTranslationX = moireeTransformation.translationX.get();
-            startTranslationY = moireeTransformation.translationY.get();
+            thresholdReached = false;
         }
 
         @Override
         public void onPositionChanged(float newX, float newY) {
             if(moireeInputMethods.translationInputEnabled.get()) {
-                float newTranslationX = startTranslationX + moireeInputMethods.translationSensitivity.get() * (newX - startX);
-                moireeTransformation.translationX.set(newTranslationX);
-                // reverse y translation because bottom > top in android's coordinate system
-                float newTranslationY = startTranslationY - moireeInputMethods.translationSensitivity.get() * (newY - startY);
-                moireeTransformation.translationY.set(newTranslationY);
+                float dx = newX - startX;
+                float dy = newY - startY;
+                double distanceToStart = Math.sqrt(dx * dx + dy * dy);
+
+                if(distanceToStart >= moireeInputMethods.translationDistanceThreshold.get()
+                        && ! thresholdReached) {
+                    thresholdReached = true;
+                    startX = newX;
+                    startY = newY;
+                    startTranslationX = moireeTransformation.translationX.get();
+                    startTranslationY = moireeTransformation.translationY.get();
+                } else if(thresholdReached) {
+                    float newTranslationX = startTranslationX + moireeInputMethods.translationSensitivity.get() * dx;
+                    moireeTransformation.translationX.set(newTranslationX);
+                    // reverse y translation because bottom > top in android's coordinate system
+                    float newTranslationY = startTranslationY - moireeInputMethods.translationSensitivity.get() * dy;
+                    moireeTransformation.translationY.set(newTranslationY);
+                }
             }
         }
     });
@@ -139,28 +148,20 @@ public class InputHandlerFragment extends Fragment {
 
         private int sixteenthPartOfCircle(float degrees) {
             int sixteenthPart = (int) Math.floor(16 * degrees / 360);
-            return mMod(sixteenthPart, 16);
+            return mMod16(sixteenthPart);
         }
 
-        private int mMod(int value, int mod) {
-            return (mod + value % mod) % mod;
+        private int mMod16(int value) {
+            return (16 + value % 16) % 16;
         }
     });
 
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int defaultSensitivityPercents = getResources().getInteger(R.integer.sensitivity_default_percents);
-        moireeInputMethods = new MoireeInputMethods(true, defaultSensitivityPercents / 100f);
+        moireeInputMethods.loadFromResources(getResources());
         moireeInputMethods.loadFromPreferences(preferences);
     }
 
@@ -234,8 +235,8 @@ public class InputHandlerFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
 
         SharedPreferences.Editor preferencesEditor = preferences.edit();
         moireeInputMethods.storeToPreferences(preferencesEditor);

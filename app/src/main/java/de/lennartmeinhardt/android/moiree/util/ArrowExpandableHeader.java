@@ -40,8 +40,8 @@ public class ArrowExpandableHeader extends LinearLayout implements Expandable {
 
         setOrientation(HORIZONTAL);
 
-        titleView = (TextView) findViewById(R.id.header_title);
-        expandedIndicatorView = (ImageView) findViewById(R.id.header_expanded_indicator);
+        titleView = findViewById(R.id.header_title);
+        expandedIndicatorView = findViewById(R.id.header_expanded_indicator);
 
         this.collapsedIndicatorRotationDegrees = context.getResources().getInteger(R.integer.indicator_arrow_collapsed_rotation);
 

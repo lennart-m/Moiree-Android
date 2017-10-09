@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="LoadMoireeColorsMenu" parent="RootMenuCard.TwoColumns"/>
+
+    <style name="LoadMoireeTransformationMenu" parent="RootMenuCard.TwoColumns"/>
+
+    <style name="ColorPreviewHeader"/>
+
+</resources>

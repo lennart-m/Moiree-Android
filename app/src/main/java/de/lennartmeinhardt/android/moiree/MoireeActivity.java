@@ -2,6 +2,7 @@ package de.lennartmeinhardt.android.moiree;
 
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,8 +58,8 @@ public class MoireeActivity extends AppCompatActivity implements
 
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
 
         SharedPreferences.Editor preferencesEditor = preferences.edit();
         preferencesEditor.putBoolean(KEY_FIRST_START, false);
@@ -88,11 +89,12 @@ public class MoireeActivity extends AppCompatActivity implements
         ActivityMoireeBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_moiree);
 
         decorView = getWindow().getDecorView();
-        rootView = (ViewGroup) findViewById(android.R.id.content);
+        rootView = findViewById(android.R.id.content);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        moireeTransformation = MoireeTransformation.loadDefaultTransformationFromResources(getResources());
+        moireeTransformation = new MoireeTransformation();
+        moireeTransformation.loadDefaultValuesFromResources(getResources());
         binding.setMoireeTransformation(moireeTransformation);
         moireeTransformation.loadFromPreferences(preferences);
         initializeMoireeColors(preferences);
@@ -298,6 +300,11 @@ public class MoireeActivity extends AppCompatActivity implements
     @Override
     public int getMoireeImageHeight() {
         return moireeViewFragment.getMoireeImageHeight();
+    }
+
+    @Override
+    public void drawMoireeImageToCanvas(Canvas canvas) {
+        moireeViewFragment.drawMoireeImageToCanvas(canvas);
     }
 
     @Override

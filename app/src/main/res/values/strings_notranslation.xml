@@ -5,6 +5,8 @@
     <string name="degrees_formatter" translatable="false">%1$d\u2009°</string>
     <string name="integer_pixel_formatter" translatable="false">%1$d\u2009px</string>
     <string name="percentage_formatter" translatable="false">%1$d\u2009%%</string>
+    <!--<string name="rgb_formatter" translatable="false">rgb(%1$d, %2$d, %3$d)</string>-->
+    <string name="hex_formatter" translatable="false">#%1$s</string>
 
     <!-- help and about menus -->
     <string name="email_address" translatable="false">lennart.meinhardt+moireeandroid@googlemail.com</string>

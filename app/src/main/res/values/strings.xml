@@ -4,13 +4,27 @@
 
     <!-- common -->
     <string name="reset">Reset</string>
+    <string name="revert">Revert</string>
     <string name="accessibility_increase">Increase</string>
     <string name="accessibility_decrease">Decrease</string>
+    <string name="form_label_name">Name:</string>
+    <string name="save">Save</string>
 
     <!-- colors setup -->
     <string name="swap_colors">Swap</string>
     <string name="background">Background color</string>
     <string name="foreground">Foreground color</string>
+    <string name="accessibility_edit_color_button">Custom values</string>
+    <string name="label_color_value">Color value</string>
+    <string name="hint_color_input">Hex code</string>
+    <string name="custom_color">Custom color</string>
+    <string name="input_error">Input error</string>
+    <string name="message_color_input_error">Please enter a hex code of 3 or 6 digits.</string>
+    <string name="delete_colors">Delete colors</string>
+    <string name="save_colors">Save colors</string>
+    <string name="load_colors">Load colors</string>
+    <string name="custom_colors">Custom colors</string>
+    <string name="preset_colors">Preset colors</string>
 
     <!-- menu names and titles -->
     <string name="menu_image">Image</string>
@@ -44,14 +58,30 @@
     <string name="checkerboard_title">Checkerboard</string>
     <string name="random_pixels_title">Random pixels</string>
     <string name="size">Size</string>
-    <string name="horizontal_lines_title">Horizontal lines</string>
+    <string name="horizontal_lines_title">Lines</string>
+    <string name="concentric_circles_title">Circles</string>
     <string name="triangles_title">Triangles</string>
     <string name="thickness">Thickness</string>
+    <string name="error_msg_load_image">The image could not be loaded</string>
+    <!-- user provided image -->
+    <string name="user_provided_image_title">Custom image</string>
+    <string name="keep_aspect_ratio">Keep aspect ratio</string>
+    <string name="load_image_button">Open</string>
+    <string name="accessibility_user_provided_image_preview">Loaded image preview</string>
+    <string name="accessibility_delete_image">Delete image</string>
+    <string name="about_custom_images">About custom images</string>
+    <string name="user_provided_image_help_title">Help</string>
+    <string name="user_provided_image_help_message">You can create Moir\u00e9 patterns using your own images as source. However, if you use a custom image it must have transparency in it in order to see any patterns. Any opaque parts of the image will be replaced by the Moir\u00e9 foreground color.</string>
+    <string name="title_confirm_delete_user_provided_image">Delete image?</string>
+    <string name="message_confirm_delete_user_provided_image">The original image will not be deleted.</string>
 
     <!-- transformation setup -->
-    <string name="set_transformation_to_identity">Set to identity</string>
+    <string name="set_transformation_to_identity">Reset all</string>
     <string name="horizontal">Horizontal</string>
     <string name="vertical">Vertical</string>
+    <string name="save_transformation">Save transformation</string>
+    <string name="load_transformation">Load transformation</string>
+    <string name="delete_transformation">Delete transformation</string>
 
     <string name="degrees">Degrees</string>
     <string name="rotation">Rotation</string>
@@ -68,6 +98,10 @@
     <string name="use_common_scaling">Scale x and y equally</string>
     <string name="common_scaling">Common scaling</string>
 
+    <!-- load transformation -->
+    <string name="saved_transformations">Saved transformations</string>
+    <string name="no_transformations_stored_placeholder">There are no transformations saved.</string>
+
     <!-- help and about menus -->
     <string name="help_introduction">With this app you can create Moiré patterns by overlaying two identical images, and applying a transformation (rotation, scaling, translation) to one of them.</string>
     <string name="help_inspiration">This app was inspired by Numberphile\'s \"Freaky Dot Patterns\" video.</string>
@@ -80,5 +114,18 @@
     <string name="view_source_code">View source code</string>
     <string name="view_desktop_version">View desktop version</string>
     <string name="about_desktop_version">I made a similar version of this app for desktop computers.</string>
+
+    <!-- export iamge -->
+    <string name="shared_image_title">Moir\u00e9</string>
+    <string name="share">Share</string>
+    <string name="share_image">Share image</string>
+
+    <!-- preset color names -->
+    <string name="preset_color_red_yellow">Red / yellow</string>
+    <string name="preset_color_gold_blue">Gold / blue</string>
+    <string name="preset_color_blue_green">Blue / green</string>
+    <string name="preset_color_black_white">Black / white</string>
+    <string name="preset_color_blue_beige">Blue / beige</string>
+    <string name="preset_color_logo">Logo colors</string>
 
 </resources>

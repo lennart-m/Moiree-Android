@@ -33,7 +33,7 @@
                 android:orientation="vertical">
 
                 <de.lennartmeinhardt.android.moiree.util.ArrowExpandableHeader
-                    style="@style/ClickableHeader"
+                    style="@style/Clickable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="@{v -> ((Expandable) v).toggleExpanded()}"
@@ -51,9 +51,10 @@
                         layout="@layout/sensitivity_setup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:defaultSensitivityPercents="@{@integer/rotation_sensitivity_default_percents}"
                         app:description="@{@string/rotation_input_description}"
                         app:inputMethodEnabled="@={moireeInputMethods.rotationInputEnabled}"
-                        app:sensitivity="@={moireeInputMethods.rotationSensitivity}"
+                        app:sensitivityPercents="@={(int) (moireeInputMethods.rotationSensitivity * 100f)}"
                         app:title="@{@string/rotation_input_name}"/>
 
                     <View style="@style/Divider.Horizontal"/>
@@ -63,9 +64,10 @@
                         layout="@layout/sensitivity_setup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:defaultSensitivityPercents="@{@integer/scaling_sensitivity_default_percents}"
                         app:description="@{@string/scaling_input_description}"
                         app:inputMethodEnabled="@={moireeInputMethods.scalingInputEnabled}"
-                        app:sensitivity="@={moireeInputMethods.scalingSensitivity}"
+                        app:sensitivityPercents="@={(int) (moireeInputMethods.scalingSensitivity * 100)}"
                         app:title="@{@string/scaling_input_name}"/>
 
                     <View style="@style/Divider.Horizontal"/>
@@ -75,9 +77,10 @@
                         layout="@layout/sensitivity_setup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:defaultSensitivityPercents="@{@integer/translation_sensitivity_default_percents}"
                         app:description="@{@string/translation_input_description}"
                         app:inputMethodEnabled="@={moireeInputMethods.translationInputEnabled}"
-                        app:sensitivity="@={moireeInputMethods.translationSensitivity}"
+                        app:sensitivityPercents="@={(int) (moireeInputMethods.translationSensitivity * 100)}"
                         app:title="@{@string/translation_input_name}"/>
 
                 </LinearLayout>

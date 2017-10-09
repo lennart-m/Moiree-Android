@@ -1,9 +1,6 @@
 package de.lennartmeinhardt.android.moiree.menu.settings;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,17 +15,8 @@ public class SettingsMenu extends MenuFragment {
 
     private static final String KEY_INPUT_METHODS_EXPANDED = "settingsFragment:inputMethodsExpanded";
 
-    private SharedPreferences preferences;
-
     private InputMethodsSetupFragment inputMethodsSetupFragment;
 
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
-    }
 
     @Nullable
     @Override
@@ -43,13 +31,13 @@ public class SettingsMenu extends MenuFragment {
         if(savedInstanceState == null)
             inputMethodsSetupFragment.setExpanded(preferences.getBoolean(KEY_INPUT_METHODS_EXPANDED, false));
 
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
 
         preferences.edit().putBoolean(KEY_INPUT_METHODS_EXPANDED, inputMethodsSetupFragment.isExpanded()).apply();
     }

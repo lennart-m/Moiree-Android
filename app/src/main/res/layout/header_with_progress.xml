@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="LinearLayout">
+
+    <TextView
+        android:id="@+id/header_title"
+        android:layout_width="0dp"
+        android:layout_marginRight="@dimen/header_spacing"
+        android:layout_marginEnd="@dimen/header_spacing"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        tools:text="Title"/>
+
+    <ProgressBar
+        android:id="@+id/header_progress"
+        android:layout_width="@dimen/header_preview_width"
+        android:layout_height="@dimen/header_preview_height"
+        android:indeterminate="true"/>
+
+</merge>

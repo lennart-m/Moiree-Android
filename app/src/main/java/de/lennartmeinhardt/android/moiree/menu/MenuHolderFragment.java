@@ -23,7 +23,7 @@ public class MenuHolderFragment extends Fragment implements MenuTransparencyConf
 
     private SharedPreferences preferences;
 
-    private FrameLayout menuHolder;
+    private FrameLayout menuRoot;
 
     private OnMenuStatusChangedListener onMenuStatusChangedListener;
 
@@ -69,7 +69,7 @@ public class MenuHolderFragment extends Fragment implements MenuTransparencyConf
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        this.menuHolder = (FrameLayout) view.findViewById(R.id.menu_holder);
+        this.menuRoot = view.findViewById(R.id.menu_holder);
     }
 
     @Override
@@ -80,16 +80,16 @@ public class MenuHolderFragment extends Fragment implements MenuTransparencyConf
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
 
         SharedPreferences.Editor preferencesEditor = preferences.edit();
         menuTransparencyConfig.storeToPreferences(preferencesEditor);
         preferencesEditor.apply();
     }
 
-    public ViewGroup getMenuHolder() {
-        return menuHolder;
+    public ViewGroup getMenuRoot() {
+        return menuRoot;
     }
 
     @Override

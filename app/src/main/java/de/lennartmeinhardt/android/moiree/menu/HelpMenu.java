@@ -23,7 +23,7 @@ public class HelpMenu extends MenuFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Button watchVideoButton = (Button) view.findViewById(R.id.watch_video);
+        Button watchVideoButton = view.findViewById(R.id.watch_video);
         watchVideoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -31,7 +31,7 @@ public class HelpMenu extends MenuFragment {
             }
         });
 
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 

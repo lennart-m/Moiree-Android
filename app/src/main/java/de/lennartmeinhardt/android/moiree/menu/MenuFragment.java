@@ -1,5 +1,8 @@
 package de.lennartmeinhardt.android.moiree.menu;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.transition.Transition;
 import android.support.transition.TransitionManager;
 import android.support.transition.TransitionSet;
@@ -15,12 +18,22 @@ import de.lennartmeinhardt.android.moiree.transition.UiChangeTransition;
  */
 public abstract class MenuFragment extends Fragment {
 
+    protected SharedPreferences preferences;
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
     /**
      * Get the first parent (or parents' parent) {@link MenuHolderFragment} to which this fragment is attached.
      *
      * @return an instance of some parent {@link MenuHolderFragment}, or null.
      */
-    protected MenuHolderFragment getMenuHolderFragment() {
+    protected MenuHolderFragment getMenuHolder() {
         Fragment current = this;
         while(current != null) {
             if(current instanceof MenuHolderFragment)
@@ -44,7 +57,7 @@ public abstract class MenuFragment extends Fragment {
      * @param transition the transition to start
      */
     protected void beginMenuTransition(Transition transition) {
-        ViewGroup root = getMenuHolderFragment().getMenuHolder();
+        ViewGroup root = getMenuHolder().getMenuRoot();
         TransitionManager.beginDelayedTransition(root, transition);
     }
 

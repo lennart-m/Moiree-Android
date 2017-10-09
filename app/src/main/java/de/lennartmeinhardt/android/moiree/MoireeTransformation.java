@@ -7,6 +7,7 @@ import android.databinding.Bindable;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableFloat;
+import android.os.Bundle;
 
 import de.lennartmeinhardt.android.moiree.util.PreferenceIO;
 
@@ -119,11 +120,9 @@ public class MoireeTransformation extends BaseObservable implements PreferenceIO
 	}
 
 
-	public static MoireeTransformation loadDefaultTransformationFromResources(Resources resources) {
-		MoireeTransformation transformation = new MoireeTransformation();
-
+	public void loadDefaultValuesFromResources(Resources resources) {
 		float defaultRotation = 1f * resources.getInteger(R.integer.default_transformation_rotation_degrees);
-		transformation.rotation.set(defaultRotation);
+		rotation.set(defaultRotation);
 
 		int defaultCommonScalingPercents = resources.getInteger(R.integer.default_transformation_common_scaling_percents);
 		int defaultScalingXPercents = resources.getInteger(R.integer.default_transformation_scaling_x_percents);
@@ -131,19 +130,38 @@ public class MoireeTransformation extends BaseObservable implements PreferenceIO
 		float defaultCommonScaling = defaultCommonScalingPercents / 100f;
 		float defaultScalingX = defaultScalingXPercents / 100f;
 		float defaultScalingY = defaultScalingYPercents / 100f;
-		transformation.commonScaling.set(defaultCommonScaling);
-		transformation.scalingX.set(defaultScalingX);
-		transformation.scalingY.set(defaultScalingY);
+		commonScaling.set(defaultCommonScaling);
+		scalingX.set(defaultScalingX);
+		scalingY.set(defaultScalingY);
 
 		float defaultTranslationX = resources.getInteger(R.integer.default_transformation_translation_x_pixels);
 		float defaultTranslationY = resources.getInteger(R.integer.default_transformation_translation_y_pixels);
-		transformation.translationX.set(defaultTranslationX);
-		transformation.translationY.set(defaultTranslationY);
+		translationX.set(defaultTranslationX);
+		translationY.set(defaultTranslationY);
 
 		boolean defaultUseCommonScaling = resources.getBoolean(R.bool.default_transformation_use_common_scaling);
-		transformation.useCommonScaling.set(defaultUseCommonScaling);
+		useCommonScaling.set(defaultUseCommonScaling);
+	}
 
-		return transformation;
+	public void storeToBundle(Bundle outBundle) {
+		outBundle.putFloat(KEY_ROTATION, rotation.get());
+		outBundle.putFloat(KEY_TRANSLATION_X, translationX.get());
+		outBundle.putFloat(KEY_TRANSLATION_Y, translationY.get());
+		outBundle.putFloat(KEY_COMMON_SCALING, commonScaling.get());
+		outBundle.putFloat(KEY_SCALING_X, scalingX.get());
+		outBundle.putFloat(KEY_SCALING_Y, scalingY.get());
+		outBundle.putBoolean(KEY_USE_COMMON_SCALING, useCommonScaling.get());
+	}
+
+	// TODO in bibliothek auslagern
+	public void readFromBundle(Bundle srcBundle) {
+		rotation.set(srcBundle.getFloat(KEY_ROTATION, rotation.get()));
+		commonScaling.set(srcBundle.getFloat(KEY_COMMON_SCALING, commonScaling.get()));
+		scalingX.set(srcBundle.getFloat(KEY_SCALING_X, scalingX.get()));
+		scalingY.set(srcBundle.getFloat(KEY_SCALING_Y, scalingY.get()));
+		translationX.set(srcBundle.getFloat(KEY_TRANSLATION_X, translationX.get()));
+		translationY.set(srcBundle.getFloat(KEY_TRANSLATION_Y, translationY.get()));
+		useCommonScaling.set(srcBundle.getBoolean(KEY_USE_COMMON_SCALING, useCommonScaling.get()));
 	}
 
 

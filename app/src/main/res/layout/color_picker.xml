@@ -5,42 +5,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:layout_height="match_parent"
     tools:layout_width="match_parent"
-    tools:parentTag="RelativeLayout">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_alignParentBottom="true">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@null"
-            android:scaleType="centerCrop"
-            android:src="@drawable/rainbow"/>
-
-    </FrameLayout>
-
-    <de.lennartmeinhardt.android.moiree.util.SeekPane
-        android:id="@+id/hue_selection"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_alignParentBottom="true"
-        app:maxX="360"
-        app:maxY="0"
-        app:stepX="10"
-        app:thumbDrawable="@drawable/thumb_rect"/>
+    tools:parentTag="LinearLayout">
 
     <de.lennartmeinhardt.android.moiree.util.SeekPane
         android:id="@+id/sat_val_selection"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/hue_selection"
+        android:layout_height="0dp"
         android:layout_marginBottom="20dp"
+        android:layout_weight="1"
         app:maxX="300"
         app:maxY="300"
         app:stepX="10"
         app:stepY="10"
         tools:background="@drawable/sat_val_mask"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:clipChildren="false">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:src="@drawable/rainbow"/>
+
+        </FrameLayout>
+
+        <de.lennartmeinhardt.android.moiree.util.SeekPane
+            android:id="@+id/hue_selection"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:maxX="360"
+            app:maxY="0"
+            app:stepX="10"
+            app:thumbDrawable="@drawable/thumb_rect"/>
+
+    </FrameLayout>
 
 </merge>

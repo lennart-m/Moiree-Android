@@ -7,4 +7,12 @@
 
     <bool name="color_setup_user_expandable">true</bool>
 
+    <bool name="user_image_def_keep_aspect_ratio">true</bool>
+
+    <bool name="transformation_setup_card_default_expanded">false</bool>
+
+    <bool name="default_rotation_input_enabled">true</bool>
+    <bool name="default_scaling_input_enabled">true</bool>
+    <bool name="default_translation_input_enabled">true</bool>
+
 </resources>

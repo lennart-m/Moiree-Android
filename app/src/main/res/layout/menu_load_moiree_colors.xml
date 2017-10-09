@@ -3,15 +3,18 @@
 
     <data>
 
+        <import type="android.view.View"/>
+
         <variable
-            name="moireeColors"
-            type="de.lennartmeinhardt.android.moiree.MoireeColors"/>
+            name="expanded"
+            type="boolean"/>
+
     </data>
 
     <android.support.v7.widget.CardView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        style="@style/RootMenuCard.TwoColumns">
+        style="@style/LoadMoireeColorsMenu">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,9 +28,9 @@
                 android:layout_height="wrap_content"
                 app:displayOptions="showHome|homeAsUp"
                 app:navigationIcon="?homeAsUpIndicator"
-                app:title="@string/menu_colors"/>
+                app:title="@string/load_colors"/>
 
-            <ScrollView
+            <android.support.v4.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -36,30 +39,23 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
                     <include
-                        android:id="@+id/foreground_color_setup_card"
-                        layout="@layout/color_setup_card"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        app:color="@={moireeColors.foregroundColor}"
-                        app:title="@{@string/foreground}"/>
+                        android:id="@+id/custom_moiree_colors_setup"
+                        layout="@layout/card_custom_moiree_colors_setup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                     <include
-                        android:id="@+id/background_color_setup_card"
-                        layout="@layout/color_setup_card"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        app:color="@={moireeColors.backgroundColor}"
-                        app:title="@{@string/background}"/>
+                        android:id="@+id/preset_moiree_colors_setup"
+                        layout="@layout/card_preset_moiree_colors_setup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
 
-            </ScrollView>
+            </android.support.v4.widget.NestedScrollView>
 
         </LinearLayout>
 

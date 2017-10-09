@@ -24,7 +24,7 @@ public class AboutMenu extends MenuFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Button sendEmailButton = (Button) view.findViewById(R.id.send_email);
+        Button sendEmailButton = view.findViewById(R.id.send_email);
         sendEmailButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -32,7 +32,7 @@ public class AboutMenu extends MenuFragment {
             }
         });
 
-        Button viewSourceCodeButton = (Button) view.findViewById(R.id.view_source_code);
+        Button viewSourceCodeButton = view.findViewById(R.id.view_source_code);
         viewSourceCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -40,7 +40,7 @@ public class AboutMenu extends MenuFragment {
             }
         });
 
-        Button viewDesktopVersionButton = (Button) view.findViewById(R.id.view_desktop_version);
+        Button viewDesktopVersionButton = view.findViewById(R.id.view_desktop_version);
         viewDesktopVersionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,7 +48,7 @@ public class AboutMenu extends MenuFragment {
             }
         });
 
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 

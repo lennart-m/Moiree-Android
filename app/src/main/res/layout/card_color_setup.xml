@@ -3,6 +3,8 @@
 
     <data>
 
+        <import type="android.graphics.Color"/>
+
         <variable
             name="color"
             type="int"/>
@@ -43,25 +45,60 @@
                     app:color="@{color}"
                     app:title="@{title}"/>
 
-                <FrameLayout
+                <LinearLayout
                     android:id="@id/expandable_view_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/header_content_margin"
                     android:clipChildren="false"
-                    android:clipToPadding="false">
+                    android:clipToPadding="false"
+                    android:orientation="vertical">
 
                     <de.lennartmeinhardt.android.moiree.util.HsbColorPicker
                         xmlns:android="http://schemas.android.com/apk/res/android"
                         android:id="@+id/color_picker"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        android:layout_marginTop="5dp"
                         android:clipChildren="false"
                         android:clipToPadding="false"
                         android:padding="8dp"/>
                     <!--app:selectedColor="@={color}"-->
 
-                </FrameLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="@string/label_color_value"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical|end"
+                            android:text="@{@string/hex_formatter(Integer.toHexString(color).substring(2).toUpperCase())}"/>
+
+                        <View
+                            style="@style/Divider.Vertical"/>
+
+                        <ImageButton
+                            android:id="@+id/edit_color_button"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:adjustViewBounds="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/accessibility_edit_color_button"
+                            android:src="@drawable/ic_edit"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 

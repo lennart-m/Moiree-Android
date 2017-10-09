@@ -171,15 +171,18 @@ public class ImageCreatorFragment extends Fragment implements ImageCreatorHolder
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
 
-        if((!reusedSavedImage) && moireeImageCreator instanceof BaseBitmapMoireeImageCreator) {
+        if((! reusedSavedImage) && moireeImageCreator instanceof BaseBitmapMoireeImageCreator) {
+            long t = System.currentTimeMillis();
             Bitmap bitmap = ((BitmapDrawable) moireeImage).getBitmap();
             saveImageInInternalStorage(bitmap);
+            Log.d("moiree", "saved backup image in " + (System.currentTimeMillis() - t) + " ms");
             SharedPreferences.Editor backupPrefsEditor = preferencesForBackup.edit();
             storeImageCreatorToPreferences(backupPrefsEditor, moireeImageCreator);
             backupPrefsEditor.apply();
+            Log.d("moiree", "stored backup image type in preferences");
         }
 
         SharedPreferences.Editor preferencesEditor = preferences.edit();
@@ -203,28 +206,33 @@ public class ImageCreatorFragment extends Fragment implements ImageCreatorHolder
         }
     }
 
-    private void saveImageInInternalStorage(Bitmap bitmap) {
-        bitmap = getAsArgb8888(bitmap, true);
+    private void saveImageInInternalStorage(final Bitmap bitmap) {
+        File outFile = getInternalImageFile();
+        Bitmap bitmapAsArgb8888 = getAsArgb8888(bitmap, true);
 
         FileOutputStream outputStream = null;
-        File outFile = getInternalImageFile();
-
         try {
             outputStream = new FileOutputStream(outFile);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-            VersionHelper.storeCurrentVersionAsLastUsed(getActivity(), preferencesForBackup);
+            bitmapAsArgb8888.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            VersionHelper.storeCurrentVersionAsLastUsed(preferencesForBackup);
         } catch(IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                outputStream.close();
-            } catch (Exception ignored) {
+                if(outputStream != null)
+                    outputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
 
+    static File getInternalImageFile(Context context) {
+        return new File(context.getFilesDir(), FILE_NAME);
+    }
+
     private File getInternalImageFile() {
-        return new File(getActivity().getFilesDir(), FILE_NAME);
+        return getInternalImageFile(getActivity());
     }
 
     public void setImageCreatorAndRecreateImage(MoireeImageCreator moireeImageCreator) {

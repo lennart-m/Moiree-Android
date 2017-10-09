@@ -189,21 +189,21 @@ public class IntValueSetup extends BaseValueSetup {
 
     protected void onIncreaseButtonClicked() {
         increaseButtonInputActive = true;
-        stepAndTrimValue(stepSize, false);
+        stepAndTrimValue(stepSize);
         increaseButtonInputActive = false;
     }
 
     protected void onDecreaseButtonClicked() {
         decreaseButtonInputActive = true;
-        stepAndTrimValue(-stepSize, false);
+        stepAndTrimValue(-stepSize);
         decreaseButtonInputActive = false;
     }
 
-    private void stepAndTrimValue(int stepSize, boolean forceUpdate) {
+    private void stepAndTrimValue(int stepSize) {
         int newValue = value + stepSize;
         if(! allowStepOutOfBounds)
             newValue = trimValue(newValue);
-        setValueInternal(newValue, forceUpdate);
+        setValueInternal(newValue, false);
     }
 
     private int trimValue(int value) {

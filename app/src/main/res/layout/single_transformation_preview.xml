@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <variable
+            name="percentage"
+            type="float"/>
+
+        <variable
+            name="moireeTransformation"
+            type="de.lennartmeinhardt.android.moiree.MoireeTransformation"/>
+    </data>
+
+    <ImageView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha=".5"
+        android:background="#4000"
+        android:contentDescription="@null"
+        android:rotation="@{percentage * moireeTransformation.rotation}"
+        android:scaleX="@{(float) Math.pow(moireeTransformation.effectiveScalingX, percentage)}"
+        android:scaleY="@{(float) Math.pow(moireeTransformation.effectiveScalingY, percentage)}"
+        android:src="@drawable/preview_border"
+        android:translationX="@{percentage * moireeTransformation.translationX}"
+        android:translationY="@{-percentage * moireeTransformation.translationY}"/>
+
+</layout>

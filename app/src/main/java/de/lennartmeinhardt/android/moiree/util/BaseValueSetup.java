@@ -38,12 +38,12 @@ public abstract class BaseValueSetup extends RelativeLayout {
     private void inflateLayout(Context context) {
         inflate(context, R.layout.value_setup, this);
 
-        valueNameTextView = (TextView) findViewById(R.id.value_setup_name);
-        valueTextView = (TextView) findViewById(R.id.value_setup_value);
+        valueNameTextView = findViewById(R.id.value_setup_name);
+        valueTextView = findViewById(R.id.value_setup_value);
 
-        decreaseButton = (ImageButton) findViewById(R.id.value_setup_decrease_button);
-        increaseButton = (ImageButton) findViewById(R.id.value_setup_increase_button);
+        decreaseButton = findViewById(R.id.value_setup_decrease_button);
+        increaseButton = findViewById(R.id.value_setup_increase_button);
 
-        valueSeekbar = (SeekBar) findViewById(R.id.value_setup_slider);
+        valueSeekbar = findViewById(R.id.value_setup_slider);
     }
 }
